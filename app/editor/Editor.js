@@ -39,6 +39,7 @@ export default class Editor extends Component {
 	componentWillReceiveProps(nextProps) {
 		this.setState({...this.state, ...nextProps});
 		if(this.props.url !== nextProps.url) {
+			console.log('------------------');
 			this.resetPrograms(() => this.loadImage(nextProps.url))
 		}
 	}
