@@ -31,7 +31,12 @@ module.exports = {
 				},
 				exclude: /(node_modules)/,
 				include: [path.join(__dirname, 'app')]
-			}
+			},
+			{
+				test: /\.glsl$/,
+				loader: 'webpack-glsl',
+				include: [ path.join(__dirname, 'app') ],
+			},
 		],
 	}
 };
