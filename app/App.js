@@ -7,7 +7,7 @@ export default class App extends Component {
 
 	constructor(props) {
 		super(props);
-		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg'];
+		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test_big.jpg'];
 		this.state = {
 			url: 'test1.jpg',
 			width: 550,
