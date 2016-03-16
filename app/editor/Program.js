@@ -1,6 +1,7 @@
 import Texture from 'editor/Texture'
 
 import { createProgramFromSources } from 'editor/utils/shaderUtils'
+import { setRectangle } from 'editor/utils/webglUtils'
 import { isNumeric, isArray } from 'editor/utils/typeUtils'
 
 import defaultVertexSource from 'editor/shaders/default_vertex.glsl'
@@ -19,14 +20,18 @@ export default class Program {
         this.label = '[unlabeled]';
         this.width = 550;
         this.height = 400;
+        this.texture = null;
 	}
 
 	destroy() {
 		this.gl.deleteProgram(this.program);
         this.program = null;
+        if(this.texture) this.texture.destroy();
 	}
 
     resize(width, height) {
+        this.gl.useProgram(this.program);
+
         const resolutionLocation = this.gl.getUniformLocation(this.program, "u_resolution");
         this.gl.uniform2f(resolutionLocation, width, height);
         this.width = width;
@@ -34,8 +39,11 @@ export default class Program {
     }
 
     render() {
-        this.renderFunction.apply(this, [this.gl, this.program, ...this.renderArgs]);
-        this.drawRect();
+        console.log('rendering shader');
+        this.gl.useProgram(this.program);
+        this.preRender();
+        this.renderFunction.apply(this, [this.gl, this.program, this.texture, ...this.renderArgs]);
+        this.postRender();
     }
 
 	uniforms(uniforms) {
@@ -80,42 +88,46 @@ export default class Program {
         return this;
 	}
 
-	drawRect(left, top, right, bottom) {
+	preRender(left, top, right, bottom) {
+
+        const gl = this.gl;
+
+        const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
+
+        // provide texture coordinates for the rectangle.
+        const texCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            0.0,  0.0,
+            1.0,  0.0,
+            0.0,  1.0,
+            0.0,  1.0,
+            1.0,  0.0,
+            1.0,  1.0
+        ]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(texCoordLocation);
+        gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+    }
+
+    postRender() {
+
+        const gl = this.gl;
+
+        // look up where the vertex data needs to go.
+        const positionLocation = gl.getAttribLocation(this.program, "a_position");
+
+        // Create a buffer for the position of the rectangle corners.
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        // Set a rectangle the same size as the image.
+        setRectangle(gl, 0, 0, this.width, this.height);
 
 
-        // calculate draw dimensions based on viewport
-        const viewport = this.gl.getParameter(this.gl.VIEWPORT);
-        top = top !== undefined ? (top - viewport[1]) / viewport[3] : 0;
-        left = left !== undefined ? (left - viewport[0]) / viewport[2] : 0;
-        right = right !== undefined ? (right - viewport[0]) / viewport[2] : 1;
-        bottom = bottom !== undefined ? (bottom - viewport[1]) / viewport[3] : 1;
-
-        // creates a vertex buffer if ones doesn't exist
-        if (this.gl.vertexPositionBuffer == null) {
-            this.gl.vertexPositionBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.gl.vertexPositionBuffer);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([ 
-                left, top, 
-                left, bottom, 
-                right, top, 
-                right, bottom 
-            ]), this.gl.STATIC_DRAW);
-        }
-
-        // set and enable position location if not
-        if (this.vertexPositionLocation == null) {
-            this.vertexPositionLocation = this.gl.getAttribLocation(this.program, 'a_vertexPosition');
-            this.gl.enableVertexAttribArray(this.vertexPositionLocation);
-        }
-
-
-
-        this.gl.useProgram(this.program);
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.gl.vertexPositionBuffer);
-        this.gl.vertexAttribPointer(this.vertexPositionLocation, 2, this.gl.FLOAT, false, 0, 0);
-
-        this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
 }

@@ -65,29 +65,4 @@ export default class Texture {
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
 
-    drawTo(callback) {
-        // start rendering to this texture
-        this.gl.framebuffer = this.gl.framebuffer || this.gl.createFramebuffer();
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.gl.framebuffer);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.id, 0);
-        if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
-            throw new Error('incomplete framebuffer');
-        }
-
-        // do the drawing
-        callback();
-
-        // stop rendering to this texture
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-    }
-
-    swapWith(other) {
-        let temp = null;
-        temp = other.id; 	 other.id 	  = this.id; 	 this.id 	 = temp;
-        temp = other.width;  other.width  = this.width;  this.width  = temp;
-        temp = other.height; other.height = this.height; this.height = temp;
-        temp = other.format; other.format = this.format; this.format = temp;
-    }
-
-
 }
