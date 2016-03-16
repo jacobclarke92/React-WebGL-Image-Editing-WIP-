@@ -26,7 +26,6 @@ export default class Program {
 	destroy() {
 		this.gl.deleteProgram(this.program);
         this.program = null;
-        if(this.texture) this.texture.destroy();
 	}
 
     resize(width, height) {
