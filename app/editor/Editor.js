@@ -65,7 +65,7 @@ export default class Editor extends Component {
 		if(this.defaultProgram) this.defaultProgram.destroy();
 		this.defaultProgram = this.addProgram('hue');
 		this.defaultProgram.texture = this.imageTexture.id;
-		this.defaultProgram.uniforms({hue: this.props.hue,});
+		this.defaultProgram.uniforms({hue: this.props.hue});
 
 		this.setState({width: image.width, height: image.height}, () => {
 
