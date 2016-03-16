@@ -12,6 +12,7 @@ export default class App extends Component {
 			url: 'test1.jpg',
 			width: 550,
 			height: 400,
+			hue: 0,
 		}
 	}
 
@@ -25,15 +26,16 @@ export default class App extends Component {
 	}
 
 	render() {
-		const { url, width, height } = this.state;
+		const { url, width, height, hue } = this.state;
 		return (
 			<div>
 				<p>
 					{this.urls.map((url, i) => 
 						<button key={i} onClick={() => this.setUrl(url)}>Image {i+1}</button>
 					)}
+					<input type="range" min={0} max={2} step={0.01} defaultValue={0} onInput={event => this.setState({hue: event.target.value})} />
 				</p>
-				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} />
+				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} hue={hue} />
 			</div>
 		)
 	}

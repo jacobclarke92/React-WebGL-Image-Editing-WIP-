@@ -6,6 +6,8 @@ import Program from 'editor/Program'
 import Texture from 'editor/Texture'
 import Framebuffer from 'editor/Framebuffer'
 
+import { getProgramInfo } from 'editor/utils/webglUtils'
+
 export default class Editor extends Component {
 
 	static defaultProps = {
@@ -42,6 +44,10 @@ export default class Editor extends Component {
 			console.log('------------------');
 			this.resetPrograms(() => this.loadImage(nextProps.url))
 		}
+		if(this.props.hue !== nextProps.hue) {
+			this.defaultProgram.uniforms({hue: nextProps.hue});
+			this.defaultProgram.render();
+		}
 	}
 
 	loadImage(url) {
@@ -57,14 +63,17 @@ export default class Editor extends Component {
 		this.imageTexture.loadContentsOf(image);
 
 		if(this.defaultProgram) this.defaultProgram.destroy();
-		this.defaultProgram = this.addProgram('default');
+		this.defaultProgram = this.addProgram('hue');
 		this.defaultProgram.texture = this.imageTexture.id;
+		this.defaultProgram.uniforms({hue: this.props.hue,});
 
 		this.setState({width: image.width, height: image.height}, () => {
 
 			this.resizeViewport();
 			this.resizePrograms();
 			this.renderPrograms();
+
+			console.table(getProgramInfo(this.gl, this.defaultProgram.program).uniforms);
 
 		});
 	}

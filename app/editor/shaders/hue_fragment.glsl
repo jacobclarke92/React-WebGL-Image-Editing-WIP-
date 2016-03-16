@@ -1,10 +1,12 @@
+precision mediump float;
+
 uniform sampler2D texture;
 uniform float hue;
 
-varying vec2 texCoord;
+varying vec2 v_texCoord;
 
 void main() {
-	vec4 color = texture2D(texture, texCoord);
+	vec4 color = texture2D(texture, v_texCoord);
 
 	/* hue adjustment, wolfram alpha: RotationTransform[angle, {1, 1, 1}][{x, y, z}] */
 	float angle = hue * 3.14159265;
