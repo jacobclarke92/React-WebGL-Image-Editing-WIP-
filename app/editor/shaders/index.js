@@ -1,6 +1,7 @@
 import default_vertex from 'editor/shaders/default_vertex.glsl'
 import default_fragment from 'editor/shaders/default_fragment.glsl'
 
+import filter_vertex from 'editor/shaders/filter_vertex.glsl'
 import curves_fragment from 'editor/shaders/curves_fragment.glsl'
 import grain_fragment from 'editor/shaders/grain_fragment.glsl'
 import hue_fragment from 'editor/shaders/hue_fragment.glsl'
@@ -12,19 +13,19 @@ const Shaders = {
 		fragment: default_fragment,
 	},
 	curves: {
-		vertex: default_vertex,
+		vertex: filter_vertex,
 		fragment: curves_fragment,
 	},
 	grain: {
-		vertex: default_vertex,
+		vertex: filter_vertex,
 		fragment: grain_fragment,
 	},
 	hue: {
-		vertex: default_vertex,
+		vertex: filter_vertex,
 		fragment: hue_fragment,
 	},
 	saturation: {
-		vertex: default_vertex,
+		vertex: filter_vertex,
 		fragment: saturation_fragment,
 	},
 };
