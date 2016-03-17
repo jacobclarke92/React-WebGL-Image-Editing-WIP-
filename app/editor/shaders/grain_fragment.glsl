@@ -1,16 +1,18 @@
-uniform sampler2D texture;
-uniform float amount;
+precision mediump float;
 
-varying vec2 texCoord;
+uniform sampler2D texture;
+uniform float grain;
+
+varying vec2 v_texCoord;
 
 float rand(vec2 co) {
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
 void main() {
-    vec4 color = texture2D(texture, texCoord);
+    vec4 color = texture2D(texture, v_texCoord);
 
-    float diff = (rand(texCoord) - 0.5) * amount;
+    float diff = (rand(v_texCoord) - 0.5) * grain;
     color.r += diff;
     color.g += diff;
     color.b += diff;

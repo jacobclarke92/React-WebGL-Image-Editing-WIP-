@@ -1,10 +1,11 @@
 import React, { PropTypes, Component } from 'react'
+import deepEqual from 'deep-equal'
 
 import Shaders from 'editor/shaders'
 
 import Program from 'editor/Program'
 import Texture from 'editor/Texture'
-import Framebuffer from 'editor/Framebuffer'
+import FramebufferTexture from 'editor/FramebufferTexture'
 
 import { getProgramInfo } from 'editor/utils/webglUtils'
 
@@ -19,10 +20,12 @@ export default class Editor extends Component {
 
 	constructor(props) {
 		super();
+		this.programs = [];
+		this.framebuffers = [];
 		this.state = {
-			...props,
-			programs: [],
-		};
+			url: props.url,
+			settings: props.settings,
+		}
 	}
 
 	componentDidMount() {
@@ -39,12 +42,18 @@ export default class Editor extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState({...this.state, ...nextProps});
+		// update certain aspects of state
+		this.setState({settings: nextProps.settings});
+
+		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
 			console.log('------------------');
-			this.resetPrograms(() => this.loadImage(nextProps.url))
-		}
-		if(this.props.hue !== nextProps.hue || this.props.saturation !== nextProps.saturation) {
+			this.resetPrograms();
+			this.resetFramebuffers();
+			this.loadImage(nextProps.url);
+
+		// if settings have changed re-render canvas
+		}else if(!deepEqual(this.props.settings, nextProps.settings)) {
 			this.renderPrograms();
 		}
 	}
@@ -57,33 +66,18 @@ export default class Editor extends Component {
 	handleImageLoad(image) {
 		console.log('image loaded');
 
-		
-		// we make blank textures and assign them to framebuffers
-		this.textures = [];
-		this.framebuffers = [];
-
-		for(let i=0; i<2; i++) {
-			const texture = new Texture(this.gl, image.width, image.height);
-			this.textures.push(texture);
-			texture.loadEmpty();
-
-			const fbo = new Framebuffer(this.gl);
-			this.framebuffers.push(fbo);
-			fbo.attachTexture(texture.id);
-		}
-
-
-		// make texture for base image
+		// make texture for base image, destroy old one first if it exists
 		if(this.imageTexture) this.imageTexture.destroy();
 		this.imageTexture = new Texture(this.gl, image.width, image.height);
 		this.imageTexture.loadContentsOf(image);
 
-
 		// init base program to render base image
 		if(this.defaultProgram) this.defaultProgram.destroy();
-		this.defaultProgram = this.addProgram('saturation');
-		this.defaultProgram.texture = this.imageTexture.id;
+		this.defaultProgram = this.addProgram('default');
 
+		this.addProgram('hue');
+		this.addProgram('saturation');
+		this.addProgram('grain');
 
 		this.setState({width: image.width, height: image.height}, () => {
 
@@ -96,21 +90,40 @@ export default class Editor extends Component {
 		});
 	}
 
+	// this function returns either an existing framebuffer or a new framebuffer
+	getTempFramebuffer(index) {
+		const { width, height } = this.state;
+
+		if(!this.framebuffers[index]) {
+			this.framebuffers[index] = new FramebufferTexture(this.gl);
+			this.framebuffers[index].attachEmptyTexture(width, height);
+		}
+
+		return this.framebuffers[index];
+	}
+
 	addProgram(label) {
 		const shader = Shaders[label];
-		const program = new Program(this.gl, shader.vertex, shader.fragment, shader.render);
+		const program = new Program(this.gl, shader.vertex, shader.fragment);
 		program.label = label;
-		const programs = this.state.programs;
-		programs.push(program);
-		this.setState({programs});
+		this.programs.push(program);
 		return program;
 	}
 
-	resetPrograms(callback = () => {}) {
-		for(let program of this.state.programs) {
+	resetPrograms() {
+		for(let program of this.programs) {
 			program.destroy();
 		}
-		this.setState({programs: []}, callback);
+		this.programs = [];
+	}
+
+	resetFramebuffers() {
+		this.currentFramebufferIndex = -1;
+		for(let framebuffer of this.framebuffers) {
+			if(framebuffer.texture) framebuffer.texture.destroy();
+			framebuffer.destroy();
+		}
+		this.framebuffers = [];
 	}
 
 	resizeViewport() {
@@ -122,33 +135,50 @@ export default class Editor extends Component {
 	}
 
 	resizePrograms() {
-		const { width, height, programs } = this.state;
-		for(let program of programs) {
+		const { width, height } = this.state;
+		for(let program of this.programs) {
 			program.resize(width, height);
 		}
 	}
 
 	renderPrograms() {
-		const { programs } = this.state;
+		const { settings } = this.state;
 
-		let count = 0;
-		for(let count = 0; count < programs.length; count ++) {
-			const program = programs[count];
+		for(let count = 0; count < this.programs.length; count ++) {
+			const program = this.programs[count];
 
-			if(count === programs.length-1) {
-				// binding framebuffer of null means to render to canvas instead of framebuffer
-				this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-			}else{
-				// if not last edit then render on to one of our framebuffers
-				this.framebuffers[count % 2].use();
-			}
-			if(this.state.hasOwnProperty(program.label)) {
+			// switch to program
+			program.use();
+
+			// update program's uniforms vars if they exist in our settings
+			if(settings.hasOwnProperty(program.label)) {
 				program.uniforms({
-					[program.label]: this.state[program.label],
+					[program.label]: settings[program.label],
 				});
 			}
-			program.render();
-			count ++;
+
+			// determine source texture - original image texture if first pass or a framebuffer texture
+			const source = count === 0 ? this.imageTexture.id : this.getTempFramebuffer(this.currentFramebufferIndex).texture.id;
+			
+			// determine render target, set to null if last one because null = canvas
+			let target = null;
+			if(count < this.programs.length-1) {
+				this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
+				target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+			}
+
+			// pre-render calcs idk
+			program.willRender();
+
+			// use current source texture and framebuffer target
+			this.gl.bindTexture(this.gl.TEXTURE_2D, source);
+			this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+
+			// post-render calcs idk
+			program.didRender();
+
+			// draw that shit
+			program.draw();
 		}
 
 	}

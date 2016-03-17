@@ -1,9 +1,13 @@
-export default class Framebuffer {
+import Texture from 'editor/Texture'
+
+export default class FramebufferTexture {
 
 	constructor(gl) {
 		this.gl = gl;
 		this.id = gl.createFramebuffer();
 		this.use();
+		
+		this.texture = null
 
 		return this;
 	}
@@ -18,6 +22,12 @@ export default class Framebuffer {
 		);
 		
 		return this;
+	}
+
+	attachEmptyTexture(width, height) {
+		this.texture = new Texture(this.gl, width, height);
+		this.texture.loadEmpty();
+		this.attachTexture(this.texture.id);
 	}
 
 	destroy() {

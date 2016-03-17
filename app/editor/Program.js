@@ -9,18 +9,14 @@ import defaultFragmentSource from 'editor/shaders/default_fragment.glsl'
 
 export default class Program {
 
-	constructor(gl, vertexSource = defaultVertexSource, fragmentSource = defaultFragmentSource, renderFunction = () => {}) {
+	constructor(gl, vertexSource = defaultVertexSource, fragmentSource = defaultFragmentSource) {
 		if(!gl) throw 'No GL instance provided for shader';
 		this.gl = gl;
 		this.program = createProgramFromSources(this.gl, vertexSource, fragmentSource);
-        this.renderFunction = renderFunction;
 
-		this.vertexPositionLocation = null;
-        this.renderArgs = [];
         this.label = '[unlabeled]';
-        this.width = 550;
-        this.height = 400;
-        this.texture = null;
+        this.width = 100;
+        this.height = 100;
 
         return this;
 	}
@@ -42,17 +38,6 @@ export default class Program {
         this.gl.uniform2f(resolutionLocation, width, height);
         this.width = width;
         this.height = height;
-
-        return this;
-    }
-
-    render() {
-        console.log('rendering shader');
-        this.use();
-
-        this.preRender();
-        this.renderFunction.apply(this, [this.gl, this.program, this.texture, ...this.renderArgs]);
-        this.postRender();
 
         return this;
     }
@@ -97,7 +82,7 @@ export default class Program {
         return this;
 	}
 
-	preRender(left, top, right, bottom) {
+	willRender(left, top, right, bottom) {
 
         const gl = this.gl;
         const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
@@ -117,9 +102,10 @@ export default class Program {
         gl.enableVertexAttribArray(texCoordLocation);
         gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
+        return this;
     }
 
-    postRender() {
+    didRender() {
 
         const gl = this.gl;
         // look up where the vertex data needs to go.
@@ -135,8 +121,14 @@ export default class Program {
         // Set a rectangle the same size as the image.
         setRectangle(gl, 0, 0, this.width, this.height);
 
+        return this;
+    }
 
+    draw() {
+        const gl = this.gl;
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+        
+        return this;
     }
 
 }

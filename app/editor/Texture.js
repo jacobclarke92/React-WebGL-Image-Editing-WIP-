@@ -58,7 +58,8 @@ export default class Texture {
         this.type = this.gl.UNSIGNED_BYTE;
 
         // make sure gl is using this texture
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+        this.use();
+        // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
 
         // write bytearray to texture
         this.gl.texImage2D(
@@ -77,6 +78,8 @@ export default class Texture {
     }
 
     loadEmpty() {
+        this.use();
+        
         this.gl.texImage2D(
             this.gl.TEXTURE_2D, 
             0, 
@@ -93,13 +96,13 @@ export default class Texture {
     }
 
     use(unit) {
-        this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
+        // this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
         return this;
     }
 
     unuse(unit) {
-        this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
+        // this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         return this;
     }
