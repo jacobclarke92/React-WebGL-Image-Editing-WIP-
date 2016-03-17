@@ -13,6 +13,7 @@ export default class App extends Component {
 			width: 550,
 			height: 400,
 			hue: 0,
+			saturation: 0,
 		}
 	}
 
@@ -26,16 +27,23 @@ export default class App extends Component {
 	}
 
 	render() {
-		const { url, width, height, hue } = this.state;
+		const { url, width, height, hue, saturation } = this.state;
 		return (
 			<div>
 				<p>
 					{this.urls.map((url, i) => 
 						<button key={i} onClick={() => this.setUrl(url)}>Image {i+1}</button>
 					)}
-					<input type="range" min={0} max={2} step={0.01} defaultValue={0} onInput={event => this.setState({hue: event.target.value})} />
+					<label>
+						Hue
+						<input type="range" min={0} max={2} step={0.01} defaultValue={0} onInput={event => this.setState({hue: event.target.value})} />
+					</label>
+					<label>
+						Saturation
+						<input type="range" min={0} max={0.9} step={0.01} defaultValue={0} onInput={event => this.setState({saturation: event.target.value})} />
+					</label>
 				</p>
-				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} hue={hue} />
+				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} hue={hue} saturation={saturation} />
 			</div>
 		)
 	}

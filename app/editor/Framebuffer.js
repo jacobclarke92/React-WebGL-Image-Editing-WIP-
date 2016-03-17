@@ -3,9 +3,8 @@ export default class Framebuffer {
 	constructor(gl) {
 		this.gl = gl;
 		this.id = gl.createFramebuffer();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this.id);
+		this.use();
 
-		// allow chaining
 		return this;
 	}
 
@@ -18,7 +17,21 @@ export default class Framebuffer {
 			0
 		);
 		
-		// allow chaining
+		return this;
+	}
+
+	destroy() {
+		this.gl.deleteFramebuffer(this.id);
+		this.id = null;
+	}
+
+	use() {
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.id);
+		return this;
+	}
+
+	unuse() {
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 		return this;
 	}
 

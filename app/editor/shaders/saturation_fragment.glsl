@@ -1,10 +1,12 @@
+precision mediump float;
+
 uniform sampler2D texture;
 uniform float saturation;
 
-varying vec2 texCoord;
+varying vec2 v_texCoord;
 
 void main() {
-	vec4 color = texture2D(texture, texCoord);
+	vec4 color = texture2D(texture, v_texCoord);
 
 	/* saturation adjustment */
 	float average = (color.r + color.g + color.b) / 3.0;

@@ -21,6 +21,8 @@ export default class Program {
         this.width = 550;
         this.height = 400;
         this.texture = null;
+
+        return this;
 	}
 
 	destroy() {
@@ -28,26 +30,36 @@ export default class Program {
         this.program = null;
 	}
 
-    resize(width, height) {
+    use() {
         this.gl.useProgram(this.program);
+        return this;
+    }
+
+    resize(width, height) {
+        this.use();
 
         const resolutionLocation = this.gl.getUniformLocation(this.program, "u_resolution");
         this.gl.uniform2f(resolutionLocation, width, height);
         this.width = width;
         this.height = height;
+
+        return this;
     }
 
     render() {
         console.log('rendering shader');
-        this.gl.useProgram(this.program);
+        this.use();
+
         this.preRender();
         this.renderFunction.apply(this, [this.gl, this.program, this.texture, ...this.renderArgs]);
         this.postRender();
+
+        return this;
     }
 
 	uniforms(uniforms) {
 
-		this.gl.useProgram(this.program);
+		this.use();
         for (let name in uniforms) {
             if (!uniforms.hasOwnProperty(name)) continue;
 
@@ -72,30 +84,27 @@ export default class Program {
             }
         }
 
-        // allow chaining
         return this;
 	}
 
 	textures(textures) {
-		this.gl.useProgram(this.program);
+		this.use();
         for (let name in textures) {
             if (!textures.hasOwnProperty(name)) continue;
             this.gl.uniform1i(this.gl.getUniformLocation(this.program, name), textures[name]);
         }
 
-        // allow chaining
         return this;
 	}
 
 	preRender(left, top, right, bottom) {
 
         const gl = this.gl;
-
         const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
+        if(!this.texCoordBuffer) this.texCoordBuffer = gl.createBuffer();
 
-        // provide texture coordinates for the rectangle.
-        const texCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+        // use tex coord buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
             0.0,  0.0,
             1.0,  0.0,
@@ -104,6 +113,7 @@ export default class Program {
             1.0,  0.0,
             1.0,  1.0
         ]), gl.STATIC_DRAW);
+
         gl.enableVertexAttribArray(texCoordLocation);
         gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
@@ -112,16 +122,16 @@ export default class Program {
     postRender() {
 
         const gl = this.gl;
-
         // look up where the vertex data needs to go.
         const positionLocation = gl.getAttribLocation(this.program, "a_position");
+        if(!this.buffer) this.buffer = gl.createBuffer();
 
-        // Create a buffer for the position of the rectangle corners.
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.enableVertexAttribArray(positionLocation);
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
+        // use this buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         // Set a rectangle the same size as the image.
         setRectangle(gl, 0, 0, this.width, this.height);
 

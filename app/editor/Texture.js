@@ -4,8 +4,8 @@ export default class Texture {
 		this.gl = gl;
 		this.width = width;
 		this.height = height;
-		this.format = format;
-		this.type = type;
+		this.format = format || gl.RGBA;
+		this.type = type || gl.UNSIGNED_BYTE;
 
 		this.id = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, this.id);
@@ -25,23 +25,33 @@ export default class Texture {
     }
 
 	loadContentsOf(element) {
-		// update dimensions in case they changed
-        if(element) {
-        	this.width = element.width || element.videoWidth;
-        	this.height = element.height || element.videoHeight;
+
+        if(!element) {
+            console.log('No element provided to load into texture');
+            return this;
         }
 
-        // make sure gl is using this texture
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+		// update dimensions in case they changed
+        this.width = element.width || element.videoWidth;
+        this.height = element.height || element.videoHeight;
 
         // write image/video element to texture
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, element);
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D, 
+            0, 
+            this.format, 
+            this.format, 
+            this.type, 
+            element
+        );
+
+        return this;
     }
 
     loadFromBytes(data, width, height) {
     	// update dimensions in case they changed
-        this.width = width;
-        this.height = height;
+        this.width = width || this.width;
+        this.height = height || this.height;
 
         // change format and type to correspond to byte array
         this.format = this.gl.RGBA;
@@ -51,18 +61,47 @@ export default class Texture {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
 
         // write bytearray to texture
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.type, new Uint8Array(data));
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D, 
+            0, 
+            this.format, 
+            this.width, 
+            this.height, 
+            0, 
+            this.format, 
+            this.type, 
+            new Uint8Array(data)
+        );
+
+        return this;
     }
 
+    loadEmpty() {
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D, 
+            0, 
+            this.format, 
+            this.width, 
+            this.height, 
+            0,
+            this.format, 
+            this.type, 
+            null
+        );
+
+        return this;
+    }
 
     use(unit) {
         this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+        return this;
     }
 
     unuse(unit) {
         this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        return this;
     }
 
 }
