@@ -37,6 +37,11 @@ module.exports = {
 				loader: 'webpack-glsl',
 				include: [ path.join(__dirname, 'app') ],
 			},
+			{
+				test: /\.json$/,
+				loader: 'json',
+				include: [path.join(__dirname, 'app')],
+			},
 		],
 	}
 };
