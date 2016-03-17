@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch",
+    "watch": "python -m SimpleHTTPServer && webpack --watch",
     "deploy": "webpack -p"
   },
   "repository": {
