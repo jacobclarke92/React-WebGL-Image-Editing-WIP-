@@ -43,7 +43,7 @@ export function createTextureFromImage(gl, image) {
 	return texture;
 }
 
-export function setRectangle(gl, x, y, width, height) {
+export function setBufferRectangle(gl, x, y, width, height) {
     var x1 = x;
     var x2 = x + width;
     var y1 = y;

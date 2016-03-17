@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import autobind from 'autobind-decorator'
 
-import Editor from 'editor/Editor'
+import Editor from 'editor/components/Editor'
 
 const effects = [
 	{
@@ -13,8 +13,8 @@ const effects = [
 	},
 	{
 		label: 'saturation',
-		min: 0,
-		max: 0.9,
+		min: -1,
+		max: 0.8,
 		step: 0.01,
 		defaultValue: 0,
 	},

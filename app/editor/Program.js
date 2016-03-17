@@ -1,7 +1,7 @@
 import Texture from 'editor/Texture'
 
 import { createProgramFromSources } from 'editor/utils/shaderUtils'
-import { setRectangle } from 'editor/utils/webglUtils'
+import { setBufferRectangle } from 'editor/utils/webglUtils'
 import { isNumeric, isArray } from 'editor/utils/typeUtils'
 
 import defaultVertexSource from 'editor/shaders/default_vertex.glsl'
@@ -119,7 +119,7 @@ export default class Program {
         // use this buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         // Set a rectangle the same size as the image.
-        setRectangle(gl, 0, 0, this.width, this.height);
+        setBufferRectangle(gl, 0, 0, this.width, this.height);
 
         return this;
     }
