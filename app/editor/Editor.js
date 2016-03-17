@@ -22,6 +22,7 @@ export default class Editor extends Component {
 		super();
 		this.programs = [];
 		this.framebuffers = [];
+		this.currentFramebufferIndex = -1;
 		this.state = {
 			url: props.url,
 			settings: props.settings,
@@ -150,7 +151,7 @@ export default class Editor extends Component {
 			// switch to program
 			program.use();
 
-			// update program's uniforms vars if they exist in our settings
+			// update program's uniforms vars if they exist in our state settings
 			if(settings.hasOwnProperty(program.label)) {
 				program.uniforms({
 					[program.label]: settings[program.label],
@@ -179,8 +180,8 @@ export default class Editor extends Component {
 
 			// draw that shit
 			program.draw();
-		}
 
+		}
 	}
 
 	render() {
