@@ -23,6 +23,13 @@ const adjustmentProperties = [
 		defaultValue: 0,
 	},
 	{
+		label: 'vibrance',
+		min: 0,
+		max: 100,
+		step: 1,
+		defaultValue: 0,
+	},
+	{
 		label: 'grain',
 		min: 0,
 		max: 0.5,
