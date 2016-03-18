@@ -2,19 +2,31 @@
 	{
 		"title": "cinematic",
 		"steps": [
-			{"key": "curves", "value": ["rgb", 
-				[0, 20],
-				[100, 50],
-				[255, 200]
-			]},
+			{
+				"key": "curves", 
+				"value": {
+					"channels": "rgb", 
+					"curves": [
+						[0, 20],
+						[100, 50],
+						[255, 200]
+					]
+				}
+			},
 			{"key": "exposure", "value": 16},
 			{"key": "contrast", "value": 12},
-			{"key": "curves", "value": ["rgb", 
-				[0, 0], 
-				[70, 110], 
-				[190, 230], 
-				[255, 255]
-			]},
+			{
+				"key": "curves", 
+				"value": {
+					"channels": "rgb", 
+					"curves": [
+						[0, 0], 
+						[70, 110], 
+						[190, 230], 
+						[255, 255]
+					]
+				}
+			},
 			{"key": "saturation", "value": -20},
 			{"key": "gamma", "value": 1.8}
 		]
@@ -27,13 +39,18 @@
 			{"key": "contrast", "value": 5},
 			{"key": "sharpen", "value": 50},
 			{"key": "grain", "value": 0.4},
-			{"key": "curves", "value": [
-				"rgb", 
-				[0, 25], 
-				[46, 54], 
-				[121, 125], 
-				[255, 252]
-			]}
+			{
+				"key": "curves", 
+				"value": {
+					"channels": "rgb", 
+					"curves": [
+						[0, 25], 
+						[46, 54], 
+						[121, 125], 
+						[255, 252]
+					]
+				}
+			}
 		]
 	},
 	{
@@ -41,7 +58,18 @@
 		"steps": [
 			{"key":"exposure","value": 5},
 			{"key":"contrast","value": 9},
-			{"key":"curves","value": ["rgb", [0,80], [100,100], [180,180], [255,222], null]},
+			{
+				"key":"curves",
+				"value": {
+					"channels": "rgb",
+					"curves": [
+						[0,80], 
+						[100,100], 
+						[180,180], 
+						[255,222]
+					]
+				}
+			},
 			{"key":"vibrance","value": 30},
 			{"key":"saturation","value": -13}
 		]
@@ -52,12 +80,18 @@
 			{"key": "temperature", "value": [7700]},
 			{"key": "exposure", "value": 16},
 			{"key": "contrast", "value": 20},
-			{"key": "curves", "value": ["rgb", 
-				[0, 55], 
-				[100, 100], 
-				[180, 180], 
-				[255, 240]
-			]},
+			{
+				"key": "curves", 
+				"value": {
+					"channels": "rgb", 
+					"curves": [
+						[0, 55], 
+						[100, 100], 
+						[180, 180], 
+						[255, 240]
+					]
+				}
+			},
 			{"key": "vibrance", "value": 20},
 			{"key": "sharpen", "value": 25}
 		]
@@ -75,7 +109,13 @@
 	{
 		"title": "badDisposable",
 		"steps": [
-			{"key": "channels", "value": {"red": 15.0, "blue": 15.0}},
+			{
+				"key": "channels", 
+				"value": {
+					"red": 15.0, 
+					"blue": 15.0
+				}
+			},
 			{"key": "grain", "value": 0.5}
 		]
 	}
