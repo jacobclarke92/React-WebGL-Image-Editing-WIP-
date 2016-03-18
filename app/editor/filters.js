@@ -20,12 +20,22 @@ export function temperature(amount) {
 	};
 }
 
+export function curves(options) {
+	const channels = options.channels || 'rgb';
+	const curves = options.curves || [[0,0], [255, 255]];
+	return {
+		key: 'curves',
+		channels,
+		curves,
+	}
+}
+
 export function exposure(amount) {
 
-	const p = Math.abs(adjust) / 100;
+	const p = Math.abs(amount) / 100;
 	const ctrl1 = [0, 255*p];
 	const ctrl2 = [255 - (255*p), 255];
-	if(adjust < 0) {
+	if(amount < 0) {
 		ctrl1.reverse();
 		ctrl2.reverse();
 	}
