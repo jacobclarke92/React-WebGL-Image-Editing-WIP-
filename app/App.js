@@ -17,10 +17,10 @@ const adjustmentProperties = [
 	},
 	{
 		label: 'gamma',
-		min: 0,
+		min: 0.2,
 		max: 4,
-		step: 0.02,
-		defaultValue: 2,
+		step: 0.01,
+		defaultValue: 1,
 	},
 	{
 		label: 'saturation',
