@@ -9,12 +9,13 @@ import defaultFragmentSource from 'editor/shaders/default_fragment.glsl'
 
 export default class Program {
 
-	constructor(gl, vertexSource = defaultVertexSource, fragmentSource = defaultFragmentSource) {
+	constructor(label = '[[unlabeled]]', gl, vertexSource = defaultVertexSource, fragmentSource = defaultFragmentSource, updateFunction = () => {}) {
 		if(!gl) throw 'No GL instance provided for shader';
 		this.gl = gl;
 		this.program = createProgramFromSources(this.gl, vertexSource, fragmentSource);
 
-        this.label = '[unlabeled]';
+        this.updateFunction = updateFunction;
+        this.label = label;
         this.width = 100;
         this.height = 100;
 
@@ -42,6 +43,10 @@ export default class Program {
         return this;
     }
 
+    update(settings) {
+        this.updateFunction.call(this, settings);
+    }
+
 	uniforms(uniforms) {
 
 		this.use();
@@ -49,7 +54,8 @@ export default class Program {
             if (!uniforms.hasOwnProperty(name)) continue;
 
             const location = this.gl.getUniformLocation(this.program, name);
-            if (location === null) continue; // will be null if the uniform isn't used in the shader
+            // ignore uniform variable if it doesn't exist in the vertex/fragment
+            if (location === null) continue;
 
             const value = uniforms[name];
             if (isArray(value)) {

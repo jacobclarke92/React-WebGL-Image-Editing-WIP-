@@ -16,6 +16,7 @@ export default class Editor extends Component {
 		width: 400,
 		height: 400,
 		onResize: () => {},
+		editSteps: [],
 	}
 
 	constructor(props) {
@@ -23,6 +24,7 @@ export default class Editor extends Component {
 		this.programs = [];
 		this.framebuffers = [];
 		this.currentFramebufferIndex = -1;
+		this.lastEditStepsKeys = props.editSteps.map(editStep => editStep.key);
 		this.state = {
 			url: props.url,
 			settings: props.settings,
@@ -46,16 +48,30 @@ export default class Editor extends Component {
 		// update certain aspects of state
 		this.setState({settings: nextProps.settings});
 
+		const editStepsKeys = nextProps.editSteps.map(editStep => editStep.key);
+
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
 			console.log('------------------');
 			this.resetPrograms();
 			this.resetFramebuffers();
+			this.lastEditStepsKeys = editStepsKeys;
 			this.loadImage(nextProps.url);
 
-		// if settings have changed re-render canvas
-		}else if(!deepEqual(this.props.settings, nextProps.settings)) {
-			this.renderPrograms();
+		}else{
+
+			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
+				console.log('---');
+				console.log('editStepsKeys changed');
+				this.lastEditStepsKeys = editStepsKeys;
+				this.buildPrograms();
+				this.renderEditSteps();
+
+			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
+				console.log('---');
+				console.log('editSteps changed');
+				this.renderEditSteps();
+			}
 		}
 	}
 
@@ -74,17 +90,15 @@ export default class Editor extends Component {
 
 		// init base program to render base image
 		if(this.defaultProgram) this.defaultProgram.destroy();
-		this.defaultProgram = this.addProgram('default');
+		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
 
-		this.addProgram('hue');
-		this.addProgram('saturation');
-		this.addProgram('grain');
+		this.buildPrograms();
 
 		this.setState({width: image.width, height: image.height}, () => {
 
 			this.resizeViewport();
 			this.resizePrograms();
-			this.renderPrograms();
+			this.renderEditSteps();
 
 			console.table(getProgramInfo(this.gl, this.defaultProgram.program).uniforms);
 
@@ -103,10 +117,21 @@ export default class Editor extends Component {
 		return this.framebuffers[index];
 	}
 
+	buildPrograms(programList = this.lastEditStepsKeys) {
+		console.log('building programs', programList);
+		this.resetPrograms();
+		programList.map(filterLabel => {
+			this.addProgram(filterLabel);
+		});
+	}
+
 	addProgram(label) {
 		const shader = Shaders[label];
-		const program = new Program(this.gl, shader.vertex, shader.fragment);
-		program.label = label;
+		if(!shader) {
+			console.warn('No shader found for:', label);
+			return;
+		}
+		const program = new Program(label, this.gl, shader.vertex, shader.fragment, shader.update);
 		this.programs.push(program);
 		return program;
 	}
@@ -142,21 +167,22 @@ export default class Editor extends Component {
 		}
 	}
 
-	renderPrograms() {
-		const { settings } = this.state;
+	renderEditSteps() {
+		const { editSteps } = this.props;
 
-		for(let count = 0; count < this.programs.length; count ++) {
-			const program = this.programs[count];
+		const steps = [{key: 'default'}, ...editSteps];
+
+		console.log('render steps', steps);
+
+		for(let count = 0; count < steps.length; count ++) {
+			const step = steps[count];
+			const program = count === 0 ? this.defaultProgram : this.programs[count-1];
 
 			// switch to program
 			program.use();
 
-			// update program's uniforms vars if they exist in our state settings
-			if(settings.hasOwnProperty(program.label)) {
-				program.uniforms({
-					[program.label]: settings[program.label],
-				});
-			}
+			// run the shader's update function -- modifies uniforms
+			program.update(step);
 
 			// determine source texture - original image texture if first pass or a framebuffer texture
 			const source = count === 0 ? this.imageTexture.id : this.getTempFramebuffer(this.currentFramebufferIndex).texture.id;
@@ -180,6 +206,8 @@ export default class Editor extends Component {
 
 			// draw that shit
 			program.draw();
+
+			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 
 		}
 	}

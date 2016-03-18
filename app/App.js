@@ -2,8 +2,12 @@ import React, { PropTypes, Component } from 'react'
 import autobind from 'autobind-decorator'
 
 import Editor from 'editor/components/Editor'
+import * as Filters from 'editor/filters'
+import filterPresets from 'editor/constants/presets.json'
 
-const effects = [
+import { isArray } from 'editor/utils/typeUtils'
+
+const adjustmentProperties = [
 	{
 		label: 'hue',
 		min: 0,
@@ -27,18 +31,32 @@ const effects = [
 	},
 ];
 
+const adjustmentOrder = [
+	'temperature',
+	'exposure',
+	'contrast',
+	'curves',
+	'fade',
+	'vibrance',
+	'saturation',
+	'sharpen',
+	'grain',
+];
+
 export default class App extends Component {
 
 	constructor(props) {
 		super(props);
 		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test_big.jpg'];
-		const settings = {};
-		effects.map(effect => settings[effect.label] = effect.defaultValue);
+		const adjustments = {};
+		adjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		this.state = {
 			url: 'test1.jpg',
 			width: 550,
 			height: 400,
-			settings,
+			adjustments,
+			editSteps: [],
+			currentFilter: [],
 		}
 	}
 
@@ -52,14 +70,25 @@ export default class App extends Component {
 	}
 
 	setValue(key, value) {
-		const { settings } = this.state;
+		const { adjustments } = this.state;
 		if(typeof value == 'string') value = parseFloat(value);
-		settings[key] = value;
-		this.setState({settings});
+		adjustments[key] = value;
+		const editSteps = this.generateEditSteps(adjustments);
+		this.setState({adjustments, editSteps});
+	}
+
+	generateEditSteps(adjustments) {
+		const { currentFilter } = this.state;
+		const editSteps = [];
+		Object.keys(adjustments).map(adjustment => {
+			const adjustmentValue = adjustments[adjustment];
+			editSteps.push(Filters[adjustment](adjustmentValue));
+		});
+		return [...editSteps, ...currentFilter]
 	}
 
 	render() {
-		const { url, width, height, settings } = this.state;
+		const { url, width, height, adjustments, editSteps } = this.state;
 		return (
 			<div>
 				<p>
@@ -68,8 +97,8 @@ export default class App extends Component {
 					)}
 				</p>
 				<p>
-					{Object.keys(settings).map((key, i) => {
-						const { label, ...inputAttrs } = effects.filter(effect => effect.label === key)[0];
+					{Object.keys(adjustments).map((key, i) => {
+						const { label, ...inputAttrs } = adjustmentProperties.filter(effect => effect.label === key)[0];
 						return (
 							<label key={i}>
 								<input type="range" {...inputAttrs} onInput={event => this.setValue(key, event.target.value)} />
@@ -79,7 +108,7 @@ export default class App extends Component {
 						)
 					})}
 				</p>
-				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} settings={{...settings}} />
+				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
 			</div>
 		)
 	}
