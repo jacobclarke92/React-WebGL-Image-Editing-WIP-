@@ -113,6 +113,14 @@ export function sharpen(amount) {
 	};
 }
 
+export function gamma(amount) {
+	const value = clamp(amount, 0, 10);
+	return {
+		key: 'gamma',
+		value
+	}
+}
+
 export function grain(amount) {
 	const value = clamp(amount, 0, 1);
 	return {
