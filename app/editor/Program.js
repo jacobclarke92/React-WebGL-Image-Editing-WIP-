@@ -68,7 +68,7 @@ export default class Program {
                     case 16: this.gl.uniformMatrix4fv(location, false, new Float32Array(value)); break;
                     default: throw 'dont\'t know how to load uniform "' + name + '" of length ' + value.length;
                 }
-            } else if (isNumeric(value)) {
+            } else if (isNumeric(value) || typeof value == 'boolean') {
                 this.gl.uniform1f(location, value);
             } else {
                 throw 'attempted to set uniform "' + name + '" to invalid value ' + (value || 'undefined').toString();

@@ -35,7 +35,14 @@
 		"title": "crispyMorning",
 		"steps": [
 			{"key": "saturation", "value": 10},
-			{"key": "channels", "value": {"red": 5, "green": 8, "blue": 8}},
+			{
+				"key": "channels", 
+				"value": {
+					"red": 5, 
+					"green": 8, 
+					"blue": 8
+				}
+			},
 			{"key": "contrast", "value": 5},
 			{"key": "sharpen", "value": 50},
 			{"key": "grain", "value": 0.4},
