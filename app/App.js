@@ -38,8 +38,8 @@ const adjustmentProperties = [
 	},
 	{
 		label: 'temperature',
-		min: 4000,
-		max: 8000,
+		min: 4600,
+		max: 8600,
 		step: 100,
 		defaultValue: 6700,
 	},
@@ -101,10 +101,18 @@ export default class App extends Component {
 
 	setFilter(filterPreset) {
 		const { adjustmentSteps } = this.state;
+		
+		const filterAdjustments = {};
+		// convert array of objects with keys 'key' & 'value' to associative object e.g. key: value
+		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
+
+		// generate adjustment steps
+		const filterSteps = this.generateEditStepsFromAdjustments(filterAdjustments);
+
 		this.setState({
 			filterName: filterPreset.title,
-			filterSteps: filterPreset.steps,
-			editSteps: [...adjustmentSteps, ...filterPreset.steps],
+			filterSteps,
+			editSteps: [...adjustmentSteps, ...filterSteps],
 		});
 	}
 

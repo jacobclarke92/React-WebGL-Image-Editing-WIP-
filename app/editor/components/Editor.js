@@ -66,7 +66,9 @@ export default class Editor extends Component {
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms();
 				this.resizePrograms();
-				this.renderEditSteps();
+
+				// Wait until props have been updated before re-rendering
+				this.setState({}, () => this.renderEditSteps());
 
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
 				console.log('---');
