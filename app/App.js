@@ -29,6 +29,13 @@ const adjustmentProperties = [
 		step: 0.01,
 		defaultValue: 0,
 	},
+	{
+		label: 'temperature',
+		min: 4000,
+		max: 8000,
+		step: 100,
+		defaultValue: 6700,
+	},
 	// {
 	// 	label: 'fade',
 	// 	min: 0,

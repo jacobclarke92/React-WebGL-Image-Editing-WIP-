@@ -4,8 +4,8 @@ import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB
 
 export function temperature(amount) {
 
-	const {red, green, blue} = getTemperatureRGB(adjust);
-	console.log('Temperature: '+adjust+' K', red, green, blue);
+	const {red, green, blue} = getTemperatureRGB(amount);
+	console.log('Temperature: '+amount+' K', red, green, blue);
 
 	const matrix = [
 		red/255,	0,	0,	0,	0,

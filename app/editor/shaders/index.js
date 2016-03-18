@@ -8,6 +8,8 @@ import curves_fragment from 'editor/shaders/curves_fragment.glsl'
 import grain_fragment from 'editor/shaders/grain_fragment.glsl'
 import hue_fragment from 'editor/shaders/hue_fragment.glsl'
 import saturation_fragment from 'editor/shaders/saturation_fragment.glsl'
+import colorMatrix_update from 'editor/shaders/colorMatrix_update'
+import colorMatrix_fragment from 'editor/shaders/colorMatrix_fragment.glsl'
 
 const Shaders = {
 	default: {
@@ -19,6 +21,11 @@ const Shaders = {
 		update: curves_update,
 		vertex: filter_vertex,
 		fragment: curves_fragment,
+	},
+	colorMatrix: {
+		update: colorMatrix_update,
+		vertex: filter_vertex,
+		fragment: colorMatrix_fragment,
 	},
 	grain: {
 		update: default_update,

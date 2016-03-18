@@ -39,7 +39,7 @@
 			},
 			{"key": "contrast", "value": 5},
 			{"key": "sharpen", "value": 50},
-			{"key": "noise", "value": 8},
+			{"key": "grain", "value": 8},
 			{
 				"key": "curves", 
 				"channels": "rgb",
@@ -109,7 +109,7 @@
 				"red": 15,
 				"blue": 15
 			},
-			{"key": "noise", "value": 10}
+			{"key": "grain", "value": 10}
 		]
 	}
 ]
