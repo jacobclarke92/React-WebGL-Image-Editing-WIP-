@@ -65,6 +65,7 @@ export default class Editor extends Component {
 				console.log('editStepsKeys changed');
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms();
+				this.resizePrograms();
 				this.renderEditSteps();
 
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
@@ -162,6 +163,7 @@ export default class Editor extends Component {
 
 	resizePrograms() {
 		const { width, height } = this.state;
+		if(this.defaultProgram) this.defaultProgram.resize(width, height);
 		for(let program of this.programs) {
 			program.resize(width, height);
 		}
@@ -189,7 +191,7 @@ export default class Editor extends Component {
 			
 			// determine render target, set to null if last one because null = canvas
 			let target = null;
-			if(count < this.programs.length-1) {
+			if(count < steps.length-1) {
 				this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 				target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 			}
@@ -210,6 +212,13 @@ export default class Editor extends Component {
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 
 		}
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return (
+			nextState.width !== this.state.width ||
+			nextState.height !== this.state.height
+		);
 	}
 
 	render() {
