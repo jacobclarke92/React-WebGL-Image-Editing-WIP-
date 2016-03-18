@@ -55,8 +55,10 @@ export default class App extends Component {
 			width: 550,
 			height: 400,
 			adjustments,
+			adjustmentSteps: [],
+			filterSteps: [],
 			editSteps: [],
-			currentFilter: [],
+			filterName: null,
 		}
 	}
 
@@ -70,30 +72,45 @@ export default class App extends Component {
 	}
 
 	setValue(key, value) {
-		const { adjustments } = this.state;
+		const { adjustments, filterSteps } = this.state;
 		if(typeof value == 'string') value = parseFloat(value);
 		adjustments[key] = value;
-		const editSteps = this.generateEditSteps(adjustments);
-		this.setState({adjustments, editSteps});
+		const adjustmentSteps = this.generateEditStepsFromAdjustments(adjustments);
+		const editSteps = [...adjustmentSteps, ...filterSteps];
+		this.setState({adjustments, adjustmentSteps, editSteps});
 	}
 
-	generateEditSteps(adjustments) {
-		const { currentFilter } = this.state;
+	setFilter(filterPreset) {
+		const { adjustmentSteps } = this.state;
+		this.setState({
+			filterName: filterPreset.title,
+			filterSteps: filterPreset.steps,
+			editSteps: [...adjustmentSteps, ...filterPreset.steps],
+		});
+	}
+
+	generateEditStepsFromAdjustments(adjustments = this.state.adjustments) {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
 			editSteps.push(Filters[adjustment](adjustmentValue));
 		});
-		return [...editSteps, ...currentFilter]
+		return editSteps;
 	}
 
 	render() {
-		const { url, width, height, adjustments, editSteps } = this.state;
+		const { url, width, height, adjustments, editSteps, filterName } = this.state;
 		return (
 			<div>
 				<p>
 					{this.urls.map((url, i) => 
 						<button key={i} onClick={() => this.setUrl(url)}>Image {i+1}</button>
+					)}
+				</p>
+				<p>
+					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
+					{filterPresets.map((filterPreset, i) => 
+						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>Filter {i+1}</button>
 					)}
 				</p>
 				<p>
