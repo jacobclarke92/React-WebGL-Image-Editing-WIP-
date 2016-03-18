@@ -47,7 +47,7 @@ export default class App extends Component {
 
 	constructor(props) {
 		super(props);
-		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test_big.jpg'];
+		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test_big.jpg'];
 		const adjustments = {};
 		adjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		this.state = {
