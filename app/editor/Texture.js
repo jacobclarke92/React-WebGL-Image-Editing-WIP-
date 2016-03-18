@@ -1,6 +1,6 @@
 export default class Texture {
 
-	constructor(gl, width, height, format, type) {
+	constructor(gl, width = 0, height = 0, format, type) {
 		this.gl = gl;
 		this.width = width;
 		this.height = height;
@@ -58,8 +58,7 @@ export default class Texture {
         this.type = this.gl.UNSIGNED_BYTE;
 
         // make sure gl is using this texture
-        this.use();
-        // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
 
         // write bytearray to texture
         this.gl.texImage2D(

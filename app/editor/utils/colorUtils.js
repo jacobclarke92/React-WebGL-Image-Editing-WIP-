@@ -1,9 +1,10 @@
 import regression from 'regression'
+import { clamp } from 'editor/utils/mathUtils'
 
 export function curvesHashTable(points, min = 0, max = 255) {
 	var result = regression('polynomial', points, points.length-1);
 	var coefficients = result.equation;
-	var curvesHashTable = {};
+	var curvesHashTable = [];
 	var rangeMinY = points[0][1];
 	var rangeMaxY = points[points.length-1][1];
 	for(var x=min; x <= max; x++) {
@@ -11,7 +12,7 @@ export function curvesHashTable(points, min = 0, max = 255) {
 		for(var c=points.length-1; c >= 0; c --) {
 			curvesHashTable[x] += coefficients[c]*Math.pow(x, c);
 		}
-		curvesHashTable[x] = Math.min(Math.max(curvesHashTable[x], min), max-1);
+		curvesHashTable[x] = clamp(curvesHashTable[x], min, max);
 	}
 	return curvesHashTable;
 }

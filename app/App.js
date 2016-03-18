@@ -18,17 +18,22 @@ const adjustmentProperties = [
 	{
 		label: 'saturation',
 		min: -1,
-		max: 0.8,
+		max: 0.6,
 		step: 0.01,
 		defaultValue: 0,
 	},
 	{
 		label: 'grain',
 		min: 0,
-		max: 0.8,
+		max: 0.5,
 		step: 0.01,
 		defaultValue: 0,
 	},
+	// {
+	// 	label: 'fade',
+	// 	min: 0,
+	// 	max: 100,
+	// },
 ];
 
 const adjustmentOrder = [

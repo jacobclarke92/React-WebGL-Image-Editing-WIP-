@@ -51,8 +51,8 @@ export function contrast(amount) {
 // insert shadow and highlight recovery here
 
 export function fade(amount) {
-	const ctrl1 = [0, adjust];
-	const ctrl2 = [255, 255 - adjust/2];
+	const ctrl1 = [0, amount];
+	const ctrl2 = [255, 255 - amount/2];
 
 	return {
 		key: 'curves', 

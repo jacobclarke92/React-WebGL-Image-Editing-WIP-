@@ -184,6 +184,7 @@ export default class Editor extends Component {
 			program.use();
 
 			// run the shader's update function -- modifies uniforms
+			// program must be in use before calling update otherwise current program's uniforms get modified
 			program.update(step);
 
 			// determine source texture - original image texture if first pass or a framebuffer texture
