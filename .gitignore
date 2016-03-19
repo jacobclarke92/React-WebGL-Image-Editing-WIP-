@@ -2,3 +2,5 @@ node_modules
 npm-debug.log
 dist/*
 !dist/empty
+react-webgl-image-editing.sublime-project
+react-webgl-image-editing.sublime-workspace

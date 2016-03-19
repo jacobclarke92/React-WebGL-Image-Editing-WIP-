@@ -15,7 +15,7 @@ export function temperature(amount) {
 	];
 
 	return {
-		key: 'colorMatrix', 
+		key: 'colorMatrix',
 		matrix,
 	};
 }
@@ -41,8 +41,8 @@ export function exposure(amount) {
 	}
 
 	return {
-		key: 'curves', 
-		channels: 'rgb', 
+		key: 'curves',
+		channels: 'rgb',
 		curves: [ctrl1, ctrl2],
 	}
 }
@@ -52,8 +52,8 @@ export function contrast(amount) {
 	const curves = getContrastCurve(amount);
 
 	return {
-		key: 'curves', 
-		channels: 'rgb', 
+		key: 'curves',
+		channels: 'rgb',
 		curves,
 	};
 }
@@ -65,7 +65,7 @@ export function fade(amount) {
 	const ctrl2 = [255, 255 - amount/2];
 
 	return {
-		key: 'curves', 
+		key: 'curves',
 		channels: 'rgb',
 		curves: [ctrl1, ctrl2],
 	};
@@ -76,7 +76,7 @@ export function vibrance(amount) {
 	const matrix = getVibranceMatrix(amount);
 
 	return {
-		key: 'colorMatrix', 
+		key: 'colorMatrix',
 		matrix,
 	};
 }
@@ -84,7 +84,7 @@ export function vibrance(amount) {
 export function saturation(amount) {
 	const value = clamp(amount, -1, 1);
 	return {
-		key: 'saturation', 
+		key: 'saturation',
 		value,
 	};
 }
@@ -93,7 +93,7 @@ export function channels(options) {
 
 	const red = options.red ? options.red/100 : 0;
 	const green = options.green ? options.green/100 : 0;
-	const blue = options.blue ? options.blue/100 : 0; 
+	const blue = options.blue ? options.blue/100 : 0;
 	const matrix = [
 		1,	0,	0,	0,	red,
 		0,	1,	0,	0,	green,
@@ -102,7 +102,7 @@ export function channels(options) {
 	];
 
 	return {
-		key: 'colorMatrix', 
+		key: 'colorMatrix',
 		matrix,
 	};
 }
@@ -118,7 +118,7 @@ export function hue(amount) {
 export function sharpen(amount) {
 	const value = clamp(amount, 0, 10);
 	return {
-		key: 'sharpen', 
+		key: 'sharpen',
 		value,
 	};
 }
@@ -134,7 +134,7 @@ export function gamma(amount) {
 export function grain(amount) {
 	const value = clamp(amount, 0, 1);
 	return {
-		key: 'grain', 
+		key: 'grain',
 		value,
 	};
 }

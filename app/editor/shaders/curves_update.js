@@ -2,12 +2,12 @@ import { curvesHashTable } from 'editor/utils/colorUtils'
 import Texture from 'editor/Texture'
 
 export default function(settings) {
-	
+
 	const channels = settings.channels || 'rgb';
 	const curves = settings.curves;
-	
+
 	const curveLookup = curvesHashTable(curves);
-	
+
 	// make an array of r,g,b,a, r,g,b,a pixel values
 	const rgbaData = [];
 	for(let n of curveLookup) {
