@@ -164,7 +164,7 @@ export default class App extends Component {
 				<div>
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
 					{filterPresets.map((filterPreset, i) =>
-						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>Filter {i+1}</button>
+						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>{filterPreset.friendlyTitle}</button>
 					)}
 				</div>
 				<div>

@@ -1,11 +1,12 @@
 [
 	{
 		"title": "cinematic",
+		"friendlyTitle" : "Cinematic",
 		"steps": [
 			{
-				"key": "curves", 
+				"key": "curves",
 				"value": {
-					"channels": "rgb", 
+					"channels": "rgb",
 					"curves": [
 						[0, 20],
 						[100, 50],
@@ -16,13 +17,13 @@
 			{"key": "exposure", "value": 16},
 			{"key": "contrast", "value": 12},
 			{
-				"key": "curves", 
+				"key": "curves",
 				"value": {
-					"channels": "rgb", 
+					"channels": "rgb",
 					"curves": [
-						[0, 0], 
-						[70, 110], 
-						[190, 230], 
+						[0, 0],
+						[70, 110],
+						[190, 230],
 						[255, 255]
 					]
 				}
@@ -33,13 +34,14 @@
 	},
 	{
 		"title": "crispyMorning",
+		"friendlyTitle" : "Crispy Morning",
 		"steps": [
 			{"key": "saturation", "value": 10},
 			{
-				"key": "channels", 
+				"key": "channels",
 				"value": {
-					"red": 5, 
-					"green": 8, 
+					"red": 5,
+					"green": 8,
 					"blue": 8
 				}
 			},
@@ -47,13 +49,13 @@
 			{"key": "sharpen", "value": 50},
 			{"key": "grain", "value": 0.4},
 			{
-				"key": "curves", 
+				"key": "curves",
 				"value": {
-					"channels": "rgb", 
+					"channels": "rgb",
 					"curves": [
-						[0, 25], 
-						[46, 54], 
-						[121, 125], 
+						[0, 25],
+						[46, 54],
+						[121, 125],
 						[255, 252]
 					]
 				}
@@ -62,6 +64,7 @@
 	},
 	{
 		"title": "readableText",
+		"friendlyTitle" : "Readable Text",
 		"steps": [
 			{"key":"exposure","value": 5},
 			{"key":"contrast","value": 9},
@@ -70,9 +73,9 @@
 				"value": {
 					"channels": "rgb",
 					"curves": [
-						[0,80], 
-						[100,100], 
-						[180,180], 
+						[0,80],
+						[100,100],
+						[180,180],
 						[255,222]
 					]
 				}
@@ -83,18 +86,19 @@
 	},
 	{
 		"title": "misty",
+		"friendlyTitle" : "Misty",
 		"steps": [
 			{"key": "temperature", "value": [7700]},
 			{"key": "exposure", "value": 16},
 			{"key": "contrast", "value": 20},
 			{
-				"key": "curves", 
+				"key": "curves",
 				"value": {
-					"channels": "rgb", 
+					"channels": "rgb",
 					"curves": [
-						[0, 55], 
-						[100, 100], 
-						[180, 180], 
+						[0, 55],
+						[100, 100],
+						[180, 180],
 						[255, 240]
 					]
 				}
@@ -105,6 +109,7 @@
 	},
 	{
 		"title": "popPop",
+		"friendlyTitle" : "Pop Pop",
 		"steps": [
 			{"key": "temperature", "value": 6740},
 			{"key": "contrast", "value": 10},
@@ -115,11 +120,12 @@
 	},
 	{
 		"title": "badDisposable",
+		"friendlyTitle" : "Bad Disposable",
 		"steps": [
 			{
-				"key": "channels", 
+				"key": "channels",
 				"value": {
-					"red": 15.0, 
+					"red": 15.0,
 					"blue": 15.0
 				}
 			},

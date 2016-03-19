@@ -52,6 +52,6 @@ export function getTemperatureRGB(temp) {
 
 	let blue = temp >= 66 ? 255 : temp <= 19 ? 0 : 138.5177312231 * Math.log( temp - 10 ) - 305.0447927307;
 	blue = blue < 0 ? 0 : blue > 255 ? 255 : blue;
-	
+
 	return {red, green, blue};
 }
