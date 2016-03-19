@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import deepEqual from 'deep-equal'
+import 'editor/styles/styles.css'
 
 import Shaders from 'editor/shaders'
 
@@ -191,7 +192,7 @@ export default class Editor extends Component {
 
 			// determine source texture - original image texture if first pass or a framebuffer texture
 			const source = count === 0 ? this.imageTexture.id : this.getTempFramebuffer(this.currentFramebufferIndex).texture.id;
-			
+
 			// determine render target, set to null if last one because null = canvas
 			let target = null;
 			if(count < steps.length-1) {
@@ -227,7 +228,9 @@ export default class Editor extends Component {
 	render() {
 		const { width, height } = this.state;
 		return (
-			<canvas ref="editor" width={width} height={height} />
+			<div className ="rwie_editor_wrapper" style={{backgroundImage:'url('+this.props.url+')'}}>
+				<canvas className="rwie_editor" ref="editor" width={width} height={height} />
+			</div>
 		)
 	}
 

@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import autobind from 'autobind-decorator'
+import RCSlider from 'rc-slider'
 
 import Editor from 'editor/components/Editor'
 import * as Filters from 'editor/filters'
@@ -14,6 +15,7 @@ const adjustmentProperties = [
 		max: 2,
 		step: 0.01,
 		defaultValue: 0,
+		tipFormatter: defaultFormatter,
 	},
 	{
 		label: 'gamma',
@@ -21,6 +23,7 @@ const adjustmentProperties = [
 		max: 4,
 		step: 0.01,
 		defaultValue: 1,
+		tipFormatter: defaultFormatter,
 	},
 	{
 		label: 'saturation',
@@ -28,6 +31,7 @@ const adjustmentProperties = [
 		max: 0.6,
 		step: 0.01,
 		defaultValue: 0,
+		tipFormatter: percentFormatter,
 	},
 	{
 		label: 'vibrance',
@@ -35,6 +39,7 @@ const adjustmentProperties = [
 		max: 100,
 		step: 1,
 		defaultValue: 0,
+		tipFormatter: percentFormatter,
 	},
 	{
 		label: 'grain',
@@ -42,6 +47,7 @@ const adjustmentProperties = [
 		max: 0.5,
 		step: 0.01,
 		defaultValue: 0,
+		tipFormatter: defaultFormatter,
 	},
 	{
 		label: 'temperature',
@@ -49,6 +55,7 @@ const adjustmentProperties = [
 		max: 8600,
 		step: 100,
 		defaultValue: 6700,
+		tipFormatter: kelvinFormatter,
 	},
 	// {
 	// 	label: 'fade',
@@ -68,6 +75,18 @@ const adjustmentOrder = [
 	'sharpen',
 	'grain',
 ];
+
+function percentFormatter(_value){
+	return _value + '%';
+}
+
+function kelvinFormatter(_value){
+	return _value + 'k';
+}
+
+function defaultFormatter(_value){
+	return _value;
+}
 
 export default class App extends Component {
 
@@ -108,7 +127,7 @@ export default class App extends Component {
 
 	setFilter(filterPreset) {
 		const { adjustmentSteps } = this.state;
-		
+
 		const filterAdjustments = {};
 		// convert array of objects with keys 'key' & 'value' to associative object e.g. key: value
 		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
@@ -134,31 +153,36 @@ export default class App extends Component {
 
 	render() {
 		const { url, width, height, adjustments, editSteps, filterName } = this.state;
+
 		return (
 			<div>
-				<p>
-					{this.urls.map((url, i) => 
+				<div>
+					{this.urls.map((url, i) =>
 						<button key={i} onClick={() => this.setUrl(url)}>Image {i+1}</button>
 					)}
-				</p>
-				<p>
+				</div>
+				<div>
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
-					{filterPresets.map((filterPreset, i) => 
+					{filterPresets.map((filterPreset, i) =>
 						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>Filter {i+1}</button>
 					)}
-				</p>
-				<p>
+				</div>
+				<div>
 					{Object.keys(adjustments).map((key, i) => {
 						const { label, ...inputAttrs } = adjustmentProperties.filter(effect => effect.label === key)[0];
 						return (
 							<label key={i}>
-								<input type="range" {...inputAttrs} onInput={event => this.setValue(key, event.target.value)} />
-								{' '+label.toUpperCase()}
+                                <div>{' '+label.toUpperCase()}</div>
+								{/*<input type="range" {...inputAttrs} value={adjustments[key]} onChange={event => this.setValue(key, event.target.value)} />
+                                <span>{' '+adjustments[key]}</span>
+                                */}
+								<br />
+								<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} />
 								<br />
 							</label>
 						)
 					})}
-				</p>
+				</div>
 				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
 			</div>
 		)
