@@ -42,6 +42,11 @@ module.exports = {
 				loader: 'json',
 				include: [path.join(__dirname, 'app')],
 			},
+			{
+				test: /\.css$/,
+				loader: 'style!css',
+				include: [path.join(__dirname, 'app')],
+			},
 		],
 	}
 };
