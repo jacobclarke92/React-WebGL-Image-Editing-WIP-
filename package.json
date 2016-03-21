@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --watch --hot --no-info --open",
     "watch": "webpack --watch",
     "deploy": "webpack -p"
   },
@@ -33,6 +34,7 @@
     "react-transform-hmr": "^1.0.4",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
+    "webpack-dev-server": "^1.14.1",
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
