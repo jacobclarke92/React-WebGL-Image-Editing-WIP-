@@ -4,7 +4,7 @@
 
 
 I've made a few classes to wrap native WebGL.  
-I'm using react for the UI and as a way of passing edit step info to the rendering component.
+I'm using react for the UI and as a way of passing edit step info to the Renderer component.
 
 
 ## Installation
@@ -23,8 +23,8 @@ Then navigate to project directory and install npm dependencies
 
 There are 3 npm scripts set up
 
-- `npm run start` fires up the webpack-dev-server with hot and watch flags
-- `npm run watch` just runs webpack with watch flag
+- `npm run start` fires up the react-hot-loader
+- `npm run watch` just runs webpack with watch flag, byo localhost
 - `npm run deploy` compiles and minifies
 
 ## Concept
