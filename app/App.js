@@ -4,7 +4,7 @@ import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 import 'styles/app.css'
 
-import Editor from 'editor/components/Editor'
+import Renderer from 'editor/components/Renderer'
 import * as Filters from 'editor/filters'
 import filterPresets from 'editor/constants/presets.json'
 
@@ -134,7 +134,7 @@ export default class App extends Component {
 		// update adjustment value
 		adjustments[key] = value;
 
-		// generate editSteps for Editor
+		// generate editSteps for Renderer
 		const adjustmentSteps = this.generateEditStepsFromAdjustments(adjustments);
 		const editSteps = [...adjustmentSteps, ...filterSteps];
 		
@@ -159,7 +159,7 @@ export default class App extends Component {
 		});
 	}
 
-	// Generates specific edit steps for Editor based on adjustment 'aliases'
+	// Generates specific edit steps for Renderer based on adjustment 'aliases'
 	// eg. temperature actually uses colorMatrix, fade uses curves
 	generateEditStepsFromAdjustments(adjustments = this.state.adjustments) {
 		const editSteps = [];
@@ -201,7 +201,7 @@ export default class App extends Component {
 				<div>
 					<button onClick={event => this.handleReset()}>Reset</button>
 				</div>
-				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
+				<Renderer url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
 			</div>
 		)
 	}
