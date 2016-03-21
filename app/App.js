@@ -153,7 +153,7 @@ export default class App extends Component {
 		const filterSteps = this.generateEditStepsFromAdjustments(filterAdjustments);
 
 		this.setState({
-			filterName: filterPreset.title,
+			filterName: filterPreset.name,
 			filterSteps,
 			editSteps: [...adjustmentSteps, ...filterSteps],
 		});
@@ -184,7 +184,7 @@ export default class App extends Component {
 				<div className="filters">
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
 					{filterPresets.map((filterPreset, i) =>
-						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>{filterPreset.friendlyTitle}</button>
+						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>{filterPreset.title}</button>
 					)}
 				</div>
 				<div className="sliders">

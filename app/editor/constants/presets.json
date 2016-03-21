@@ -1,7 +1,7 @@
 [
 	{
-		"title": "cinematic",
-		"friendlyTitle" : "Cinematic",
+		"name": "cinematic",
+		"title" : "Cinematic",
 		"steps": [
 			{
 				"key": "curves",
@@ -33,8 +33,8 @@
 		]
 	},
 	{
-		"title": "crispyMorning",
-		"friendlyTitle" : "Crispy Morning",
+		"name": "crispyMorning",
+		"title" : "Crispy Morning",
 		"steps": [
 			{"key": "saturation", "value": 10},
 			{
@@ -63,8 +63,8 @@
 		]
 	},
 	{
-		"title": "readableText",
-		"friendlyTitle" : "Readable Text",
+		"name": "readableText",
+		"title" : "Readable Text",
 		"steps": [
 			{"key":"exposure","value": 5},
 			{"key":"contrast","value": 9},
@@ -85,8 +85,8 @@
 		]
 	},
 	{
-		"title": "misty",
-		"friendlyTitle" : "Misty",
+		"name": "misty",
+		"title" : "Misty",
 		"steps": [
 			{"key": "temperature", "value": [7700]},
 			{"key": "exposure", "value": 16},
@@ -108,8 +108,8 @@
 		]
 	},
 	{
-		"title": "popPop",
-		"friendlyTitle" : "Pop Pop",
+		"name": "popPop",
+		"title" : "Pop Pop",
 		"steps": [
 			{"key": "temperature", "value": 6740},
 			{"key": "contrast", "value": 10},
@@ -119,8 +119,8 @@
 		]
 	},
 	{
-		"title": "badDisposable",
-		"friendlyTitle" : "Bad Disposable",
+		"name": "badDisposable",
+		"title" : "Bad Disposable",
 		"steps": [
 			{
 				"key": "channels",
