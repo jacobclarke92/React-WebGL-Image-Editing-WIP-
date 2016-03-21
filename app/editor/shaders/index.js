@@ -48,6 +48,12 @@ const Shaders = {
 		vertex: filter_vertex,
 		fragment: saturation_fragment,
 	},
+	// dummy sharpen for now to keep presets happy
+	sharpen: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: default_fragment,
+	}
 };
 
 export default Shaders;
