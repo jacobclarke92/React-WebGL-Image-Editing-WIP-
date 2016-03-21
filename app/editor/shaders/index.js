@@ -1,6 +1,6 @@
 import default_vertex from 'editor/shaders/default_vertex.glsl'
 import default_fragment from 'editor/shaders/default_fragment.glsl'
-import default_update from 'editor/shaders/defualt_update'
+import default_update from 'editor/shaders/default_update'
 
 import filter_vertex from 'editor/shaders/filter_vertex.glsl'
 import curves_update from 'editor/shaders/curves_update'
