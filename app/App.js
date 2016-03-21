@@ -1,6 +1,8 @@
 import React, { PropTypes, Component } from 'react'
 import autobind from 'autobind-decorator'
 import RCSlider from 'rc-slider'
+import titleize from 'titleize'
+import 'styles/app.css'
 
 import Editor from 'editor/components/Editor'
 import * as Filters from 'editor/filters'
@@ -64,18 +66,6 @@ const adjustmentProperties = [
 	// },
 ];
 
-const adjustmentOrder = [
-	'temperature',
-	'exposure',
-	'contrast',
-	'curves',
-	'fade',
-	'vibrance',
-	'saturation',
-	'sharpen',
-	'grain',
-];
-
 function percentFormatter(_value){
 	return _value + '%';
 }
@@ -93,13 +83,19 @@ export default class App extends Component {
 	constructor(props) {
 		super(props);
 		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test_big.jpg'];
+
+		// generate initial slider values
 		const adjustments = {};
 		adjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+
+		// store reset point, make a copy of adjustments object
+		this.defaultAdjustments = {...adjustments};
+		
 		this.state = {
 			url: 'test1.jpg',
 			width: 550,
 			height: 400,
-			adjustments,
+			adjustments: adjustments,
 			adjustmentSteps: [],
 			filterSteps: [],
 			editSteps: [],
@@ -112,24 +108,45 @@ export default class App extends Component {
 		this.setState({width, height});
 	}
 
+	// Reset adjustments and filter
+	handleReset() {
+		this.setState({
+			adjustments: {...this.defaultAdjustments},
+			adjustmentSteps: [],
+			filterName: null,
+			filterSteps: [],
+			editSteps: [],
+		});
+	}
+
+	// Update image url
 	setUrl(url) {
 		this.setState({url});
 	}
 
+	// Update adjustment value
 	setValue(key, value) {
 		const { adjustments, filterSteps } = this.state;
+
+		// make sure value is number
 		if(typeof value == 'string') value = parseFloat(value);
+
+		// update adjustment value
 		adjustments[key] = value;
+
+		// generate editSteps for Editor
 		const adjustmentSteps = this.generateEditStepsFromAdjustments(adjustments);
 		const editSteps = [...adjustmentSteps, ...filterSteps];
+		
 		this.setState({adjustments, adjustmentSteps, editSteps});
 	}
 
+	// Update filter preset
 	setFilter(filterPreset) {
 		const { adjustmentSteps } = this.state;
 
-		const filterAdjustments = {};
 		// convert array of objects with keys 'key' & 'value' to associative object e.g. key: value
+		const filterAdjustments = {};
 		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
 
 		// generate adjustment steps
@@ -142,6 +159,8 @@ export default class App extends Component {
 		});
 	}
 
+	// Generates specific edit steps for Editor based on adjustment 'aliases'
+	// eg. temperature actually uses colorMatrix, fade uses curves
 	generateEditStepsFromAdjustments(adjustments = this.state.adjustments) {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
@@ -155,33 +174,32 @@ export default class App extends Component {
 		const { url, width, height, adjustments, editSteps, filterName } = this.state;
 
 		return (
-			<div>
-				<div>
-					{this.urls.map((url, i) =>
-						<button key={i} onClick={() => this.setUrl(url)}>Image {i+1}</button>
+			<div className="image-editor">
+				<h1>React WebGL Image Editing</h1>
+				<div className="images">
+					{this.urls.map((_url, i) =>
+						<button key={i} onClick={() => this.setUrl(_url)} disabled={url == _url}>Image {i+1}</button>
 					)}
 				</div>
-				<div>
+				<div className="filters">
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
 					{filterPresets.map((filterPreset, i) =>
 						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.title === filterName}>{filterPreset.friendlyTitle}</button>
 					)}
 				</div>
-				<div>
+				<div className="sliders">
 					{Object.keys(adjustments).map((key, i) => {
 						const { label, ...inputAttrs } = adjustmentProperties.filter(effect => effect.label === key)[0];
 						return (
 							<label key={i}>
-                                <div>{' '+label.toUpperCase()}</div>
-								{/*<input type="range" {...inputAttrs} value={adjustments[key]} onChange={event => this.setValue(key, event.target.value)} />
-                                <span>{' '+adjustments[key]}</span>
-                                */}
-								<br />
+                                <div>{titleize(label)}</div>
 								<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} />
-								<br />
 							</label>
 						)
 					})}
+				</div>
+				<div>
+					<button onClick={event => this.handleReset()}>Reset</button>
 				</div>
 				<Editor url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
 			</div>

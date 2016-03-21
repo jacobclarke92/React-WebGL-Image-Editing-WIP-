@@ -1,0 +1,71 @@
+
+/* UI Styles */
+
+html, body {
+	margin: 0;
+	padding: 15px;
+	font-family: Helvetica, Arial, sans-serif;
+	color: #333c47;
+}
+
+h1 {
+	margin-top: 0;
+}
+
+button {
+	margin-right: 10px;
+	margin-bottom: 10px;
+	padding: 8px 15px;
+	border: 1px solid #efefef;
+	background-color: #beeeef;
+	border-radius: 3px;
+	transition: all 0.1s ease-in-out;
+	cursor: pointer;
+}
+button:hover:not(:disabled) {
+	border-color: #5BBFDF;
+}
+button:disabled {
+	background-color: #96dbfa;
+	cursor: not-allowed;
+}
+
+p {
+	margin-top: 0;
+}
+
+.sliders {
+	margin-bottom: 20px;
+}
+
+.sliders .rc-slider {
+	margin: 5px 0;
+}
+
+.sliders label>div:first-of-type {
+	margin: 15px 0 5px 0;
+}
+
+
+
+/* Editor Styles */
+
+.canvas-wrapper, 
+.canvas-wrapper canvas {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    display: inherit;
+}
+
+.canvas-wrapper {
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.canvas-wrapper canvas {
+	transition: opacity 0.1s linear;
+}
+.canvas-wrapper:hover canvas {
+    opacity: 0;
+}

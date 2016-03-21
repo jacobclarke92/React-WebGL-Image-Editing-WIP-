@@ -1,6 +1,5 @@
 import React, { PropTypes, Component } from 'react'
 import deepEqual from 'deep-equal'
-import 'editor/styles/styles.css'
 
 import Shaders from 'editor/shaders'
 
@@ -228,8 +227,8 @@ export default class Editor extends Component {
 	render() {
 		const { width, height } = this.state;
 		return (
-			<div className ="rwie_editor_wrapper" style={{backgroundImage:'url('+this.props.url+')', maxWidth:width}}>
-				<canvas className="rwie_editor" ref="editor" width={width} height={height} />
+			<div className="canvas-wrapper" style={{backgroundImage:'url('+this.props.url+')', maxWidth:width}}>
+				<canvas ref="editor" width={width} height={height} />
 			</div>
 		)
 	}
