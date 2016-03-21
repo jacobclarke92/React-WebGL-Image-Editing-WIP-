@@ -1,5 +1,23 @@
 [
 	{
+		"name": "curvesTest",
+		"title" : "Curves Test",
+		"steps": [
+			{
+				"key": "curves",
+				"value": {
+					"channels": "rgb",
+					"curves": [
+						[0, 0],
+						[78, 27],
+						[157, 186],
+						[255, 255]
+					]
+				}
+			}
+		]
+	},
+	{
 		"name": "cinematic",
 		"title" : "Cinematic",
 		"steps": [
@@ -28,7 +46,7 @@
 					]
 				}
 			},
-			{"key": "saturation", "value": -20},
+			{"key": "saturation", "value": -0.2},
 			{"key": "gamma", "value": 1.8}
 		]
 	},

@@ -15,6 +15,8 @@ export default class Texture {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
+        if(width && height) this.loadEmpty();
+
 		// allow chaining
 		return this;
 	}
@@ -37,11 +39,11 @@ export default class Texture {
 
         // write image/video element to texture
         this.gl.texImage2D(
-            this.gl.TEXTURE_2D, 
-            0, 
-            this.format, 
-            this.format, 
-            this.type, 
+            this.gl.TEXTURE_2D,
+            0,
+            this.format,
+            this.format,
+            this.type,
             element
         );
 
@@ -58,18 +60,18 @@ export default class Texture {
         this.type = this.gl.UNSIGNED_BYTE;
 
         // make sure gl is using this texture
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+        this.use();
 
         // write bytearray to texture
         this.gl.texImage2D(
-            this.gl.TEXTURE_2D, 
-            0, 
-            this.format, 
-            this.width, 
-            this.height, 
-            0, 
-            this.format, 
-            this.type, 
+            this.gl.TEXTURE_2D,
+            0,
+            this.format,
+            this.width,
+            this.height,
+            0,
+            this.format,
+            this.type,
             new Uint8Array(data)
         );
 
@@ -78,16 +80,16 @@ export default class Texture {
 
     loadEmpty() {
         this.use();
-        
+
         this.gl.texImage2D(
-            this.gl.TEXTURE_2D, 
-            0, 
-            this.format, 
-            this.width, 
-            this.height, 
+            this.gl.TEXTURE_2D,
             0,
-            this.format, 
-            this.type, 
+            this.format,
+            this.width,
+            this.height,
+            0,
+            this.format,
+            this.type,
             null
         );
 
