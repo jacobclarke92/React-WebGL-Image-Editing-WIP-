@@ -1,7 +1,7 @@
 import regression from 'regression'
 import { clamp } from 'editor/utils/mathUtils'
 
-export function curvesHashTable(points, min = 0, max = 255) {
+export function curvesHashTable(points = [[0,0], [255,255]], min = 0, max = 255) {
 	var result = regression('polynomial', points, points.length-1);
 	var coefficients = result.equation;
 	var curvesHashTable = [];
