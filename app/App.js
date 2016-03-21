@@ -1,5 +1,4 @@
 import React, { PropTypes, Component } from 'react'
-import autobind from 'autobind-decorator'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 import 'styles/app.css'
@@ -103,7 +102,6 @@ export default class App extends Component {
 		}
 	}
 
-	@autobind
 	handleImageResize(width, height) {
 		this.setState({width, height});
 	}
@@ -201,7 +199,7 @@ export default class App extends Component {
 				<div>
 					<button onClick={event => this.handleReset()}>Reset</button>
 				</div>
-				<Renderer url={url} width={width} height={height} onResize={this.handleImageResize} editSteps={editSteps} />
+				<Renderer url={url} width={width} height={height} onResize={this.handleImageResize.bind(this)} editSteps={editSteps} />
 			</div>
 		)
 	}
