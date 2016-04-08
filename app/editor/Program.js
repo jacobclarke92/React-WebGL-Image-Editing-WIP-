@@ -91,11 +91,14 @@ export default class Program {
 	willRender(left, top, right, bottom) {
 
         const gl = this.gl;
-        const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
+        
+        // initializes a WebGLBuffer storing data such as vertices or colors
         if(!this.texCoordBuffer) this.texCoordBuffer = gl.createBuffer();
 
         // use tex coord buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+
+        // creates and initializes a buffer object's data store
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
             0.0,  0.0,
             1.0,  0.0,
@@ -105,7 +108,13 @@ export default class Program {
             1.0,  1.0
         ]), gl.STATIC_DRAW);
 
+        // get a_texCoord pointer
+        const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
+        
+        // enables the generic vertex attribute array
         gl.enableVertexAttribArray(texCoordLocation);
+
+        // define an array of generic vertex attribute data
         gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
         return this;
@@ -114,13 +123,19 @@ export default class Program {
     didRender() {
 
         const gl = this.gl;
-        // look up where the vertex data needs to go.
-        const positionLocation = gl.getAttribLocation(this.program, "a_position");
         if(!this.buffer) this.buffer = gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+        // look up where the vertex data needs to go.
+        const positionLocation = gl.getAttribLocation(this.program, "a_position");
+
+        //enables the generic vertex attribute array
         gl.enableVertexAttribArray(positionLocation);
+
+        // define an array of generic vertex attribute data
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
 
         // use this buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);

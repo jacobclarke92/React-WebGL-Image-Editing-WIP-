@@ -17,7 +17,7 @@ export default class Editor extends Component {
 		height: 400,
 		onResize: () => {},
 		editSteps: [],
-	}
+	};
 
 	constructor(props) {
 		super();
