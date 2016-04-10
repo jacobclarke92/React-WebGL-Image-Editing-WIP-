@@ -221,7 +221,7 @@ export default class App extends Component {
 						return (
 							<label key={i}>
                                 <div>{titleize(label)}</div>
-								<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} />
+								<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
 							</label>
 						)
 					})}
