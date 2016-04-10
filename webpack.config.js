@@ -3,7 +3,8 @@ var webpack = require('webpack');
 
 var babelLoaderSettings = JSON.stringify({
 	cacheDirectory: true,
-	presets: ['es2015', 'stage-0', 'react']
+	presets: ['es2015', 'stage-0', 'react'],
+	plugins: ['transform-decorators-legacy'],
 });
 
 module.exports = {

@@ -47,6 +47,37 @@ p {
 }
 
 
+/* Dropzone Styles */
+
+.dropzone.drop:after,
+.dropzone.drop:before {
+	content: '';
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 10;
+}
+	
+.dropzone.drop:before {
+	background-color: rgba(192, 230, 249, 0.85);
+	text-align: center;
+	font-size: 48px;
+	font-weight: bold;
+	color: white;
+	padding-top: calc(50vh - 24px);
+}
+
+.dropzone.drop:after {
+	margin: 50px;
+	border-radius: 50px;
+	border: 10px dashed white;
+}
+
+.dropzone.drop.over:before {
+	content: 'Drop!';
+}
 
 /* Editor Styles */
 

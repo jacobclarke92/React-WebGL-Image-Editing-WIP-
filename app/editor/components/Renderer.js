@@ -79,7 +79,7 @@ export default class Editor extends Component {
 	}
 
 	loadImage(url) {
-		console.log('loading image', url);
+		console.log('loading image...');
 		this.image.src = url;
 	}
 
