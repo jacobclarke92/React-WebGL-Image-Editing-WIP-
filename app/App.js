@@ -190,7 +190,10 @@ export default class App extends Component {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
-			editSteps.push(Filters[adjustment](adjustmentValue));
+			const defaultValue = adjustmentProperties.filter(property => property.label === adjustment)[0].defaultValue;
+			if(adjustmentValue !== defaultValue) {
+				editSteps.push(Filters[adjustment](adjustmentValue));
+			}
 		});
 		return editSteps;
 	}
