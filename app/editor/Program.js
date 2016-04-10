@@ -99,14 +99,7 @@ export default class Program {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
 
         // creates and initializes a buffer object's data store
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.0,  0.0,
-            1.0,  0.0,
-            0.0,  1.0,
-            0.0,  1.0,
-            1.0,  0.0,
-            1.0,  1.0
-        ]), gl.STATIC_DRAW);
+        setBufferRectangle(gl, 0, 0, 1, 1);
 
         // get a_texCoord pointer
         const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");

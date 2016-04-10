@@ -1,5 +1,6 @@
 import regression from 'regression'
 import { clamp } from 'editor/utils/mathUtils'
+import { isNumeric } from 'editor/utils/typeUtils'
 
 export function curvesHashTable(points = [[0,0], [255,255]], min = 0, max = 255) {
 	const result = regression('polynomial', points, points.length-1);
@@ -17,7 +18,7 @@ export function curvesHashTable(points = [[0,0], [255,255]], min = 0, max = 255)
 
 // modeled from photoshop
 export function getContrastCurve(contrast = 0) {
-	if(typeof contrast == 'string' && !isNaN(parseInt(contrast))) contrast = parseInt(contrast);
+	if(typeof contrast == 'string' && isNumeric(contrast)) contrast = parseInt(contrast);
 	const amt = 75;
 	return [
 		[0,		0],
@@ -28,7 +29,7 @@ export function getContrastCurve(contrast = 0) {
 }
 
 export function getVibranceMatrix(vibrance) {
-	if(typeof vibrance == 'string' && !isNaN(parseInt(vibrance))) vibrance = parseInt(vibrance);
+	if(typeof vibrance == 'string' && isNumeric(vibrance)) vibrance = parseInt(vibrance);
 	const amt = vibrance/200;
 	return [
 		1+amt,		-amt/1.5,	-amt/1.5,	0,	0,

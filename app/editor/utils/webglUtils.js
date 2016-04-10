@@ -1,9 +1,9 @@
 
 export function setBufferRectangle(gl, x, y, width, height) {
-    var x1 = x;
-    var x2 = x + width;
-    var y1 = y;
-    var y2 = y + height;
+    const x1 = x;
+    const x2 = x + width;
+    const y1 = y;
+    const y2 = y + height;
     gl.bufferData(
         gl.ARRAY_BUFFER, 
         new Float32Array([

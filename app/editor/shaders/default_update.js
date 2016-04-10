@@ -1,7 +1,9 @@
 // called within context of a Program
 export default function(settings) {
-	console.log('updating:', this.label, settings);
-	this.uniforms({
-		[settings.key]: settings.value,
-	})
+	if(settings.key && settings.value) {
+		console.log('updating uniform:', settings.key, settings.value);
+		this.uniforms({
+			[settings.key]: settings.value,
+		});
+	}
 }
