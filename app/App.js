@@ -82,6 +82,14 @@ const adjustmentProperties = [
 		defaultValue: 0,
 		tipFormatter: defaultFormatter
 	},
+	{
+		label: 'blur',
+		min: 0,
+		max: 20,
+		step: 0.2,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter
+	},
 ];
 
 const defaultFormatter = value => value;

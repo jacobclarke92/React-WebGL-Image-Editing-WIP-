@@ -107,6 +107,14 @@ export function channels(options) {
 	};
 }
 
+export function blur(amount) {
+	const value = clamp(amount, 0, 100);
+	return {
+		key: 'blur',
+		value
+	}
+}
+
 export function hue(amount) {
 	const value = clamp(amount, 0, 2);
 	return {
