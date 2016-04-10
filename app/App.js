@@ -27,6 +27,22 @@ const adjustmentProperties = [
 		tipFormatter: defaultFormatter,
 	},
 	{
+		label: 'contrast',
+		min: 0,
+		max: 50,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter,
+	},
+	{
+		label: 'exposure',
+		min: -50,
+		max: 50,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter,
+	},
+	{
 		label: 'saturation',
 		min: -1,
 		max: 0.6,
@@ -58,24 +74,19 @@ const adjustmentProperties = [
 		defaultValue: 6700,
 		tipFormatter: kelvinFormatter,
 	},
-	// {
-	// 	label: 'fade',
-	// 	min: 0,
-	// 	max: 100,
-	// },
+	{
+		label: 'fade',
+		min: 0,
+		max: 100,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter
+	},
 ];
 
-function percentFormatter(_value){
-	return _value + '%';
-}
-
-function kelvinFormatter(_value){
-	return _value + 'k';
-}
-
-function defaultFormatter(_value){
-	return _value;
-}
+const defaultFormatter = value => value;
+const percentFormatter = value => value + '%';
+const kelvinFormatter = value => value + 'k';
 
 export default class App extends Component {
 
