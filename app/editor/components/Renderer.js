@@ -190,7 +190,7 @@ export default class Editor extends Component {
 			program.update(step);
 
 			// determine source texture - original image texture if first pass or a framebuffer texture
-			const source = count === 0 ? this.imageTexture.id : this.getTempFramebuffer(this.currentFramebufferIndex).texture.id;
+			const sourceTexture = count === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
 
 			// determine render target, set to null if last one because null = canvas
 			let target = null;
@@ -203,7 +203,7 @@ export default class Editor extends Component {
 			program.willRender();
 
 			// use current source texture and framebuffer target
-			this.gl.bindTexture(this.gl.TEXTURE_2D, source);
+			sourceTexture.use();
 			this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
 
 			// post-render calcs idk
