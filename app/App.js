@@ -19,6 +19,22 @@ const adjustmentProperties = [
 		tipFormatter: defaultFormatter,
 	},
 	{
+		label: 'temperature',
+		min: 4600,
+		max: 8600,
+		step: 100,
+		defaultValue: 6700,
+		tipFormatter: kelvinFormatter,
+	},
+	{
+		label: 'exposure',
+		min: -50,
+		max: 50,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter,
+	},
+	{
 		label: 'gamma',
 		min: 0.2,
 		max: 4,
@@ -35,44 +51,12 @@ const adjustmentProperties = [
 		tipFormatter: defaultFormatter,
 	},
 	{
-		label: 'exposure',
-		min: -50,
-		max: 50,
-		step: 1,
-		defaultValue: 0,
-		tipFormatter: defaultFormatter,
-	},
-	{
 		label: 'saturation',
 		min: -1,
 		max: 0.6,
 		step: 0.01,
 		defaultValue: 0,
 		tipFormatter: percentFormatter,
-	},
-	{
-		label: 'vibrance',
-		min: 0,
-		max: 100,
-		step: 1,
-		defaultValue: 0,
-		tipFormatter: percentFormatter,
-	},
-	{
-		label: 'grain',
-		min: 0,
-		max: 0.5,
-		step: 0.01,
-		defaultValue: 0,
-		tipFormatter: defaultFormatter,
-	},
-	{
-		label: 'temperature',
-		min: 4600,
-		max: 8600,
-		step: 100,
-		defaultValue: 6700,
-		tipFormatter: kelvinFormatter,
 	},
 	{
 		label: 'fade',
@@ -83,12 +67,36 @@ const adjustmentProperties = [
 		tipFormatter: defaultFormatter
 	},
 	{
+		label: 'vibrance',
+		min: 0,
+		max: 100,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: percentFormatter,
+	},
+	{
 		label: 'blur',
 		min: 0,
 		max: 20,
 		step: 0.2,
 		defaultValue: 0,
 		tipFormatter: defaultFormatter
+	},
+	{
+		label: 'bloom',
+		min: 0,
+		max: 1,
+		step: 0.01,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter
+	},
+	{
+		label: 'grain',
+		min: 0,
+		max: 0.5,
+		step: 0.01,
+		defaultValue: 0,
+		tipFormatter: defaultFormatter,
 	},
 ];
 
