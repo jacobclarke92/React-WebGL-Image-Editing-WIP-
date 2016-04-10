@@ -135,6 +135,9 @@ export default class Program {
         // Set a rectangle the same size as the image.
         setBufferRectangle(gl, 0, 0, this.width, this.height);
 
+        // set texture back to 0 -- e.g. when another activeTexture is used to set a uniform
+        this.gl.activeTexture(this.gl.TEXTURE0);
+
         return this;
     }
 
