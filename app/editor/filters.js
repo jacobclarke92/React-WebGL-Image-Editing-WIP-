@@ -123,6 +123,15 @@ export function bloom(amount) {
 	}
 }
 
+export function denoise(amount) {
+	amount = clamp(amount, 0, 1);
+	const value = 3 + 200 * Math.pow(1 - amount, 4);
+	return {
+		key: 'denoise',
+		value
+	}
+}
+
 export function hue(amount) {
 	const value = clamp(amount, 0, 2);
 	return {

@@ -7,6 +7,7 @@ import blur_fragment from 'editor/shaders/blur_fragment.glsl'
 import bloom_fragment from 'editor/shaders/bloom_fragment.glsl'
 import curves_update from 'editor/shaders/curves_update'
 import curves_fragment from 'editor/shaders/curves_fragment.glsl'
+import denoise_fragment from 'editor/shaders/denoise_fragment.glsl'
 import gamma_fragment from 'editor/shaders/gamma_fragment.glsl'
 import grain_fragment from 'editor/shaders/grain_fragment.glsl'
 import hue_fragment from 'editor/shaders/hue_fragment.glsl'
@@ -34,6 +35,11 @@ const Shaders = {
 		update: curves_update,
 		vertex: filter_vertex,
 		fragment: curves_fragment,
+	},
+	denoise: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: denoise_fragment,
 	},
 	colorMatrix: {
 		update: colorMatrix_update,
