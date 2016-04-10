@@ -1,23 +1,5 @@
 [
 	{
-		"name": "curvesTest",
-		"title" : "Curves Test",
-		"steps": [
-			{
-				"key": "curves",
-				"value": {
-					"channels": "rgb",
-					"curves": [
-						[0, 0],
-						[78, 27],
-						[157, 186],
-						[255, 255]
-					]
-				}
-			}
-		]
-	},
-	{
 		"name": "cinematic",
 		"title" : "Cinematic",
 		"steps": [
@@ -32,7 +14,7 @@
 					]
 				}
 			},
-			{"key": "exposure", "value": 16},
+			{"key": "exposure", "value": -2},
 			{"key": "contrast", "value": 12},
 			{
 				"key": "curves",
@@ -41,13 +23,14 @@
 					"curves": [
 						[0, 0],
 						[70, 110],
-						[190, 230],
+						[190, 220],
 						[255, 255]
 					]
 				}
 			},
 			{"key": "saturation", "value": -0.2},
-			{"key": "gamma", "value": 1.8}
+			{"key": "vibrance", "value": 35},
+			{"key": "gamma", "value": 0.6}
 		]
 	},
 	{
@@ -99,7 +82,7 @@
 				}
 			},
 			{"key":"vibrance","value": 30},
-			{"key":"saturation","value": -13}
+			{"key":"saturation","value": -0.13}
 		]
 	},
 	{
@@ -126,13 +109,24 @@
 		]
 	},
 	{
+		"name": "fitterHappier",
+		"title" : "Fitter, Happier",
+		"steps": [
+			{"key": "temperature", "value": 5500},
+			{"key": "gamma", "value": 1.25},
+			{"key": "contrast", "value": 11},
+			{"key": "fade", "value": 20},
+			{"key": "vibrance", "value": 30}
+		]
+	},
+	{
 		"name": "popPop",
 		"title" : "Pop Pop",
 		"steps": [
 			{"key": "temperature", "value": 6740},
 			{"key": "contrast", "value": 10},
 			{"key": "vibrance", "value": 35},
-			{"key": "saturation", "value": -20},
+			{"key": "saturation", "value": -0.20},
 			{"key": "sharpen", "value": 40}
 		]
 	},
