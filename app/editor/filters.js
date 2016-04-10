@@ -115,6 +115,14 @@ export function blur(amount) {
 	}
 }
 
+export function bloom(amount) {
+	const value = clamp(amount, 0, 1);
+	return {
+		key: 'bloom',
+		value
+	}
+}
+
 export function hue(amount) {
 	const value = clamp(amount, 0, 2);
 	return {

@@ -4,6 +4,7 @@ import default_update from 'editor/shaders/default_update'
 
 import filter_vertex from 'editor/shaders/filter_vertex.glsl'
 import blur_fragment from 'editor/shaders/blur_fragment.glsl'
+import bloom_fragment from 'editor/shaders/bloom_fragment.glsl'
 import curves_update from 'editor/shaders/curves_update'
 import curves_fragment from 'editor/shaders/curves_fragment.glsl'
 import gamma_fragment from 'editor/shaders/gamma_fragment.glsl'
@@ -23,6 +24,11 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: blur_fragment,
+	},
+	bloom: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: bloom_fragment,
 	},
 	curves: {
 		update: curves_update,
