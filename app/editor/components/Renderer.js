@@ -16,6 +16,7 @@ export default class Editor extends Component {
 		width: 400,
 		height: 400,
 		onResize: () => {},
+		autoResize: false,
 		editSteps: [],
 	};
 
@@ -60,6 +61,14 @@ export default class Editor extends Component {
 
 		}else{
 
+			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
+				console.log('---');
+				console.log('width/height changed!', nextProps.width, nextProps.height);
+				this.resizeViewport(nextProps.width, nextProps.height);
+				this.resizePrograms(nextProps.width, nextProps.height);
+				setTimeout(() => this.renderEditSteps());
+			}
+
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
 				console.log('---');
 				console.log('editStepsKeys changed');
@@ -68,7 +77,7 @@ export default class Editor extends Component {
 				this.resizePrograms();
 
 				// Wait until props have been updated before re-rendering
-				this.setState({}, () => this.renderEditSteps());
+				setTimeout(() => this.renderEditSteps());
 
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
 				console.log('---');
@@ -84,6 +93,7 @@ export default class Editor extends Component {
 	}
 
 	handleImageLoad(image) {
+		console.log('---');
 		console.log('image loaded');
 
 		// make texture for base image, destroy old one first if it exists
@@ -94,23 +104,25 @@ export default class Editor extends Component {
 		// init base program to render base image
 		if(this.defaultProgram) this.defaultProgram.destroy();
 		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
+		// console.table(getProgramInfo(this.gl, this.defaultProgram.program).uniforms);
 
 		this.buildPrograms();
 
-		this.setState({width: image.width, height: image.height}, () => {
-
+		if(!this.props.autoResize) {
+			console.log('not autoResizing so render immediately');
 			this.resizeViewport();
 			this.resizePrograms();
 			this.renderEditSteps();
+		}else{
+			console.log('is autoResize so using resize callback, when props update render will occur');
+			this.props.onResize(image.width, image.height);
+		}
 
-			console.table(getProgramInfo(this.gl, this.defaultProgram.program).uniforms);
-
-		});
 	}
 
 	// this function returns either an existing framebuffer or a new framebuffer
 	getTempFramebuffer(index) {
-		const { width, height } = this.state;
+		const { width, height } = this.props;
 
 		if(!this.framebuffers[index]) {
 			this.framebuffers[index] = new FramebufferTexture(this.gl);
@@ -155,16 +167,14 @@ export default class Editor extends Component {
 		this.framebuffers = [];
 	}
 
-	resizeViewport() {
-		const { width, height } = this.state;
+	resizeViewport(width = this.props.width, height = this.props.height) {
 		this.canvas.width = width;
 		this.canvas.height = height;
 		this.gl.viewport(0, 0, width, height);
-		this.props.onResize(width, height);
+		// this.props.onResize(width, height);
 	}
 
-	resizePrograms() {
-		const { width, height } = this.state;
+	resizePrograms(width = this.props.width, height = this.props.height) {
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
 		for(let program of this.programs) {
 			program.resize(width, height);
@@ -218,18 +228,17 @@ export default class Editor extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
+		// only do a render if dimensions change
 		return (
-			nextState.width !== this.state.width ||
-			nextState.height !== this.state.height
+			nextProps.width !== this.props.width ||
+			nextProps.height !== this.props.height
 		);
 	}
 
 	render() {
-		const { width, height } = this.state;
+		const { width, height } = this.props;
 		return (
-			<div className="canvas-wrapper" style={{backgroundImage:'url('+this.props.url+')', maxWidth:width}}>
-				<canvas ref="editor" width={width} height={height} />
-			</div>
+			<canvas ref="editor" width={width} height={height} />
 		)
 	}
 

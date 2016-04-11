@@ -5,10 +5,14 @@ import titleize from 'titleize'
 import FileDropzone from 'FileDropzone'
 
 import Renderer from 'editor/components/Renderer'
+
 import * as Filters from 'editor/filters'
 import filterPresets from 'editor/constants/presets.json'
 
 import { isArray } from 'editor/utils/typeUtils'
+
+const thumbnailWidth = 160;
+const thumbnailHeight = 100;
 
 const defaultFormatter = value => value;
 const percentFormatter = value => (Math.round(value) + '%');
@@ -185,14 +189,9 @@ export default class Editor extends Component {
 
 	// Update filter preset
 	setFilter(filterPreset) {
+
 		const { adjustmentSteps } = this.state;
-
-		// convert array of objects with keys 'key' & 'value' to associative object e.g. key: value
-		const filterAdjustments = {};
-		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
-
-		// generate adjustment steps
-		const filterSteps = this.generateEditStepsFromAdjustments(filterAdjustments);
+		const filterSteps = this.generateEditStepsFromFilterPreset(filterPreset);
 
 		this.setState({
 			filterName: filterPreset.name,
@@ -215,6 +214,13 @@ export default class Editor extends Component {
 		return editSteps;
 	}
 
+	// formats adjustments from filterPreset and gives to generateEditStepsFromAdjustments
+	generateEditStepsFromFilterPreset(filterPreset) {
+		const filterAdjustments = {};
+		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
+		return this.generateEditStepsFromAdjustments(filterAdjustments);
+	}
+
 	handleReceivedFile(files) {
 		console.log('Files received in Editor', files);
 		const file = files[0];
@@ -232,15 +238,23 @@ export default class Editor extends Component {
 			<div className="image-editor">
 				<h1>React WebGL Image Editing</h1>
 				<div className="images">
-					{this.urls.map((_url, i) =>
+					{this.urls.map((_url, i) => 
 						<button key={i} onClick={() => this.setUrl(_url)} disabled={url == _url}>Image {i+1}</button>
 					)}
 				</div>
 				<div className="filters">
-					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>None</button>
-					{filterPresets.map((filterPreset, i) =>
-						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>{filterPreset.title}</button>
-					)}
+					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>
+						<img src={url} width={thumbnailWidth} height={thumbnailHeight} />
+						<br />
+						Original
+					</button>
+					{filterPresets.map((filterPreset, i) => (
+						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>
+							<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} editSteps={this.generateEditStepsFromFilterPreset(filterPreset)} />
+							<br />
+							{filterPreset.title}
+						</button>
+					))}
 				</div>
 				<div className="sliders">
 					{Object.keys(adjustments).map((key, i) => {
@@ -257,7 +271,9 @@ export default class Editor extends Component {
 					<button onClick={event => this.handleReset()}>Reset</button>
 				</div>
 				<FileDropzone onFilesReceived={::this.handleReceivedFile}>
-					<Renderer url={url} width={width} height={height} onResize={this.handleImageResize.bind(this)} editSteps={editSteps} />
+					<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
+						<Renderer url={url} width={width} height={height} onResize={::this.handleImageResize} editSteps={editSteps} autoResize />
+					</div>
 				</FileDropzone>
 			</div>
 		)
