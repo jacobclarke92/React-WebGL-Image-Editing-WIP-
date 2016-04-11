@@ -14,6 +14,10 @@ import hue_fragment from 'editor/shaders/hue_fragment.glsl'
 import saturation_fragment from 'editor/shaders/saturation_fragment.glsl'
 import colorMatrix_update from 'editor/shaders/colorMatrix_update'
 import colorMatrix_fragment from 'editor/shaders/colorMatrix_fragment.glsl'
+import HSL_update from 'editor/shaders/HSL_update'
+import HSL_hueAdjustment_fragment from 'editor/shaders/HSL_hueAdjustment_fragment.glsl'
+import HSL_saturationAdjustment_fragment from 'editor/shaders/HSL_saturationAdjustment_fragment.glsl'
+import HSL_luminanceAdjustment_fragment from 'editor/shaders/HSL_luminanceAdjustment_fragment.glsl'
 
 const Shaders = {
 	default: {
@@ -65,6 +69,21 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: saturation_fragment,
+	},
+	hueAdjustment: {
+		update: HSL_update,
+		vertex: filter_vertex,
+		fragment: HSL_hueAdjustment_fragment,
+	},
+	saturationAdjustment: {
+		update: HSL_update,
+		vertex: filter_vertex,
+		fragment: HSL_saturationAdjustment_fragment,
+	},
+	luminanceAdjustment: {
+		update: HSL_update,
+		vertex: filter_vertex,
+		fragment: HSL_luminanceAdjustment_fragment,
 	},
 	// dummy sharpen for now to keep presets happy
 	sharpen: {

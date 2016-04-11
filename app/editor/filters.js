@@ -163,3 +163,33 @@ export function grain(amount) {
 		value,
 	};
 }
+
+export function hueAdjustment(options) {
+	console.warn('HUE ADJUST OPTS', options);
+	const value = clamp(options.value, -1, 1);
+	return {
+		key: 'hueAdjustment',
+		value,
+		color: options.color,
+	};
+}
+
+export function saturationAdjustment(options) {
+	console.warn('LUMINANCE ADJUST OPTS', options);
+	const value = clamp(options.value, -1, 1);
+	return {
+		key: 'saturationAdjustment',
+		value,
+		color: options.color,
+	};
+}
+
+export function luminanceAdjustment(options) {
+	console.warn('LUMINANCE ADJUST OPTS', options);
+	const value = clamp(options.value, -1, 1);
+	return {
+		key: 'luminanceAdjustment',
+		value,
+		color: options.color,
+	};
+}

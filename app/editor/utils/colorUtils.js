@@ -54,3 +54,23 @@ export function getTemperatureRGB(temp) {
 
 	return {red, green, blue};
 }
+
+const red 		= [187, 13,  44];
+const orange	= [188, 81,  22];
+const yellow	= [191, 182, 38];
+const green		= [69,  188, 33];
+const aqua		= [44,  190, 161];
+const blue		= [13,  109, 188];
+const purple	= [143, 33,  188];
+const magenta 	= [187, 23,  123];
+
+const hueAdjustRanges = {
+	reds: [magenta, orange],
+	oranges: [red, yellow],
+	yellows: [orange, green],
+	greens: [yellow, aqua],
+	aquas: [green, blue],
+	blues: [aqua, purple],
+	purples: [blue, magenta],
+	magentas: [magenta, red],
+}
