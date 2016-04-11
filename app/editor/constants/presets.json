@@ -123,11 +123,11 @@
 		"name": "popPop",
 		"title" : "Pop Pop",
 		"steps": [
-			{"key": "temperature", "value": 6740},
-			{"key": "contrast", "value": 10},
-			{"key": "vibrance", "value": 35},
-			{"key": "saturation", "value": -0.20},
-			{"key": "sharpen", "value": 40}
+			{"key": "temperature", "value": 6900},
+			{"key": "gamma", "value": 1.1},
+			{"key": "contrast", "value": 23},
+			{"key": "vibrance", "value": 23},
+			{"key": "bloom", "value": 0.25}
 		]
 	},
 	{
