@@ -60,20 +60,20 @@ const adjustmentProperties = [
 		tipFormatter: defaultFormatter,
 	},
 	{
-		label: 'saturation',
-		min: -1,
-		max: 0.6,
-		step: 0.01,
-		defaultValue: 0,
-		tipFormatter: decimalPercentFormatter,
-	},
-	{
 		label: 'fade',
 		min: 0,
 		max: 100,
 		step: 1,
 		defaultValue: 0,
 		tipFormatter: percentFormatter,
+	},
+	{
+		label: 'saturation',
+		min: -1,
+		max: 0.6,
+		step: 0.01,
+		defaultValue: 0,
+		tipFormatter: decimalPercentFormatter,
 	},
 	{
 		label: 'vibrance',
