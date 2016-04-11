@@ -86,6 +86,16 @@
 		]
 	},
 	{
+		"name": "bulletproofReadableText",
+		"title" : "Bulletproof Readable Text",
+		"steps": [
+			{"key":"gamma","value": 1.4},
+			{"key":"saturation","value": 0.45},
+			{"key":"fade","value": 85},
+			{"key":"blur","value": 13}
+		]
+	},
+	{
 		"name": "misty",
 		"title" : "Misty",
 		"steps": [
