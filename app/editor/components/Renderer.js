@@ -42,7 +42,11 @@ export default class Editor extends Component {
 		this.gl = this.canvas.getContext('experimental-webgl');
 		if(!this.gl) this.gl = this.canvas.getContext('webgl');
 
-		this.loadImage(url);
+		if(url) {
+			this.loadImage(url);
+		}else{
+			console.log('No URL provided to Renderer');
+		}
 	}
 
 	componentWillReceiveProps(nextProps) {
