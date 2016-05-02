@@ -3,6 +3,7 @@ precision highp float;
 uniform sampler2D texture;
 uniform float amount;
 uniform vec3 baseColor;
+uniform float range;
 
 varying vec2 v_texCoord;
 
@@ -29,7 +30,7 @@ void main(void) {
 	vec4 color = texture2D(texture, v_texCoord);
 	vec3 colorHSV = rgb2hsv(vec3(color.r, color.g, color.b));
 	
-	float range = 30.0/360.0;
+	// float range = 30.0/360.0;
 
 	float hueDifference = colorHSV[0] - avoidColorHSL[0];
 	if(abs(hueDifference) <= range) {

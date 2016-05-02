@@ -182,6 +182,8 @@ export default class Editor extends Component {
 			filterSteps: [],
 			editSteps: [],
 			filterName: null,
+			// hueAmount: 0,
+			// hueRange: 0.13,
 		}
 	}
 
@@ -335,6 +337,22 @@ export default class Editor extends Component {
 							})}
 						</div>
 					</Panel>
+					{/*
+					<Panel title="HSL Adjustments">
+						<Tabs>
+							<Panel title="Hue">
+								<RCSlider value={this.state.hueAmount} min={-1} max={1} step={0.01} onChange={value => {this.setValue('hueAdjustment', {color: [66, 255, 7], value, range: this.state.hueRange}); this.setState({hueAmount: value})}} />
+								<RCSlider value={this.state.hueRange} min={0} max={1} step={0.01} onChange={range => {this.setValue('hueAdjustment', {color: [66, 255, 7], value: this.state.hueAmount, range}); this.setState({hueRange: range})}} />
+							</Panel>
+							<Panel title="Luminance">
+								<div>Hi</div>
+							</Panel>
+							<Panel title="Saturation">
+								<div>Hello</div>
+							</Panel>
+						</Tabs>
+					</Panel>
+					*/}
 				</Tabs>
 				<div>
 					<button onClick={event => this.handleReset()}>Reset</button>

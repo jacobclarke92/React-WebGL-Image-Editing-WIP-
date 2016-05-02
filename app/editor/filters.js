@@ -5,7 +5,7 @@ import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB
 export function temperature(amount) {
 
 	const {red, green, blue} = getTemperatureRGB(amount);
-	console.log('Temperature: '+amount+' K', red, green, blue);
+	// console.log('Temperature: '+amount+' K', red, green, blue);
 
 	const matrix = [
 		red/255,	0,	0,	0,	0,
@@ -167,29 +167,35 @@ export function grain(amount) {
 export function hueAdjustment(options) {
 	console.warn('HUE ADJUST OPTS', options);
 	const value = clamp(options.value, -1, 1);
+	const range = clamp(options.range, 0, 1);
 	return {
 		key: 'hueAdjustment',
 		value,
 		color: options.color,
+		range,
 	};
 }
 
 export function saturationAdjustment(options) {
 	console.warn('LUMINANCE ADJUST OPTS', options);
 	const value = clamp(options.value, -1, 1);
+	const range = clamp(options.range, 0, 1);
 	return {
 		key: 'saturationAdjustment',
 		value,
 		color: options.color,
+		range,
 	};
 }
 
 export function luminanceAdjustment(options) {
 	console.warn('LUMINANCE ADJUST OPTS', options);
 	const value = clamp(options.value, -1, 1);
+	const range = clamp(options.range, 0, 1);
 	return {
 		key: 'luminanceAdjustment',
 		value,
 		color: options.color,
+		range,
 	};
 }
