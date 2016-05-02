@@ -174,7 +174,7 @@ export default class Editor extends Component {
 		this.defaultAdjustments = {...adjustments};
 		
 		this.state = {
-			url: 'test1.jpg',
+			url: this.urls[Math.floor(Math.random()*this.urls.length)],
 			width: 550,
 			height: 400,
 			adjustments: adjustments,
