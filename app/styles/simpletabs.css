@@ -1,5 +1,4 @@
 .tabs-navigation {
-  padding: 0 20px;
   max-height: 50px;
   border-bottom: 1px solid #ddd;
 }
@@ -18,16 +17,16 @@
   height: 50px;
   line-height: 50px;
   border-bottom: 0;
-  color: #a9a9a9;
+  color: #333c47;
   cursor: pointer;
 }
 .tabs-menu-item.is-active a {
   background: #fff;
   border: 1px solid #ddd;
-  border-top: 2px solid #3498db;
+  border-top: 2px solid #96dbfa;
   border-bottom: 0;
-  color: #333;
+  color: #333c47;
 }
 .tabs-menu-item:not(.is-active) a:hover {
-  color: #3498db;
+  color: #96dbfa;
 }
