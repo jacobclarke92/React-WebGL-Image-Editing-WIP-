@@ -100,3 +100,36 @@ p {
 .canvas-wrapper:hover canvas {
     opacity: 0;
 }
+
+
+/* Curve creator styles */
+
+.curve-creator {
+	position: relative;
+	width: 400px;
+	height: 400px;
+	margin: 40px 20px 40px 20px;
+}
+
+.curve-creator:before {
+	content: '0,0';
+	position: absolute;
+	top: calc(100% + 5px);
+	right: calc(100% + 5px);
+}
+
+.curve-creator:after {
+	content: '255,255';
+	position: absolute;
+	bottom: calc(100% + 5px);
+	left: calc(100% + 5px);
+}
+
+.grid-pattern {
+	box-sizing: content-box;
+	text-overflow: clip;
+	background: linear-gradient(0deg, #FFFFFF 2px, rgba(0,0,0,0) 2px), linear-gradient(90deg, #FFFFFF 2px, rgba(0,0,0,0) 2px), linear-gradient(0deg, rgba(255,255,255,0.298039) 1px, rgba(0,0,0,0) 1px), linear-gradient(90deg, rgba(255,255,255,0.298039) 1px, rgba(0,0,0,0) 1px), #96dbfa;
+	background-origin: padding-box;
+	background-clip: border-box;
+	background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+}

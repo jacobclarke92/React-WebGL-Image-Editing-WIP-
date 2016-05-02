@@ -4,6 +4,7 @@ import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
 import FileDropzone from 'FileDropzone'
+import CurveCreator from 'CurveCreator'
 
 import Renderer from 'editor/components/Renderer'
 
@@ -277,6 +278,11 @@ export default class Editor extends Component {
 									</label>
 								)
 							})}
+						</div>
+					</Panel>
+					<Panel title="Curves">
+						<div className="sliders">
+							<CurveCreator />
 						</div>
 					</Panel>
 					<Panel title="Enhancements">
