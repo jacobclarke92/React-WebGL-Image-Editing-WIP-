@@ -13,8 +13,8 @@ import filterPresets from 'editor/constants/presets.json'
 
 import { isArray } from 'editor/utils/typeUtils'
 
-const thumbnailWidth = 160;
-const thumbnailHeight = 100;
+const thumbnailWidth = 120;
+const thumbnailHeight = 90;
 
 const defaultFormatter = value => value;
 const percentFormatter = value => (Math.round(value) + '%');

@@ -46,6 +46,12 @@ p {
 	margin: 15px 0 5px 0;
 }
 
+.filters {
+	max-width: 100%;
+	overflow-x: scroll;
+	white-space: nowrap;
+}
+
 
 /* Dropzone Styles */
 
@@ -99,65 +105,4 @@ p {
 }
 .canvas-wrapper:hover canvas {
     opacity: 0;
-}
-
-
-/* Curve creator styles */
-
-.curve-label {
-	display: inline-block;
-	text-align: center;
-	margin-top: 20px;
-}
-
-.curve-creator {
-	position: relative;
-	width: 400px;
-	height: 400px;
-	margin: 20px 20px 40px 20px;
-}
-
-.grid-pattern {
-	box-sizing: content-box;
-	text-overflow: clip;
-	background: linear-gradient(0deg, #FFFFFF 2px, rgba(0,0,0,0) 2px), linear-gradient(90deg, #FFFFFF 2px, rgba(0,0,0,0) 2px), linear-gradient(0deg, rgba(255,255,255,0.298039) 1px, rgba(0,0,0,0) 1px), linear-gradient(90deg, rgba(255,255,255,0.298039) 1px, rgba(0,0,0,0) 1px), #96dbfa;
-	background-origin: padding-box;
-	background-clip: border-box;
-	background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-}
-
-.curve-point {
-	z-index: 2;
-	position: absolute;
-	box-sizing: border-box;
-	width: 16px;
-	height: 16px;
-	margin: -8px 0 0 -8px;
-
-	border-radius: 100%;
-	border: solid 2px #96dbfa;
-	background-color: #fff;
-	cursor: pointer;
-}
-
-.curve-point:after {
-	content: attr(data-label);
-	display: none;
-	position: absolute;
-	left: 100%;
-	top: 0;
-	white-space: nowrap;
-	padding: 5px;
-	margin: -8px 0 0 10px;
-	background-color: rgba(255,255,255, 0.7);
-}
-
-.curve-point:hover:after {
-	display: block;
-}
-
-.curve-line {
-	position: absolute;
-	left: 0;
-	top: 0;
 }

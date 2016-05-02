@@ -87,7 +87,7 @@
 	},
 	{
 		"name": "bulletproofReadableText",
-		"title" : "Bulletproof Readable Text",
+		"title" : "Blurred Readable",
 		"steps": [
 			{"key":"gamma","value": 1.4},
 			{"key":"saturation","value": 0.45},
@@ -152,6 +152,45 @@
 				}
 			},
 			{"key": "grain", "value": 0.5}
+		]
+	},
+	{
+		"name": "winderHaze",
+		"title": "Winter Haze",
+		"steps": [
+			{"key": "temperature", "value": 6600},
+			{"key": "curves", "value": {
+				"channels": "rgb",
+				"curves": [
+					[0,0],
+					[99,147],
+					[255,255]
+				]	
+			}},
+			{"key": "curves", "value": {
+				"channels": "r",
+				"curves": [
+					[52,0],
+					[155,130],
+					[245,255]
+				]	
+			}},
+			{"key": "curves", "value": {
+				"channels": "g",
+				"curves": [
+					[0,0],
+					[145,115],
+					[255,255]
+				]	
+			}},
+			{"key": "curves", "value": {
+				"channels": "b",
+				"curves": [
+					[0,54],
+					[90,75],
+					[255,255]
+				]	
+			}}
 		]
 	}
 ]
