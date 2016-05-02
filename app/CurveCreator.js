@@ -17,6 +17,7 @@ export default class CurveCreator extends Component {
 
 	static propTypes = {
 		size: PropTypes.number,
+		outputSize: PropTypes.number,
 		lineWidth: PropTypes.number,
 		throttle: PropTypes.number,
 		strokeStyle: PropTypes.string,
@@ -25,6 +26,7 @@ export default class CurveCreator extends Component {
 
 	static defaultProps = {
 		size: 400,
+		outputSize: 255,
 		lineWidth: 4,
 		throttle: 1000/50,
 		strokeStyle: '#333c47',
@@ -39,11 +41,16 @@ export default class CurveCreator extends Component {
 		this.handleCallback = _throttle(this.handleCallback, props.throttle);
 		this.handleMouseMove = this.handleMouseMove.bind(this);
 		this.handleMouseUp = this.handleMouseUp.bind(this);
+		const defaultValue = props.defaultValue ? props.defaultValue.map(point => ({
+			id: ++counter,
+			x: point[0]/props.outputSize*props.size,
+			y: (props.outputSize-point[1])/props.outputSize*props.size,
+		})) : [
+			{id: ++counter, x: 0, y: props.size},
+			{id: ++counter, x: props.size, y: 0},
+		];
 		this.state = {
-			points: props.points || [
-				{id: ++counter, x: 0, y: props.size},
-				{id: ++counter, x: props.size, y: 0},
-			],
+			points: defaultValue,
 		};
 	}
 
@@ -100,7 +107,8 @@ export default class CurveCreator extends Component {
 	}
 
 	handleCallback(points) {
-		const newPoints = points.map(point => [point[0], this.props.size - point[1]]);
+		const { size, outputSize } = this.props;
+		const newPoints = points.map(point => [point[0]/size*outputSize, (size - point[1])/size*outputSize]);
 		this.props.onChange(newPoints);
 	}
 
@@ -127,7 +135,7 @@ export default class CurveCreator extends Component {
 
 	render() {
 
-		const { size } = this.props;
+		const { size, outputSize } = this.props;
 		const { points } = this.state;
 
 		return (
@@ -143,7 +151,7 @@ export default class CurveCreator extends Component {
 						className="curve-point"
 						style={{left: point.x, top: point.y}} 
 						onMouseDown={event => this.handlePointMouseDown(event, point.id)}
-						data-label={Math.round(point.x/size*255) + ', ' + Math.round((size-point.y)/size*255)} />
+						data-label={Math.round(point.x/size * outputSize) + ', ' + Math.round((size-point.y)/size * outputSize)} />
 				)}
 			</div>
 		)

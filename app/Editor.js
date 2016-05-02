@@ -135,22 +135,22 @@ const curveAdjustmentProperties = [
 	{
 		label: 'curves',
 		channels: 'rgb',
-		defaultValue: [[0,0], [255,255]],
+		defaultValue: {channels: 'rgb', curves: [[0,0], [255,255]]},
 	},
 	{
 		label: 'curves_red',
 		channels: 'r', 
-		defaultValue: [[0,0], [255,255]],
+		defaultValue: {channels: 'r', curves: [[0,0], [255,255]]},
 	},
 	{
 		label: 'curves_green',
 		channels: 'g', 
-		defaultValue: [[0,0], [255,255]],
+		defaultValue: {channels: 'g', curves: [[0,0], [255,255]]},
 	},
 	{
 		label: 'curves_blue',
 		channels: 'b', 
-		defaultValue: [[0,0], [255,255]],
+		defaultValue: {channels: 'b', curves: [[0,0], [255,255]]},
 	},
 ];
 
@@ -312,11 +312,12 @@ export default class Editor extends Component {
 					</Panel>
 					<Panel title="Curves">
 						{Object.keys(adjustments).filter(key => curvePropertyLabels.indexOf(key) >= 0).map((key, i) => {
-							const { label, channels, ...inputAttrs } = curveAdjustmentProperties.filter(effect => effect.label === key)[0];
+							const { label, channels } = curveAdjustmentProperties.filter(effect => effect.label === key)[0];
+							const points = adjustments[key].curves;
 							return (
 								<label key={'curve'+i} className="curve-label">
 									<div>{titleize(label.replace('_', ' '))}</div>
-									<CurveCreator {...inputAttrs} size={200} onChange={points => this.setValue(key, {channels, curves: points})} />
+									<CurveCreator defaultValue={points} size={200} onChange={points => this.setValue(key, {channels, curves: points})} />
 								</label>
 							)
 						})}
