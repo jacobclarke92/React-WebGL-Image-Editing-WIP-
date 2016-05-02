@@ -16,6 +16,7 @@ export default class Editor extends Component {
 		width: 400,
 		height: 400,
 		onResize: () => {},
+		onRender: () => {},
 		autoResize: false,
 		editSteps: [],
 	};
@@ -57,7 +58,7 @@ export default class Editor extends Component {
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
-			console.log('------------------');
+			// console.log('------------------');
 			this.resetPrograms();
 			this.resetFramebuffers();
 			this.lastEditStepsKeys = editStepsKeys;
@@ -66,16 +67,16 @@ export default class Editor extends Component {
 		}else{
 
 			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-				console.log('---');
-				console.log('width/height changed!', nextProps.width, nextProps.height);
+				// console.log('---');
+				// console.log('width/height changed!', nextProps.width, nextProps.height);
 				this.resizeViewport(nextProps.width, nextProps.height);
 				this.resizePrograms(nextProps.width, nextProps.height);
 				setTimeout(() => this.renderEditSteps());
 			}
 
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
-				console.log('---');
-				console.log('editStepsKeys changed');
+				// console.log('---');
+				// console.log('editStepsKeys changed');
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms();
 				this.resizePrograms();
@@ -84,21 +85,21 @@ export default class Editor extends Component {
 				setTimeout(() => this.renderEditSteps());
 
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
-				console.log('---');
-				console.log('editSteps changed');
+				// console.log('---');
+				// console.log('editSteps changed');
 				this.renderEditSteps();
 			}
 		}
 	}
 
 	loadImage(url) {
-		console.log('loading image...');
+		console.log('loading', url);
 		this.image.src = url;
 	}
 
 	handleImageLoad(image) {
-		console.log('---');
-		console.log('image loaded');
+		// console.log('---');
+		console.log(this.props.url, 'loaded');
 
 		// make texture for base image, destroy old one first if it exists
 		if(this.imageTexture) this.imageTexture.destroy();
@@ -113,7 +114,7 @@ export default class Editor extends Component {
 		this.buildPrograms();
 
 		if(!this.props.autoResize) {
-			console.log('not autoResizing so render immediately');
+			// console.log('not autoResizing so render immediately');
 			this.resizeViewport();
 			this.resizePrograms();
 			this.renderEditSteps();
@@ -137,7 +138,7 @@ export default class Editor extends Component {
 	}
 
 	buildPrograms(programList = this.lastEditStepsKeys) {
-		console.log('building programs', programList);
+		// console.log('building programs', programList);
 		this.resetPrograms();
 		programList.map(filterLabel => {
 			this.addProgram(filterLabel);
@@ -190,7 +191,7 @@ export default class Editor extends Component {
 
 		const steps = [{key: 'default'}, ...editSteps];
 
-		console.log('render steps', steps);
+		// console.log('render steps', steps);
 
 		for(let count = 0; count < steps.length; count ++) {
 			const step = steps[count];
@@ -227,8 +228,9 @@ export default class Editor extends Component {
 			program.draw();
 
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
-
 		}
+
+		this.props.onRender();
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
