@@ -130,8 +130,33 @@ const enhancementAdjustmentProperties = [
 	},
 ];
 
+Filters.curves_red = Filters.curves_green = Filters.curves_blue = Filters.curves;
+const curveAdjustmentProperties = [
+	{
+		label: 'curves',
+		channels: 'rgb',
+		defaultValue: [[0,0], [255,255]],
+	},
+	{
+		label: 'curves_red',
+		channels: 'r', 
+		defaultValue: [[0,0], [255,255]],
+	},
+	{
+		label: 'curves_green',
+		channels: 'g', 
+		defaultValue: [[0,0], [255,255]],
+	},
+	{
+		label: 'curves_blue',
+		channels: 'b', 
+		defaultValue: [[0,0], [255,255]],
+	},
+];
+
 const tonalPropertyLabels = tonalAdjustmentProperties.map(property => property.label);
 const enhancementPropertyLabels = enhancementAdjustmentProperties.map(property => property.label);
+const curvePropertyLabels = curveAdjustmentProperties.map(property => property.label);
 
 export default class Editor extends Component {
 
@@ -140,9 +165,10 @@ export default class Editor extends Component {
 		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test_big.jpg'];
 
 		// generate initial slider values
-		const adjustments = {};
+		const adjustments = {curves: []};
 		tonalAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		enhancementAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+		curveAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 
 		// store reset point, make a copy of adjustments object
 		this.defaultAdjustments = {...adjustments};
@@ -215,7 +241,11 @@ export default class Editor extends Component {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
-			const adjustmentProperties = [...tonalAdjustmentProperties, ...enhancementAdjustmentProperties];
+			const adjustmentProperties = [
+				...tonalAdjustmentProperties, 
+				...enhancementAdjustmentProperties, 
+				...curveAdjustmentProperties
+			];
 			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
 			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
 				editSteps.push(Filters[adjustment](adjustmentValue));
@@ -273,7 +303,7 @@ export default class Editor extends Component {
 								const { label, ...inputAttrs } = tonalAdjustmentProperties.filter(effect => effect.label === key)[0];
 								return (
 									<label key={i}>
-		                                <div>{titleize(label)}</div>
+										<div>{titleize(label)}</div>
 										<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
 									</label>
 								)
@@ -281,9 +311,15 @@ export default class Editor extends Component {
 						</div>
 					</Panel>
 					<Panel title="Curves">
-						<div className="sliders">
-							<CurveCreator />
-						</div>
+						{Object.keys(adjustments).filter(key => curvePropertyLabels.indexOf(key) >= 0).map((key, i) => {
+							const { label, channels, ...inputAttrs } = curveAdjustmentProperties.filter(effect => effect.label === key)[0];
+							return (
+								<label key={i} className="curve-label">
+									<div>{titleize(label.replace('_', ' '))}</div>
+									<CurveCreator {...inputAttrs} size={200} onChange={points => this.setValue(key, {channels, curves: points})} />
+								</label>
+							)
+						})}
 					</Panel>
 					<Panel title="Enhancements">
 						<div className="sliders">
