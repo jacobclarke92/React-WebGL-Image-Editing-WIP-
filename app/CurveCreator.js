@@ -129,6 +129,11 @@ export default class CurveCreator extends Component {
 		this.ctx.stroke();
 	}
 
+	handlePointDelete(id) {
+		const points = this.state.points.filter(point => point.id !== id);
+		this.setState({points});
+	}
+
 	componentWillUpdate(nextProps, nextState) {
 		this.handleCurveDraw(nextState.points);
 	}
@@ -151,6 +156,7 @@ export default class CurveCreator extends Component {
 						className="curve-point"
 						style={{left: point.x, top: point.y}} 
 						onMouseDown={event => this.handlePointMouseDown(event, point.id)}
+						onDoubleClick={event => this.handlePointDelete(point.id)}
 						data-label={Math.round(point.x/size * outputSize) + ', ' + Math.round((size-point.y)/size * outputSize)} />
 				)}
 			</div>
