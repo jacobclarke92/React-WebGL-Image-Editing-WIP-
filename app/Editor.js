@@ -214,7 +214,8 @@ export default class Editor extends Component {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
-			const adjustmentProperty = tonalAdjustmentProperties.filter(property => property.label === adjustment)[0];
+			const adjustmentProperties = [...tonalAdjustmentProperties, ...enhancementAdjustmentProperties];
+			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
 			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
 				editSteps.push(Filters[adjustment](adjustmentValue));
 			}
