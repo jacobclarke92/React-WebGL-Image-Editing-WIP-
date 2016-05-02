@@ -244,7 +244,7 @@ export default class Editor extends Component {
 				</div>
 				<div className="filters">
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>
-						<img src={url} width={thumbnailWidth} height={thumbnailHeight} />
+						<img src={url} width={thumbnailWidth} height={thumbnailHeight} onMouseDown={e => e.preventDefault()} />
 						<br />
 						Original
 					</button>
