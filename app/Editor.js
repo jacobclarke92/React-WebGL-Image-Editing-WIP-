@@ -302,7 +302,7 @@ export default class Editor extends Component {
 							{Object.keys(adjustments).filter(key => tonalPropertyLabels.indexOf(key) >= 0).map((key, i) => {
 								const { label, ...inputAttrs } = tonalAdjustmentProperties.filter(effect => effect.label === key)[0];
 								return (
-									<label key={i}>
+									<label key={'tonal'+i}>
 										<div>{titleize(label)}</div>
 										<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
 									</label>
@@ -314,7 +314,7 @@ export default class Editor extends Component {
 						{Object.keys(adjustments).filter(key => curvePropertyLabels.indexOf(key) >= 0).map((key, i) => {
 							const { label, channels, ...inputAttrs } = curveAdjustmentProperties.filter(effect => effect.label === key)[0];
 							return (
-								<label key={i} className="curve-label">
+								<label key={'curve'+i} className="curve-label">
 									<div>{titleize(label.replace('_', ' '))}</div>
 									<CurveCreator {...inputAttrs} size={200} onChange={points => this.setValue(key, {channels, curves: points})} />
 								</label>
@@ -326,7 +326,7 @@ export default class Editor extends Component {
 							{Object.keys(adjustments).filter(key => enhancementPropertyLabels.indexOf(key) >= 0).map((key, i) => {
 								const { label, ...inputAttrs } = enhancementAdjustmentProperties.filter(effect => effect.label === key)[0];
 								return (
-									<label key={i}>
+									<label key={'enhancement'+i}>
 		                                <div>{titleize(label)}</div>
 										<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
 									</label>
