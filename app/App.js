@@ -4,6 +4,7 @@ import HTML5Backend from 'react-dnd-html5-backend'
 
 import 'styles/app.css'
 import 'styles/rcslider.css'
+import 'styles/simpletabs.css'
 
 import Editor from 'Editor'
 

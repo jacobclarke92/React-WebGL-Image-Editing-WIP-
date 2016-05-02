@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react'
+import Tabs, { Panel } from 'react-simpletabs'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
@@ -18,7 +19,7 @@ const defaultFormatter = value => value;
 const percentFormatter = value => (Math.round(value) + '%');
 const decimalPercentFormatter = value => (Math.round(value*100) + '%');
 
-const adjustmentProperties = [
+const tonalAdjustmentProperties = [
 	{
 		label: 'hue',
 		min: 0,
@@ -83,6 +84,9 @@ const adjustmentProperties = [
 		defaultValue: 0,
 		tipFormatter: percentFormatter,
 	},
+];
+
+const enhancementAdjustmentProperties = [
 	{
 		label: 'denoise',
 		min: 0,
@@ -125,6 +129,9 @@ const adjustmentProperties = [
 	},
 ];
 
+const tonalPropertyLabels = tonalAdjustmentProperties.map(property => property.label);
+const enhancementPropertyLabels = enhancementAdjustmentProperties.map(property => property.label);
+
 export default class Editor extends Component {
 
 	constructor(props) {
@@ -133,7 +140,8 @@ export default class Editor extends Component {
 
 		// generate initial slider values
 		const adjustments = {};
-		adjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+		tonalAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+		enhancementAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 
 		// store reset point, make a copy of adjustments object
 		this.defaultAdjustments = {...adjustments};
@@ -206,7 +214,7 @@ export default class Editor extends Component {
 		const editSteps = [];
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
-			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
+			const adjustmentProperty = tonalAdjustmentProperties.filter(property => property.label === adjustment)[0];
 			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
 				editSteps.push(Filters[adjustment](adjustmentValue));
 			}
@@ -256,17 +264,34 @@ export default class Editor extends Component {
 						</button>
 					))}
 				</div>
-				<div className="sliders">
-					{Object.keys(adjustments).map((key, i) => {
-						const { label, ...inputAttrs } = adjustmentProperties.filter(effect => effect.label === key)[0];
-						return (
-							<label key={i}>
-                                <div>{titleize(label)}</div>
-								<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
-							</label>
-						)
-					})}
-				</div>
+				<Tabs>
+					<Panel title="Tonal Adjustments">
+						<div className="sliders">
+							{Object.keys(adjustments).filter(key => tonalPropertyLabels.indexOf(key) >= 0).map((key, i) => {
+								const { label, ...inputAttrs } = tonalAdjustmentProperties.filter(effect => effect.label === key)[0];
+								return (
+									<label key={i}>
+		                                <div>{titleize(label)}</div>
+										<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
+									</label>
+								)
+							})}
+						</div>
+					</Panel>
+					<Panel title="Enhancements">
+						<div className="sliders">
+							{Object.keys(adjustments).filter(key => enhancementPropertyLabels.indexOf(key) >= 0).map((key, i) => {
+								const { label, ...inputAttrs } = enhancementAdjustmentProperties.filter(effect => effect.label === key)[0];
+								return (
+									<label key={i}>
+		                                <div>{titleize(label)}</div>
+										<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
+									</label>
+								)
+							})}
+						</div>
+					</Panel>
+				</Tabs>
 				<div>
 					<button onClick={event => this.handleReset()}>Reset</button>
 				</div>
