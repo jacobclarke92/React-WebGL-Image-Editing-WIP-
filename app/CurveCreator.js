@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import _throttle from 'lodash/throttle'
+import deepEqual from 'deep-equal'
 
 import { clamp } from 'editor/utils/mathUtils'
 import { curvesHashTable } from 'editor/utils/colorUtils'
@@ -63,6 +64,19 @@ export default class CurveCreator extends Component {
 	componentWillUnmount() {
 		document.removeEventListener('mousemove', this.handleMouseMove);
 		document.removeEventListener('mouseup', this.handleMouseUp);
+	}
+
+	// Resets state points if points change, e.g. reset button pressed
+	componentWillReceiveProps(nextProps) {
+		if(!this.capturingMouseMove && !deepEqual(this.props.defaultValue, nextProps.defaultValue)) {
+			const { size, outputSize } = this.props;
+			const points = nextProps.defaultValue.map(point => ({
+				id: ++counter,
+				x: point[0]/outputSize*size,
+				y: (outputSize-point[1])/outputSize*size,
+			}));
+			this.setState({points});
+		}
 	}
 
 	handleMouseUp(event) {
