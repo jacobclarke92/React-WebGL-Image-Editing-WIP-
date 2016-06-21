@@ -34,6 +34,27 @@ p {
 	margin-top: 0;
 }
 
+label {
+	display: block;
+	font-size: 14px;
+	margin: 16px 0 8px 0;
+}
+
+.input {
+	display: inline-block;
+	width: 800px;
+	margin-top: 50px;
+	text-align: left;
+}
+
+.input textarea {
+	width: 100%;
+}
+
+.text-center {
+	text-align: center;
+}
+
 .sliders {
 	margin-bottom: 20px;
 }

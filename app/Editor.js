@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import Tabs, { Panel } from 'react-simpletabs'
+import Textarea from 'react-textarea-autosize'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
@@ -280,11 +281,13 @@ export default class Editor extends Component {
 			<div className="image-editor">
 				<h1>React WebGL Image Editing</h1>
 				<div className="images">
+					<label>Select an image below or drag your own onto the window</label>
 					{this.urls.map((_url, i) => 
 						<button key={i} onClick={() => this.setUrl(_url)} disabled={url == _url}>Image {i+1}</button>
 					)}
 				</div>
 				<div className="filters">
+					<label>Select a preset (optional)</label>
 					<button onClick={() => this.setFilter({title: null, steps: []})} disabled={!filterName}>
 						<img src={url} width={thumbnailWidth} height={thumbnailHeight} onMouseDown={e => e.preventDefault()} />
 						<br />
@@ -362,6 +365,18 @@ export default class Editor extends Component {
 						<Renderer url={url} width={width} height={height} onResize={::this.handleImageResize} editSteps={editSteps} autoResize />
 					</div>
 				</FileDropzone>
+				<div className="text-center">
+					{/*
+					<div className="input">
+						<label>Edit Steps</label>
+						<Textarea value={JSON.stringify(editSteps, null, '\t')} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+					</div>
+					*/}
+					<div className="input">
+						<label>Terminal command</label>
+						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+					</div>
+				</div>
 			</div>
 		)
 	}

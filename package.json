@@ -55,6 +55,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.0.2",
     "react-simpletabs": "^0.7.0",
+    "react-textarea-autosize": "^4.0.2",
     "regression": "^1.2.1",
     "save-pixels": "^2.3.3",
     "titleize": "^1.0.0"
