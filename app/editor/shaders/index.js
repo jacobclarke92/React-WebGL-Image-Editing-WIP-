@@ -1,4 +1,5 @@
 import default_vertex from './default_vertex.glsl'
+import default_vertex_node from './default_vertex_node.glsl'
 import default_fragment from './default_fragment.glsl'
 import default_update from './default_update'
 
@@ -23,6 +24,11 @@ const Shaders = {
 	default: {
 		update: default_update,
 		vertex: default_vertex,
+		fragment: default_fragment,
+	},
+	default_node: {
+		update: default_update,
+		vertex: default_vertex_node,
 		fragment: default_fragment,
 	},
 	blur: {

@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import async from 'async'
+import ndarray from 'ndarray'
 import sizeOf from 'image-size'
 import getPixels from 'get-pixels'
 import savePixels from 'save-pixels'
@@ -11,6 +12,7 @@ import Program from '../app/editor/Program'
 import Texture from '../app/editor/Texture'
 import FramebufferTexture from '../app/editor/FramebufferTexture'
 import Shaders from '../app/editor/shaders'
+import { getProgramInfo } from '../app/editor/utils/webglUtils'
 
 const args = {};
 process.argv.slice(2).forEach(arg => {
@@ -32,17 +34,18 @@ let currentFramebufferIndex = -1;
 
 const gl = GL(10, 10);
 const imageTexture = new Texture(gl);
-const defaultProgram = new Program('default', gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
+const defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
 
 console.log(gl.drawingBufferHeight, gl.drawingBufferWidth);
 const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
-function resize(_width, _height) {
-	width = _width;
-	height = _height;
-	EXT_resize.resize(width, height);
-	console.log(gl.drawingBufferHeight, gl.drawingBufferWidth);
-}
 
+function getTempFramebuffer(index) {
+	if(!framebuffers[index]) {
+		framebuffers[index] = new FramebufferTexture(gl);
+		framebuffers[index].attachEmptyTexture(width, height);
+	}
+	return framebuffers[index];
+}
 
 function resetPrograms() {
 	for(let program of programs) {
@@ -78,8 +81,12 @@ function resetFramebuffers() {
 	framebuffers = [];
 }
 
-function resizeViewport() {
+function resizeViewport(_width, _height) {
+	width = _width;
+	height = _height;
+	EXT_resize.resize(width, height);
 	gl.viewport(0, 0, width, height);
+	console.log(gl.drawingBufferHeight, gl.drawingBufferWidth);
 }
 
 function resizePrograms() {
@@ -91,6 +98,57 @@ function resizePrograms() {
 
 function renderEditSteps() {
 	console.log('OMG do some rendering');
+	// const steps = [{key: 'default'}, ...editSteps];
+	const steps = [{key: 'default_node'}, ...editSteps];
+	// const steps = [{key: 'default'}];
+
+	for(let count = 0; count < steps.length; count ++) {
+		const step = steps[count];
+		const program = count === 0 ? defaultProgram : programs[count-1];
+
+		// switch to program
+		program.use();
+
+		// run the shader's update function -- modifies uniforms
+		// program must be in use before calling update otherwise current program's uniforms get modified
+		program.update(step);
+
+		// determine source texture - original image texture if first pass or a framebuffer texture
+		const sourceTexture = count === 0 ? imageTexture : getTempFramebuffer(currentFramebufferIndex).texture;
+
+		// determine render target, set to null if last one because null = canvas
+		let target = null;
+		if(count < steps.length-1) {
+			currentFramebufferIndex = (currentFramebufferIndex+1)%2;
+			target = getTempFramebuffer(currentFramebufferIndex).id;
+		}
+
+		// pre-render calcs idk
+		program.willRender();
+
+		// use current source texture and framebuffer target
+		sourceTexture.use();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+
+		// post-render calcs idk
+		program.didRender();
+
+		// draw that shit
+		program.draw();
+
+		// console.table(getProgramInfo(gl, program.program).uniforms);
+	}
+}
+
+function saveImage() {
+	let pixels = new Uint8Array(width*height*4);
+	gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+	const extIndex = args.input.lastIndexOf('.');
+	const savePath = ('output' in args) ? args.output : args.input.slice(0, extIndex-1) + '_processed' + args.input.slice(extIndex);
+	const saveFile = fs.createWriteStream(savePath, {flags: 'w'});
+	// console.log(pixels);
+	const data = ndarray(pixels, [width, height, 4], [4, 4*width, 1], 0);
+	savePixels(data, 'png').pipe(saveFile);
 }
 
 if('editSteps' in args) {
@@ -100,25 +158,16 @@ if('editSteps' in args) {
 
 if('input' in args) {
 	const imagePath = path.resolve(args.input);
-	async.parallel([
-		callback => sizeOf(imagePath, (err, dimensions) => {
-			if(err) return callback(err);
-			resizeViewport(dimensions.width, dimensions.height);
-			callback();
-		}),
-		callback => getPixels(imagePath, (err, pixels) => {
-			if(err) return callback(err);
-			console.log('Got pixels');
-			imagePixels = pixels;
-			callback();
-		}),
-	], err => {
-		if(err) console.log('Error', err);
-		console.log('Done');
-		imageTexture.loadFromBytes(imagePixels, width, height);
+	getPixels(imagePath, (err, pixels) => {
+		if(err) return callback(err);
+		console.log('Got pixels');
+		resizeViewport(pixels.shape[0], pixels.shape[1]);
+		imageTexture.loadFromBytes(pixels.data, width, height);
 
 		buildPrograms();
 		resizePrograms();
 		renderEditSteps();
-	})
+
+		saveImage(); 
+	});
 }
