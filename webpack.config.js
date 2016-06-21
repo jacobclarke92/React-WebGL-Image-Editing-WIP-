@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var babelLoaderSettings = JSON.stringify({
 	cacheDirectory: true,
 	presets: ['es2015', 'stage-0', 'react'],
-	plugins: ['transform-decorators-legacy'],
+	plugins: ['transform-decorators-legacy', 'glslify'],
 });
 
 module.exports = {
@@ -37,9 +37,14 @@ module.exports = {
 				loaders: ['react-hot','babel?'+babelLoaderSettings],
 				include: [path.join(__dirname, 'app')]
 			},
+			// {
+			// 	test: /\.glsl$/,
+			// 	loader: 'raw',
+			// 	include: [path.join(__dirname, 'app')],
+			// },
 			{
 				test: /\.glsl$/,
-				loader: 'webpack-glsl',
+				loaders: ['babel?'+babelLoaderSettings],
 				include: [path.join(__dirname, 'app')],
 			},
 			{

@@ -1,13 +1,13 @@
 import React, { PropTypes, Component } from 'react'
 import deepEqual from 'deep-equal'
 
-import Shaders from 'editor/shaders'
+import Shaders from '../shaders'
 
-import Program from 'editor/Program'
-import Texture from 'editor/Texture'
-import FramebufferTexture from 'editor/FramebufferTexture'
+import Program from '../Program'
+import Texture from '../Texture'
+import FramebufferTexture from '../FramebufferTexture'
 
-import { getProgramInfo } from 'editor/utils/webglUtils'
+import { getProgramInfo } from '../utils/webglUtils'
 
 export default class Editor extends Component {
 
@@ -55,6 +55,8 @@ export default class Editor extends Component {
 		this.setState({settings: nextProps.settings});
 
 		const editStepsKeys = nextProps.editSteps.map(editStep => editStep.key);
+
+		console.log(JSON.stringify(nextProps.editSteps).split('"').join('\\"'));
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {

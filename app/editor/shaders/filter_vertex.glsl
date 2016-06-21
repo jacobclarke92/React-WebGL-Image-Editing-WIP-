@@ -1,3 +1,4 @@
+export default `
 attribute vec2 a_position;
 attribute vec2 a_texCoord;
 uniform vec2 u_resolution;
@@ -10,3 +11,4 @@ void main() {
    gl_Position = vec4(clipSpace * vec2(1, 1), 0, 1);
    v_texCoord = a_texCoord;
 }
+`

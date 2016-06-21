@@ -1,5 +1,5 @@
-import { curvesHashTable } from 'editor/utils/colorUtils'
-import Texture from 'editor/Texture'
+import { curvesHashTable } from '../utils/colorUtils'
+import Texture from '../Texture'
 
 export default function(settings) {
 

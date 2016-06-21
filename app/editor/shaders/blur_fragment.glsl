@@ -1,6 +1,7 @@
+export default `
 precision highp float;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 varying vec2 v_texCoord;
 
 uniform float blur;
@@ -31,7 +32,7 @@ vec3 BlurredPixel (in vec2 uv) {
             float fx = Gaussian (blur, float(ix) - float(c_halfSamplesX));
             float offsetX = float(ix - c_halfSamplesX) * c_pixelSizeX;
             total += fx * fy;            
-            ret += texture2D(texture, uv + vec2(offsetX, offsetY)).rgb * fx*fy;
+            ret += texture2D(Texture, uv + vec2(offsetX, offsetY)).rgb * fx*fy;
 
         }
     }
@@ -42,3 +43,4 @@ void main(void) {
     vec2 uv = v_texCoord.xy;
     gl_FragColor = vec4(BlurredPixel(uv), 1.0);
 }
+`

@@ -1,6 +1,7 @@
+export default  `
 precision highp float;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 uniform float amount;
 uniform vec3 baseColor;
 uniform float range;
@@ -27,7 +28,7 @@ void main(void) {
 
 	vec3 avoidColorHSL = rgb2hsv(vec3(baseColor.r/255.0, baseColor.g/255.0, baseColor.b/255.0));
 
-	vec4 color = texture2D(texture, v_texCoord);
+	vec4 color = texture2D(Texture, v_texCoord);
 	vec3 colorHSV = rgb2hsv(vec3(color.r, color.g, color.b));
 	
 	// float range = 30.0/360.0;
@@ -43,3 +44,4 @@ void main(void) {
 		gl_FragColor = color;
 	}
 }
+`

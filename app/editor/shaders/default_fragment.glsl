@@ -1,8 +1,10 @@
+export default `
 precision highp float;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 varying vec2 v_texCoord;
  
 void main() {
-   gl_FragColor = texture2D(texture, v_texCoord);
+   gl_FragColor = texture2D(Texture, v_texCoord);
 }
+`

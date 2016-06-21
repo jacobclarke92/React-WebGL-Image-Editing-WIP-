@@ -1,11 +1,11 @@
-import Texture from 'editor/Texture'
+import Texture from './Texture'
 
-import { createProgramFromSources } from 'editor/utils/shaderUtils'
-import { setBufferRectangle } from 'editor/utils/webglUtils'
-import { isNumeric, isArray } from 'editor/utils/typeUtils'
+import { createProgramFromSources } from './utils/shaderUtils'
+import { setBufferRectangle } from './utils/webglUtils'
+import { isNumeric, isArray } from './utils/typeUtils'
 
-import defaultVertexSource from 'editor/shaders/default_vertex.glsl'
-import defaultFragmentSource from 'editor/shaders/default_fragment.glsl'
+import defaultVertexSource from './shaders/default_vertex.glsl'
+import defaultFragmentSource from './shaders/default_fragment.glsl'
 
 export default class Program {
 

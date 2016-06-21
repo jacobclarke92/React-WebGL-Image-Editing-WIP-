@@ -16,6 +16,10 @@ You'll probably need to install webpack globally:
 
 `npm install -g webpack webpack-dev-server`
 
+Also babel-cli if you plan on using the node.js renderer
+
+`npm install -g babel-cli`
+
 Then navigate to project directory and install npm dependencies
 
 `npm install`

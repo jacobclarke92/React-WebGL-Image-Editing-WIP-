@@ -1,6 +1,7 @@
+export default  `
 precision highp float;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 varying vec2 v_texCoord;
 
 uniform float bloom;
@@ -34,8 +35,9 @@ void main(void) {
     float BlurSize = 2.0 - Bloom * 2.0;
     float Intensity = 2.0 - Bloom * 2.0;
     
-    vec4 Color = texture2D(texture, uv);
-    vec4 Highlight = clamp(BlurColor(uv, texture, BlurSize) - Threshold, 0.0, 1.0) * 1.0 / (1.0 - Threshold);
+    vec4 Color = texture2D(Texture, uv);
+    vec4 Highlight = clamp(BlurColor(uv, Texture, BlurSize) - Threshold, 0.0, 1.0) * 1.0 / (1.0 - Threshold);
         
     gl_FragColor = 1.0 - (1.0 - Color) * (1.0 - Highlight*Intensity); //Screen Blend Mode
 }
+`

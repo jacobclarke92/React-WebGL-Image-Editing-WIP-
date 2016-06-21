@@ -1,4 +1,4 @@
-import Texture from 'editor/Texture'
+import Texture from './Texture'
 
 export default class FramebufferTexture {
 

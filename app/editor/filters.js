@@ -1,5 +1,5 @@
-import { clamp } from 'editor/utils/mathUtils'
-import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB} from 'editor/utils/colorUtils'
+import { clamp } from './utils/mathUtils'
+import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB} from './utils/colorUtils'
 
 
 export function temperature(amount) {

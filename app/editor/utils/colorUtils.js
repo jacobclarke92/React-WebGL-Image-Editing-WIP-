@@ -1,6 +1,6 @@
 import regression from 'regression'
-import { clamp } from 'editor/utils/mathUtils'
-import { isNumeric } from 'editor/utils/typeUtils'
+import { clamp } from './mathUtils'
+import { isNumeric } from './typeUtils'
 
 export function curvesHashTable(points = [[0,0], [255,255]], min = 0, max = 255) {
 	const result = regression('polynomial', points, points.length-1);

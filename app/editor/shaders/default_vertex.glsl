@@ -1,3 +1,4 @@
+export default `
 precision highp float;
 
 attribute vec2 a_position;
@@ -24,3 +25,4 @@ void main() {
    // The GPU will interpolate this value between points
    v_texCoord = a_texCoord;
 }
+`

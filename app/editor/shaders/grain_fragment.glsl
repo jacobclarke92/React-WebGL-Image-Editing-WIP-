@@ -1,6 +1,7 @@
+export default  `
 precision highp float;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 uniform float grain;
 
 varying vec2 v_texCoord;
@@ -10,7 +11,7 @@ float rand(vec2 co) {
 }
 
 void main() {
-    vec4 color = texture2D(texture, v_texCoord);
+    vec4 color = texture2D(Texture, v_texCoord);
 
     float diff = (rand(v_texCoord) - 0.5) * grain;
     color.r += diff;
@@ -19,3 +20,4 @@ void main() {
 
     gl_FragColor = color;
 }
+`

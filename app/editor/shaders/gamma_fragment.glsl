@@ -1,13 +1,14 @@
+export default `
 precision highp float;
 
 varying vec2 v_texCoord;
 
-uniform sampler2D texture;
+uniform sampler2D Texture;
 uniform float gamma;
 
 void main(void) {
 	float g = pow(gamma, -1.0);
-	vec4 color = texture2D(texture, v_texCoord);
+	vec4 color = texture2D(Texture, v_texCoord);
 	color.rgb = vec3(
 		pow(abs(color.r), g),
 		pow(abs(color.g), g),
@@ -15,3 +16,4 @@ void main(void) {
 	);
 	gl_FragColor = color;
 }
+`
