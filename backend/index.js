@@ -171,9 +171,13 @@ if('editSteps' in args) {
 }
 
 if('input' in args) {
-	const imagePath = path.resolve(args.input);
+	const imagePath = path.isAbsolute(args.input) ? args.input : path.resolve(__dirname + '/../' + args.input);
+	console.log(imagePath)
 	getPixels(imagePath, (err, pixels) => {
-		if(err) return callback(err);
+		if(err) {
+			console.log('Error reading file', err);
+			return;
+		}
 		console.log('Got pixels');
 		console.log('After pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
