@@ -1,13 +1,13 @@
 import React, { PropTypes, Component } from 'react'
 import deepEqual from 'deep-equal'
 
-import Shaders from '../shaders'
+import Shaders from './editor/shaders'
 
-import Program from '../Program'
-import Texture from '../Texture'
-import FramebufferTexture from '../FramebufferTexture'
+import Program from './editor/Program'
+import Texture from './editor/Texture'
+import FramebufferTexture from './editor/FramebufferTexture'
 
-import { getProgramInfo } from '../utils/webglUtils'
+import { getProgramInfo } from './editor/utils/webglUtils'
 
 export default class Editor extends Component {
 

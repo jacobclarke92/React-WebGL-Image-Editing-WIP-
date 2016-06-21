@@ -4,15 +4,14 @@ import Textarea from 'react-textarea-autosize'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
-import FileDropzone from 'FileDropzone'
-import CurveCreator from 'CurveCreator'
+import FileDropzone from './FileDropzone'
+import CurveCreator from './CurveCreator'
+import Renderer from './Renderer'
 
-import Renderer from 'editor/components/Renderer'
+import * as Filters from './editor/filters'
+import filterPresets from './editor/constants/presets.json'
 
-import * as Filters from 'editor/filters'
-import filterPresets from 'editor/constants/presets.json'
-
-import { isArray } from 'editor/utils/typeUtils'
+import { isArray } from './editor/utils/typeUtils'
 
 const thumbnailWidth = 120;
 const thumbnailHeight = 90;
