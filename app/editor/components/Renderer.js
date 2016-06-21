@@ -55,8 +55,7 @@ export default class Editor extends Component {
 		this.setState({settings: nextProps.settings});
 
 		const editStepsKeys = nextProps.editSteps.map(editStep => editStep.key);
-
-		console.log(JSON.stringify(nextProps.editSteps).split('"').join('\\"'));
+		// console.log(JSON.stringify(nextProps.editSteps).split('"').join('\\"'));
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
