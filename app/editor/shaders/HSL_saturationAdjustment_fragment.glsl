@@ -1,4 +1,5 @@
 export default  `
+// HSL_saturationAdjustment fragment
 precision highp float;
 
 uniform sampler2D Texture;

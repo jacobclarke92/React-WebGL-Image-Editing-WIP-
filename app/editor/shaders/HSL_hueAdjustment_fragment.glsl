@@ -1,4 +1,5 @@
 export default  `
+// HSL_hueAdjustment fragment
 precision highp float;
 
 uniform sampler2D Texture;

@@ -1,4 +1,5 @@
 export default `
+// denoise fragment
 precision highp float;
 
 uniform sampler2D Texture;
@@ -13,10 +14,10 @@ void main() {
     float total = 0.0;
     for (float x = -4.0; x <= 4.0; x += 1.0) {
         for (float y = -4.0; y <= 4.0; y += 1.0) {
-            vec4 sample = texture2D(Texture, v_texCoord + vec2(x, y) / u_resolution);
-            float weight = 1.0 - abs(dot(sample.rgb - center.rgb, vec3(0.25)));
+            vec4 Sample = texture2D(Texture, v_texCoord + vec2(x, y) / u_resolution);
+            float weight = 1.0 - abs(dot(Sample.rgb - center.rgb, vec3(0.25)));
             weight = pow(weight, denoise);
-            color += sample * weight;
+            color += Sample * weight;
             total += weight;
         }
     }

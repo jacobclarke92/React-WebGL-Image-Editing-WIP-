@@ -1,16 +1,17 @@
 export default `
+// colorMatrix fragment
 precision highp float;
 
 varying vec2 v_texCoord;
 
 uniform sampler2D Texture;
-uniform float m[20];
+uniform float Matrix[20];
 
 void main(void) {
 	vec4 c = texture2D(Texture, v_texCoord);
-	gl_FragColor.r = m[0] * c.r + m[1] * c.g + m[2] * c.b + m[3] * c.a + m[4];
-	gl_FragColor.g = m[5] * c.r + m[6] * c.g + m[7] * c.b + m[8] * c.a + m[9];
-	gl_FragColor.b = m[10] * c.r + m[11] * c.g + m[12] * c.b + m[13] * c.a + m[14];
-	gl_FragColor.a = m[15] * c.r + m[16] * c.g + m[17] * c.b + m[18] * c.a + m[19];
+	gl_FragColor.r = Matrix[0] * c.r + Matrix[1] * c.g + Matrix[2] * c.b + Matrix[3] * c.a + Matrix[4];
+	gl_FragColor.g = Matrix[5] * c.r + Matrix[6] * c.g + Matrix[7] * c.b + Matrix[8] * c.a + Matrix[9];
+	gl_FragColor.b = Matrix[10] * c.r + Matrix[11] * c.g + Matrix[12] * c.b + Matrix[13] * c.a + Matrix[14];
+	gl_FragColor.a = Matrix[15] * c.r + Matrix[16] * c.g + Matrix[17] * c.b + Matrix[18] * c.a + Matrix[19];
 }
 `

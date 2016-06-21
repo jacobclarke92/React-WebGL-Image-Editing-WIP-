@@ -1,4 +1,5 @@
 export default `
+// convolution fragment
 precision highp float;
 
 varying vec2 vUv;

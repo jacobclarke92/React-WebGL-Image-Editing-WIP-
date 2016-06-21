@@ -1,4 +1,5 @@
 export default `
+// default node vertex
 precision highp float;
 
 attribute vec2 a_position;

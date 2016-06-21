@@ -1,4 +1,5 @@
 export default  `
+// grain fragment
 precision highp float;
 
 uniform sampler2D Texture;

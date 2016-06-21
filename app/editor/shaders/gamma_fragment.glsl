@@ -1,4 +1,5 @@
 export default `
+// gamma fragment
 precision highp float;
 
 varying vec2 v_texCoord;
