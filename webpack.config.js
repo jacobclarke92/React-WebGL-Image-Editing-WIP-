@@ -55,7 +55,11 @@ module.exports = {
 			{
 				test: /\.css$/,
 				loader: 'style!css',
-				include: [path.join(__dirname, 'app')],
+				include: [
+					path.join(__dirname, 'app'),
+					path.join(__dirname, 'node_modules', 'rc-color-picker'),
+					path.join(__dirname, 'node_modules', 'rc-slider'),
+				],
 			},
 		],
 	}

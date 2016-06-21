@@ -6,6 +6,7 @@ import titleize from 'titleize'
 
 import FileDropzone from './FileDropzone'
 import CurveCreator from './CurveCreator'
+import GradientCreator from './GradientCreator'
 import Renderer from './Renderer'
 
 import * as Filters from './editor/filters'
@@ -338,6 +339,9 @@ export default class Editor extends Component {
 								)
 							})}
 						</div>
+					</Panel>
+					<Panel title="Color Map">
+						<GradientCreator value={adjustments['color_map']} onChange={() => {}/*value => this.setValue('color_map', value)*/} />
 					</Panel>
 					{/*
 					<Panel title="HSL Adjustments">
