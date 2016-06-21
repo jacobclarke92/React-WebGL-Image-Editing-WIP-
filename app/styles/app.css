@@ -56,7 +56,7 @@ label {
 }
 
 .input textarea {
-	width: 100%;
+	width: calc(100% - 60px);
 }
 
 .text-center {
