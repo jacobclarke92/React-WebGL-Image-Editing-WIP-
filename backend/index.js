@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import async from 'async'
+import OS from 'os'
 import ndarray from 'ndarray'
 import sizeOf from 'image-size'
 import getPixels from 'get-pixels'
@@ -13,6 +13,11 @@ import Texture from '../app/editor/Texture'
 import FramebufferTexture from '../app/editor/FramebufferTexture'
 import Shaders from '../app/editor/shaders'
 import { getProgramInfo } from '../app/editor/utils/webglUtils'
+
+const startTime = new Date().getTime();
+const startMem = OS.freemem();
+let lastTime = new Date().getTime();
+console.log('Init memory\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 
 const args = {};
 process.argv.slice(2).forEach(arg => {
@@ -36,7 +41,6 @@ const gl = GL(10, 10);
 const imageTexture = new Texture(gl);
 const defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
 
-console.log(gl.drawingBufferHeight, gl.drawingBufferWidth);
 const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
 function getTempFramebuffer(index) {
@@ -136,19 +140,29 @@ function renderEditSteps() {
 		// draw that shit
 		program.draw();
 
-		// console.table(getProgramInfo(gl, program.program).uniforms);
+		// console.log(getProgramInfo(gl, program.program).uniforms);
 	}
 }
 
 function saveImage() {
-	let pixels = new Uint8Array(width*height*4);
+	const pixels = new Uint8Array(width*height*4);
 	gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	const extIndex = args.input.lastIndexOf('.');
-	const savePath = ('output' in args) ? args.output : args.input.slice(0, extIndex-1) + '_processed' + args.input.slice(extIndex);
+	const savePath = ('output' in args) ? args.output : args.input.slice(0, extIndex) + '_processed.' + args.input.slice(extIndex+1);
+	const ext = savePath.slice(savePath.lastIndexOf('.')+1);
 	const saveFile = fs.createWriteStream(savePath, {flags: 'w'});
 	// console.log(pixels);
 	const data = ndarray(pixels, [width, height, 4], [4, 4*width, 1], 0);
-	savePixels(data, 'png').pipe(saveFile);
+	console.log('After image fetch\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+	lastTime = new Date().getTime();
+
+	const stream = savePixels(data, ext, (ext == 'jpg' || ext == 'jpeg') ? {quality: 80} : null).pipe(saveFile);
+	stream.on('finish', () => {
+		const endTime = new Date().getTime();
+		console.log('After save\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		lastTime = new Date().getTime();
+		console.log('TOOK: '+(endTime-startTime)+'ms');
+	});
 }
 
 if('editSteps' in args) {
@@ -161,12 +175,22 @@ if('input' in args) {
 	getPixels(imagePath, (err, pixels) => {
 		if(err) return callback(err);
 		console.log('Got pixels');
+		console.log('After pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		lastTime = new Date().getTime();
+
 		resizeViewport(pixels.shape[0], pixels.shape[1]);
 		imageTexture.loadFromBytes(pixels.data, width, height);
+		console.log('After image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		lastTime = new Date().getTime();
 
 		buildPrograms();
 		resizePrograms();
+		console.log('After programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		lastTime = new Date().getTime();
+
 		renderEditSteps();
+		console.log('After render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		lastTime = new Date().getTime();
 
 		saveImage(); 
 	});

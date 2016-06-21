@@ -23,6 +23,7 @@ export function compileShader(gl, shaderSource, shaderType) {
 	if (!success) {
 		// Something went wrong during compilation; get the error
 		console.log(gl.getShaderInfoLog(shader));
+		console.log(shaderSource);
 		throw "could not compile shader"
 	}
  
