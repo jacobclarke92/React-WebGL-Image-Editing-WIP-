@@ -7,6 +7,9 @@ I've made a few classes to wrap native WebGL.
 I'm using react for the UI and as a way of passing edit step info to the Renderer component.
 
 
+I've also created a node script to that uses headless-gl to render edits so it can be serverside.
+
+
 ## Installation
 
 For a start node.js + npm is requied.
@@ -38,6 +41,7 @@ There are two main parts to this:
 
 1. The UI and instructions generation
 2. The WebGL renderer
+2.5. The serverside renderer
 
 I've kept these two parts seperate from one another so the renderer can be implmented with any UI in the future.
 
@@ -46,6 +50,17 @@ Some of the user adjustments may not correspond with a core shader effect so I u
 An example of this is 'temperature' which takes a single input and converts it into a colorMatrix step.  
 All of the middleware filters can be found in `editor/filters.js`  
 All of the core shader effects can be found in `editor/shaders/index.js`  
+
+
+## Serverside
+
+While totally optional the nodeJS renderer offers an alternative using a GUI. It takes input, output and editSteps as JSON strong. The major advantage of using nodeJS is that I'm able to uuse the same WebGL render code as in the front-end to create identical results. 
+
+As mentioned above a global install of babel-cli is required to run the node script.
+
+An example of what a command might look like is
+
+`babel-node backend/index.js input=test1.jpg output=test1_processed.jpg editSteps="[{\"key\":\"gamma\",\"value\":0.42}]"`
 
 
 ## WebGL
@@ -88,8 +103,8 @@ The current overall process is as follows:
 #### Texture
 
 Texture is a lot more straightforward. It takes in a gl instace, width, height and format + type (optional).  
-Once a texture class is instanciated it can be loaded with one of the following:
-- 'loadContentsOf' takes a native dom element, in this instance just Image, but I assume video works the same way.
+Once a texture class is instantiated it can be loaded with one of the following:
+- 'loadContentsOf' takes a native dom element, in this instance just Image, but I assume video works more or less the same way (untested & unimplemented).
 - 'loadFromBytes' takes a UTF8 byte array containing rgba values, appropriate width and height must be specified.
 - 'loadEmpty' creates an empty texture
 
