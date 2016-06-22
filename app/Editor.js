@@ -386,16 +386,11 @@ export default class Editor extends Component {
 					</div>
 				</FileDropzone>
 				<div className="text-center">
-					{/*
-					<div className="input">
-						<label>Edit Steps</label>
-						<Textarea value={JSON.stringify(editSteps, null, '\t')} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
-					</div>
-					*/}
-					<div className="input">
+					<div className="input" style={{marginBottom: 30}}>
 						<label>Terminal command</label>
 						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 					</div>
+					<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(editSteps, null, '\t'))} download="preset.json">Download preset</a>
 				</div>
 			</div>
 		)
