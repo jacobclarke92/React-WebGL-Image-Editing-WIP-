@@ -251,7 +251,8 @@ export default class Editor extends Component {
 			];
 			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
 			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
-				editSteps.push(Filters[adjustment](adjustmentValue));
+				const realKey = (adjustment.indexOf('_unique') > 0) ? adjustment.split('_unique')[0] : adjustment;
+				editSteps.push(Filters[realKey](adjustmentValue));
 			}
 		});
 		return editSteps;
@@ -260,7 +261,10 @@ export default class Editor extends Component {
 	// formats adjustments from filterPreset and gives to generateEditStepsFromAdjustments
 	generateEditStepsFromFilterPreset(filterPreset) {
 		const filterAdjustments = {};
-		filterPreset.steps.map(step => filterAdjustments[step.key] = step.value);
+		let counter = 0;
+		filterPreset.steps.map(step => {
+			filterAdjustments[(step.key in filterAdjustments) ? step.key+'_unique'+(++counter) : step.key] = step.value
+		});
 		return this.generateEditStepsFromAdjustments(filterAdjustments);
 	}
 
