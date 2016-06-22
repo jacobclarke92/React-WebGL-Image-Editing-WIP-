@@ -1,6 +1,12 @@
 import { clamp } from './utils/mathUtils'
 import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB} from './utils/colorUtils'
 
+export function colorMatrix(value) {
+	return {
+		key: 'colorMatrix',
+		matrix: value,
+	};
+}
 
 export function temperature(amount) {
 
