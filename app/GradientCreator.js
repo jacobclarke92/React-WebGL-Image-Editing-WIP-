@@ -28,12 +28,12 @@ export default class GradientCreator extends Component {
 		const defaultValue = props.defaultValue
 		? props.defaultValue.map(marker => ({id: ++counter, ...marker})) 
 		: [
-			{id: ++counter, position: 0, color: [10, 0, 178]},
-			{id: ++counter, position: 0.5, color: [255, 0, 0]},
-			{id: ++counter, position: 1, color: [255, 252, 0]},
+			{id: ++counter, position: 0, color: [10, 0, 178], alpha: 1},
+			{id: ++counter, position: 0.5, color: [255, 0, 0], alpha: 1},
+			{id: ++counter, position: 1, color: [255, 252, 0], alpha: 1},
 		];
 		this.state = {
-			markers: defaultValue,
+			markers: props.value || defaultValue,
 		};
 	}
 
@@ -83,7 +83,7 @@ export default class GradientCreator extends Component {
 		const mousePosition = getElementMousePosition(event, this.refs.gradientCreator);
 		
 		const { markers } = this.state;
-		markers.push({id: ++counter, position: mousePosition.x/this.props.size, color: [255,255,255]});
+		markers.push({id: ++counter, position: mousePosition.x/this.props.size, color: [255,255,255], alpha: 1});
 		this.currentMarkerId = counter;
 		
 		// persist event and send it to mousemove handler to place point
@@ -102,9 +102,13 @@ export default class GradientCreator extends Component {
 		this.setState({markers});
 	}
 
-	updateColor(color, id) {
+	updateColor(id, color, alpha = 100) {
+		console.log(alpha);
 		const markers = this.state.markers.map(marker => {
-			if(marker.id === id) marker.color = color;
+			if(marker.id === id) {
+				marker.color = color;
+				marker.alpha = alpha/100;
+			}
 			return marker;
 		});
 		this.setState({markers});
@@ -114,7 +118,7 @@ export default class GradientCreator extends Component {
 		const { size } = this.props;
 		const markers = this.state.markers.filter(marker => (!this.hideCurrentMarker || marker.id !== this.currentMarkerId));
 		markers.sort((a,b) => a.position < b.position ? -1 : (a.position > b.position ? 1 : 0));
-		const gradientStyle = 'linear-gradient(to right, '+markers.map(marker => 'rgb('+marker.color.join(',')+') '+(marker.position*100)+'%').join(', ')+')';
+		const gradientStyle = 'linear-gradient(to right, '+markers.map(marker => 'rgba('+marker.color.join(',')+','+marker.alpha+') '+(marker.position*100)+'%').join(', ')+')';
 		return (
 			<div
 				className="gradient" 
@@ -131,8 +135,9 @@ export default class GradientCreator extends Component {
 						<ColorPicker 
 							placement="bottomLeft" 
 							defaultColor="#FFFFFF"
+							alpha={marker.alpha*100}
 							color={rgbToHex(marker.color)} 
-							onChange={value => this.updateColor(hexToRgb(value.color), marker.id)}>
+							onChange={value => this.updateColor(marker.id, hexToRgb(value.color), value.alpha)}>
 							<span className="marker-trigger" />
 						</ColorPicker>
 					</div>

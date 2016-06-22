@@ -6,17 +6,20 @@
 	border: 1px solid #333c47;
 	margin: 15px 0 45px 0;
 }
-/*
+
 .gradient:after {
 	content: '';
 	cursor: pointer;
 	position: absolute;
-	top: 40px;
+	top: 0;
+	left: 0;
 	width: 100%;
-	height: 30px;
-	background-color: transparent;
+	height: 40px;
+	background-color: white;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAJUlEQVQYV2M8c+bMfwY0YGJiwoguxjgUFKI7GsTH5m4M3w1ChQDhOyT6zjZ1vAAAAABJRU5ErkJggg==);
+	z-index: -1;
 }
-*/
+
 
 .gradient-marker {
 	cursor: pointer;
