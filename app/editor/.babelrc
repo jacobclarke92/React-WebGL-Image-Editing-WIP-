@@ -1,4 +1,4 @@
 {
 	"presets": ["es2015"],
-	"plugins": ["glslify"]
+	"plugins": ["glslify", "transform-object-rest-spread"]
 }
