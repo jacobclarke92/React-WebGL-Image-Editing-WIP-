@@ -3,17 +3,6 @@
 		"name": "cinematic",
 		"title" : "Cinematic",
 		"steps": [
-			{
-				"key": "curves",
-				"value": {
-					"channels": "rgb",
-					"curves": [
-						[0, 20],
-						[100, 50],
-						[255, 200]
-					]
-				}
-			},
 			{"key": "exposure", "value": -2},
 			{"key": "contrast", "value": 12},
 			{
@@ -58,6 +47,100 @@
 						[46, 54],
 						[121, 125],
 						[255, 252]
+					]
+				}
+			}
+		]
+	},
+	{
+		"name": "harshSunset",
+		"title": "Harsh Sunset",
+		"steps": [  
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"rgb",
+					"curves":[  
+						[0, 0],
+						[255, 255],
+						[133.875, 40.0828125],
+						[239.7, 205.8328125]
+					]
+				}
+			},
+			{  
+				"key":"colorMatrix",
+				"value": [1,0,0,0,0,0,0.8980481071179868,0,0,0,0,0,0.8143182717448771,0,0,0,0,0,1,0]
+			},
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"rgb",
+					"curves":[  
+						[0, 20],
+						[235, 255]
+					]
+				}
+			},
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"g",
+					"curves":[  
+						[0, 0],
+						[255, 255],
+						[123.675, 128.0578125]
+					]
+				}
+			},
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"b",
+					"curves":[  
+						[0, 33],
+						[255, 255],
+						[111, 122]
+					]
+				}
+			},
+			{  
+				"key":"saturation",
+				"value":0.1
+			},
+			{  
+				"key":"colorMatrix",
+				"value": [1,0,0,0,0.05,0,1,0,0,0.08,0,0,1,0,0.08,0,0,0,1,0]
+			},
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"rgb",
+					"curves":[  
+						[0, 0],
+						[75, 70],
+						[180, 185],
+						[255, 255]
+					]
+				}
+			},
+			{  
+				"key":"sharpen",
+				"value":10
+			},
+			{  
+				"key":"grain",
+				"value":0.1
+			},
+			{  
+				"key":"curves",
+				"value": {
+					"channels":"rgb",
+					"curves":[  
+						[0,25],
+						[46,54],
+						[121,125],
+						[255,252]
 					]
 				}
 			}
@@ -165,7 +248,7 @@
 					[0,0],
 					[99,147],
 					[255,255]
-				]	
+				]  
 			}},
 			{"key": "curves", "value": {
 				"channels": "r",
@@ -173,7 +256,7 @@
 					[52,0],
 					[155,130],
 					[245,255]
-				]	
+				]  
 			}},
 			{"key": "curves", "value": {
 				"channels": "g",
@@ -181,7 +264,7 @@
 					[0,0],
 					[145,115],
 					[255,255]
-				]	
+				]  
 			}},
 			{"key": "curves", "value": {
 				"channels": "b",
@@ -189,7 +272,7 @@
 					[0,54],
 					[90,75],
 					[255,255]
-				]	
+				]  
 			}}
 		]
 	}
