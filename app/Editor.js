@@ -7,10 +7,13 @@ import titleize from 'titleize'
 import FileDropzone from './FileDropzone'
 import CurveCreator from './CurveCreator'
 import GradientCreator from './GradientCreator'
+import Gradient from './Gradient'
 import Renderer from './Renderer'
+import Select from './Select'
 
 import * as Filters from './editor/filters'
-import filterPresets from './editor/constants/presets.json'
+import filterPresets from './constants/presets.json'
+import gradientPresets from './constants/gradientPresets.js'
 
 import { isArray } from './editor/utils/typeUtils'
 
@@ -158,11 +161,11 @@ const curveAdjustmentProperties = [
 const colorMapAdjustment = {
 	label: 'colorMap',
 	defaultValue: [
-		{position: 0, color: [10, 0, 178], alpha: 1},
-		{position: 0.5, color: [255, 0, 0], alpha: 1},
-		{position: 1, color: [255, 252, 0], alpha: 1},
-		// {position: 0, color: [0,0,0], alpha: 0},
-		// {position: 1, color: [0,0,0], alpha: 0},
+		// {position: 0, color: [10, 0, 178], alpha: 1},
+		// {position: 0.5, color: [255, 0, 0], alpha: 1},
+		// {position: 1, color: [255, 252, 0], alpha: 1},
+		{position: 0, color: [0,0,0], alpha: 0},
+		{position: 1, color: [0,0,0], alpha: 0},
 	],
 };
 
@@ -358,6 +361,18 @@ export default class Editor extends Component {
 						</div>
 					</Panel>
 					<Panel title="Color Map">
+						<div className="input">
+							<label>Gradient Presets</label>
+							<Select 
+								items={gradientPresets}
+								onChange={value => this.setValue('colorMap', value.markers)}
+								Item={props => 
+									<div>
+										<label>{props.item.title}</label>
+										<Gradient markers={props.item.markers} width={200} height={30} />
+									</div>
+								} />
+						</div>
 						<GradientCreator value={adjustments['colorMap']} onChange={value => this.setValue('colorMap', value)} />
 					</Panel>
 					{/*

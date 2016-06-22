@@ -2,6 +2,8 @@ import React, { PropTypes, Component } from 'react'
 import ColorPicker from 'rc-color-picker'
 import _throttle from 'lodash/throttle'
 
+import Gradient from './Gradient'
+
 import { clamp } from './editor/utils/mathUtils'
 import { rgbToHex, hexToRgb } from './utils/colorUtils'
 import { getElementMousePosition } from './utils/domUtils'
@@ -47,6 +49,10 @@ export default class GradientCreator extends Component {
 		document.removeEventListener('mouseup', this.handleMouseUp);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		this.setState({markers: nextProps.value});
+	}
+
 	handleCallback(markers) {
 		this.props.onChange(markers);
 	}
@@ -61,7 +67,7 @@ export default class GradientCreator extends Component {
 
 	handleMouseMove(event) {
 		if(this.capturingMouseMove) {
-			const mousePosition = getElementMousePosition(event, this.refs.gradientCreator);
+			const mousePosition = getElementMousePosition(event, this.refs.gradientCreator.refs.gradient);
 
 			// clamp point position inside grid
 			mousePosition.x = clamp(mousePosition.x, 0, this.props.size);
@@ -80,7 +86,7 @@ export default class GradientCreator extends Component {
 
 	handleNewMouseDown(event) {
 		this.capturingMouseMove = true;
-		const mousePosition = getElementMousePosition(event, this.refs.gradientCreator);
+		const mousePosition = getElementMousePosition(event, this.refs.gradientCreator.refs.gradient);
 		
 		const { markers } = this.state;
 		markers.push({id: ++counter, position: mousePosition.x/this.props.size, color: [255,255,255], alpha: 1});
@@ -118,13 +124,9 @@ export default class GradientCreator extends Component {
 		const { size } = this.props;
 		const markers = this.state.markers.filter(marker => (!this.hideCurrentMarker || marker.id !== this.currentMarkerId));
 		markers.sort((a,b) => a.position < b.position ? -1 : (a.position > b.position ? 1 : 0));
-		const gradientStyle = 'linear-gradient(to right, '+markers.map(marker => 'rgba('+marker.color.join(',')+','+marker.alpha+') '+(marker.position*100)+'%').join(', ')+')';
+		
 		return (
-			<div
-				className="gradient" 
-				ref="gradientCreator" 
-				style={{width: size, background: gradientStyle}}
-				onMouseDown={::this.handleNewMouseDown}>
+			<Gradient ref="gradientCreator" width={size} markers={markers} onMouseDown={::this.handleNewMouseDown}>
 				{markers.map((marker, i) =>
 					<div key={i} 
 						className="gradient-marker" 
@@ -142,7 +144,7 @@ export default class GradientCreator extends Component {
 						</ColorPicker>
 					</div>
 				)}
-			</div>
+			</Gradient>
 		)
 	}
 }

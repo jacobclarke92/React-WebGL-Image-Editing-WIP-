@@ -12,7 +12,8 @@ h1 {
 	margin-top: 0;
 }
 
-button {
+button,
+.button {
 	margin-right: 10px;
 	margin-bottom: 10px;
 	padding: 8px 15px;
@@ -22,10 +23,12 @@ button {
 	transition: all 0.1s ease-in-out;
 	cursor: pointer;
 }
-button:hover:not(:disabled) {
+button:hover:not(:disabled)
+.button:hover:not(:disabled) {
 	border-color: #5BBFDF;
 }
-button:disabled {
+button:disabled,
+.button:disabled {
 	background-color: #96dbfa;
 	cursor: not-allowed;
 }
@@ -38,6 +41,11 @@ label {
 	display: block;
 	font-size: 14px;
 	margin: 16px 0 8px 0;
+}
+
+a.button {
+	color: #333c47;
+	text-decoration: none;
 }
 
 .rc-color-picker-panel label {
@@ -79,6 +87,55 @@ label {
 	max-width: 100%;
 	overflow-x: scroll;
 	white-space: nowrap;
+}
+
+
+/* Select Styles */
+
+.select {
+	cursor: pointer;
+	position: relative;
+	display: inline-block;
+	border: 1px solid #efefef;
+	padding: 8px 35px 6px 10px;
+}
+.select:after {
+	content: '';
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	width: 0;
+	height: 0;
+	margin-top: -2px;
+	border-style: solid;
+	border-width: 5px 5px 0 5px;
+	border-color: #beeeef transparent transparent transparent;
+}
+.select-wrapper {
+	position: relative;
+}
+.options {
+	position: absolute;
+	z-index: 10;
+	top: calc(100% - 1px);
+	left: 0;
+	border: 1px solid #efefef;
+	background-color: white;
+}
+.option {
+	cursor: pointer;
+ 	padding: 8px;
+}
+.option:hover {
+	background-color: #beeeef;
+}
+.option .gradient,
+.select .gradient {
+	margin: 0;
+}
+.option label,
+.select label {
+	margin: 0 0 6px 0;
 }
 
 
