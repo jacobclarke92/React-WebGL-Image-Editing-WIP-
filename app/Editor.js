@@ -158,8 +158,11 @@ const curveAdjustmentProperties = [
 const colorMapAdjustment = {
 	label: 'colorMap',
 	defaultValue: [
-		{position: 0, color: [0,0,0], alpha: 0},
-		{position: 1, color: [0,0,0], alpha: 0},
+		{position: 0, color: [10, 0, 178], alpha: 1},
+		{position: 0.5, color: [255, 0, 0], alpha: 1},
+		{position: 1, color: [255, 252, 0], alpha: 1},
+		// {position: 0, color: [0,0,0], alpha: 0},
+		// {position: 1, color: [0,0,0], alpha: 0},
 	],
 };
 

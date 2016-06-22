@@ -8,6 +8,8 @@ import blur_fragment from './blur_fragment.glsl'
 import bloom_fragment from './bloom_fragment.glsl'
 import curves_update from './curves_update'
 import curves_fragment from './curves_fragment.glsl'
+import colorMap_update from './colorMap_update'
+import colorMap_fragment from './colorMap_fragment.glsl'
 import denoise_fragment from './denoise_fragment.glsl'
 import gamma_fragment from './gamma_fragment.glsl'
 import grain_fragment from './grain_fragment.glsl'
@@ -98,9 +100,9 @@ const Shaders = {
 		fragment: default_fragment,
 	},
 	colorMap: {
-		update: default_update,
+		update: colorMap_update,
 		vertex: filter_vertex,
-		fragment: default_fragment,
+		fragment: colorMap_fragment,
 	}
 };
 

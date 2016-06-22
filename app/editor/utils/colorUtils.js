@@ -39,6 +39,44 @@ export function getVibranceMatrix(vibrance) {
 	];
 }
 
+export function interpolateGradient(_markers, range = 255) {
+	// map the position and alpha to 255 then sort by position
+	let markers = _markers.map(marker => ({
+		...marker, 
+		position: Math.floor(marker.position*range), 
+		alpha: Math.floor(marker.alpha*255)
+	})).sort((a,b) => a.position < b.position ? -1 : (a.position > b.position ? 1 : 0));
+
+	// if first marker is above 0 then create an identical one at 0
+	if(markers[0].position > 0) markers = [{...markers[0], position: 0}, ...markers];
+	// and vice versa
+	if(markers[markers.length-1].position < 255) markers = [...markers, {...markers[markers.length-1], position: 255}];
+
+	const rgbaData = [];
+	let currentMarker = markers[0];
+	let nextMarker = markers[1];
+	for(let i=0; i<range; i++) {
+
+		// bump current marker if reached next marker position
+		if(i >= nextMarker.position) currentMarker = nextMarker;
+
+		// don't proceed if reached last marker (position 255)
+		const currentMarkerIndex = markers.indexOf(currentMarker);
+		if(currentMarkerIndex === markers.length-1) break;
+		nextMarker = markers[currentMarkerIndex+1];
+
+		// get percentage along current and next marker
+		const amt = (i-currentMarker.position)/(nextMarker.position-currentMarker.position);
+
+		// add pixel data to array
+		rgbaData.push(currentMarker.color[0]*(1-amt) + nextMarker.color[0]*amt);
+		rgbaData.push(currentMarker.color[1]*(1-amt) + nextMarker.color[1]*amt);
+		rgbaData.push(currentMarker.color[2]*(1-amt) + nextMarker.color[2]*amt);
+		rgbaData.push(currentMarker.alpha*(1-amt) + nextMarker.alpha*amt);
+	}
+	return rgbaData;
+}
+
 // http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
 export function getTemperatureRGB(temp) {
 	temp /= 100;
