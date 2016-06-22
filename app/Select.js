@@ -9,6 +9,7 @@ export default class Editor extends Component {
 		Item: props => (<span>{item.key}</span>),
 		value: null,
 		onChange: value => {},
+		showValue: false,
 	};
 
 	constructor(props) {
@@ -44,11 +45,11 @@ export default class Editor extends Component {
 
 	render() {
 		const { expanded, value } = this.state;
-		const { items, Item, placeholder } = this.props;
+		const { items, Item, placeholder, showValue } = this.props;
 		return (
 			<div className="select-wrapper">
 				<div className="select" onMouseDown={() => this.expanding = true} onClick={::this.handleExpand}>
-					{value ? <Item item={value} /> : placeholder}
+					{(value && showValue) ? <Item item={value} /> : placeholder}
 				</div>
 				{expanded && 
 					<div className="options">
