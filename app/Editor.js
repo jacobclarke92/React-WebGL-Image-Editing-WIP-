@@ -287,11 +287,30 @@ export default class Editor extends Component {
 	handleReceivedFile(files) {
 		console.log('Files received in Editor', files);
 		const file = files[0];
+		const ext = file.name.substring(file.name.lastIndexOf('.')+1);
+		console.log(file, ext);
 		const reader = new FileReader();
 		reader.onload = (theFile => e => {
-			this.setState({url: e.target.result});
+			if(ext == 'json') {
+				const steps  = JSON.parse(e.target.result).map(step => {
+					switch(step.key) {
+						case 'curves': step.value = {channels: step.channels, curves: step.curves}; break;
+						case 'colorMap': step.value = step.markers; break;
+					}
+					return step;
+				});
+				filterPresets.splice(0, 0, {
+					name: 'custom'+(new Date().getTime()),
+					title: 'Custom',
+					steps,
+				});
+				this.setFilter(filterPresets[0]);
+			}else{
+				this.setState({url: e.target.result});
+			}
 		})(file);
-		reader.readAsDataURL(file);
+		if(ext == 'json') reader.readAsText(file);
+		else reader.readAsDataURL(file);
 	}
 
 	render() {
@@ -321,6 +340,10 @@ export default class Editor extends Component {
 						</button>
 					))}
 				</div>
+				<label>
+					Upload Preset <br />
+					<input className="button" type="file" onChange={event => this.handleReceivedFile(event.nativeEvent.target.files)} />
+				</label>
 				<Tabs>
 					<Panel title="Tonal Adjustments">
 						<div className="sliders">
