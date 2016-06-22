@@ -155,6 +155,14 @@ const curveAdjustmentProperties = [
 	},
 ];
 
+const colorMapAdjustment = {
+	label: 'colorMap',
+	defaultValue: [
+		{position: 0, color: [0,0,0], alpha: 0},
+		{position: 1, color: [0,0,0], alpha: 0},
+	],
+};
+
 const tonalPropertyLabels = tonalAdjustmentProperties.map(property => property.label);
 const enhancementPropertyLabels = enhancementAdjustmentProperties.map(property => property.label);
 const curvePropertyLabels = curveAdjustmentProperties.map(property => property.label);
@@ -170,6 +178,7 @@ export default class Editor extends Component {
 		tonalAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		enhancementAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		curveAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+		adjustments[colorMapAdjustment.label] = colorMapAdjustment.defaultValue;
 
 		// store reset point, make a copy of adjustments object
 		this.defaultAdjustments = {...adjustments};
@@ -247,7 +256,8 @@ export default class Editor extends Component {
 			const adjustmentProperties = [
 				...tonalAdjustmentProperties, 
 				...enhancementAdjustmentProperties, 
-				...curveAdjustmentProperties
+				...curveAdjustmentProperties,
+				colorMapAdjustment,
 			];
 			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
 			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
@@ -345,7 +355,7 @@ export default class Editor extends Component {
 						</div>
 					</Panel>
 					<Panel title="Color Map">
-						<GradientCreator value={adjustments['color_map']} onChange={() => {}/*value => this.setValue('color_map', value)*/} />
+						<GradientCreator value={adjustments['colorMap']} onChange={value => this.setValue('colorMap', value)} />
 					</Panel>
 					{/*
 					<Panel title="HSL Adjustments">

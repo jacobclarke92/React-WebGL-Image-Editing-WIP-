@@ -96,6 +96,11 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: default_fragment,
+	},
+	colorMap: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: default_fragment,
 	}
 };
 
