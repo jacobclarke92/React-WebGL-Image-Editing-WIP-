@@ -170,12 +170,9 @@ if('editSteps' in args) {
 	editStepKeys = editSteps.map(editStep => editStep.key);
 }
 
-if('input' in args) {
-
-	if(gl == null) {
-		console.log('HeadlessGL context could not be initialised :(');
-		break;
-	}
+if(gl == null) {
+	console.log('HeadlessGL context could not be initialised :(');
+}else if('input' in args) {
 
 	const imagePath = path.isAbsolute(args.input) ? args.input : path.resolve(__dirname + '/../' + args.input);
 	console.log(imagePath)
