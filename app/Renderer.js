@@ -213,7 +213,7 @@ export default class Editor extends Component {
 
 				// determine render target, set to null if last one because null = canvas
 				let target = null;
-				if(count < steps.length-1) {
+				if(count < steps.length-1 && i < iterations) {
 					this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 					target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 				}
