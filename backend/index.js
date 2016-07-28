@@ -174,7 +174,7 @@ if('input' in args) {
 
 	if(gl == null) {
 		console.log('HeadlessGL context could not be initialised :(');
-		return;
+		break;
 	}
 
 	const imagePath = path.isAbsolute(args.input) ? args.input : path.resolve(__dirname + '/../' + args.input);
