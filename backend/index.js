@@ -38,8 +38,6 @@ let editStepKeys = [];
 let currentFramebufferIndex = -1;
 
 const gl = GL(10, 10);
-console.log('GL', GL);
-console.log('GL INSTANCE', gl);
 const imageTexture = new Texture(gl);
 const defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
 
@@ -173,6 +171,12 @@ if('editSteps' in args) {
 }
 
 if('input' in args) {
+
+	if(gl == null) {
+		console.log('HeadlessGL context could not be initialised :(');
+		return;
+	}
+
 	const imagePath = path.isAbsolute(args.input) ? args.input : path.resolve(__dirname + '/../' + args.input);
 	console.log(imagePath)
 	getPixels(imagePath, (err, pixels) => {

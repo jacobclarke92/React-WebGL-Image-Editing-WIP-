@@ -427,6 +427,8 @@ export default class Editor extends Component {
 					<div className="input" style={{marginBottom: 30}}>
 						<label>Terminal command</label>
 						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+						<label>Server command</label>
+						<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js '+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 					</div>
 					<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(editSteps, null, '\t'))} download="preset.json">Download preset</a>
 				</div>
