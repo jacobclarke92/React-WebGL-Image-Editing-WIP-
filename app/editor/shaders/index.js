@@ -20,6 +20,8 @@ import HSL_hueAdjustment_fragment from './HSL_hueAdjustment_fragment.glsl'
 import HSL_saturationAdjustment_fragment from './HSL_saturationAdjustment_fragment.glsl'
 import HSL_luminanceAdjustment_fragment from './HSL_luminanceAdjustment_fragment.glsl'
 import hue_fragment from './hue_fragment.glsl'
+import pixelSort_update from './pixelSort_update'
+import pixelSort_fragment from './pixelSort_fragment.glsl'
 import saturation_fragment from './saturation_fragment.glsl'
 import sharpen_update from './sharpen_update'
 import sharpen_fragment from './sharpen_fragment.glsl'
@@ -74,6 +76,11 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: hue_fragment,
+	},
+	pixelSort: {
+		update: pixelSort_update,
+		vertex: filter_vertex,
+		fragment: pixelSort_fragment,
 	},
 	saturation: {
 		update: default_update,

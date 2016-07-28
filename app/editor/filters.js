@@ -153,6 +153,14 @@ export function hue(amount) {
 	}
 }
 
+export function pixelSort(amount) {
+	const value = clamp(amount, 0, 255);
+	return {
+		key: 'pixelSort',
+		value,
+	};
+}
+
 export function sharpen(amount) {
 	const value = clamp(amount, 0, 10);
 	return {

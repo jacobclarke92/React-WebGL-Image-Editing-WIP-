@@ -132,6 +132,14 @@ const enhancementAdjustmentProperties = [
 		defaultValue: 0,
 		tipFormatter: value => decimalPercentFormatter(value*2),
 	},
+	{
+		label: 'pixelSort',
+		min: 0,
+		max: 255,
+		step: 1,
+		defaultValue: 0,
+		tipFormatter: value => percentFormatter(value/25.5),
+	},
 ];
 
 Filters.curves_red = Filters.curves_green = Filters.curves_blue = Filters.curves;
