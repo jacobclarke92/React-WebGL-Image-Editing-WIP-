@@ -43,8 +43,8 @@ export default class Program {
         return this;
     }
 
-    update(settings) {
-        this.updateFunction.call(this, settings);
+    update(settings, iteration = 0) {
+        this.updateFunction.call(this, settings, iteration);
     }
 
 	uniforms(uniforms) {

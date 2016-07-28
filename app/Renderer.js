@@ -201,32 +201,37 @@ export default class Editor extends Component {
 			// switch to program
 			program.use();
 
-			// run the shader's update function -- modifies uniforms
-			// program must be in use before calling update otherwise current program's uniforms get modified
-			program.update(step);
+			const iterations = step.iterations || 1;
+			for(let i=0; i<iterations; i++) {
 
-			// determine source texture - original image texture if first pass or a framebuffer texture
-			const sourceTexture = count === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+				// run the shader's update function -- modifies uniforms
+				// program must be in use before calling update otherwise current program's uniforms get modified
+				program.update(step, i);
 
-			// determine render target, set to null if last one because null = canvas
-			let target = null;
-			if(count < steps.length-1) {
-				this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
-				target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+				// determine source texture - original image texture if first pass or a framebuffer texture
+				const sourceTexture = count === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+
+				// determine render target, set to null if last one because null = canvas
+				let target = null;
+				if(count < steps.length-1) {
+					this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
+					target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+				}
+
+				// pre-render calcs idk
+				program.willRender();
+
+				// use current source texture and framebuffer target
+				sourceTexture.use();
+				this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+
+				// post-render calcs idk
+				program.didRender();
+
+				// draw that shit
+				program.draw();
+
 			}
-
-			// pre-render calcs idk
-			program.willRender();
-
-			// use current source texture and framebuffer target
-			sourceTexture.use();
-			this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
-
-			// post-render calcs idk
-			program.didRender();
-
-			// draw that shit
-			program.draw();
 
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 		}
