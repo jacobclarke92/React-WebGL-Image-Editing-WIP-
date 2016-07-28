@@ -38,6 +38,7 @@ let editStepKeys = [];
 let currentFramebufferIndex = -1;
 
 const gl = GL(10, 10);
+console.log('GL', GL);
 console.log('GL INSTANCE', gl);
 const imageTexture = new Texture(gl);
 const defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
