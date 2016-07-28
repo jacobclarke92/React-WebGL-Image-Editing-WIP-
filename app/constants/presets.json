@@ -36,7 +36,6 @@
 				}
 			},
 			{"key": "contrast", "value": 5},
-			{"key": "sharpen", "value": 50},
 			{"key": "grain", "value": 0.1},
 			{
 				"key": "curves",
@@ -125,10 +124,6 @@
 				}
 			},
 			{  
-				"key":"sharpen",
-				"value":10
-			},
-			{  
 				"key":"grain",
 				"value":0.1
 			},
@@ -197,8 +192,7 @@
 					]
 				}
 			},
-			{"key": "vibrance", "value": 20},
-			{"key": "sharpen", "value": 25}
+			{"key": "vibrance", "value": 20}
 		]
 	},
 	{

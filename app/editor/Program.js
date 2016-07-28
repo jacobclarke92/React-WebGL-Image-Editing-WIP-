@@ -58,7 +58,16 @@ export default class Program {
             if (location === null) continue;
 
             const value = uniforms[name];
-            if (isArray(value)) {
+            if(isArray(value) && value.length && isArray(value[0])) {
+                const isVec3 = value[0].length > 2;
+                for(let i=0; i<value.length; i ++) {
+                    const vecLocation = this.gl.getUniformLocation(this.program, name+'['+i+']');
+                    if(vecLocation) {
+                        if(isVec3) this.gl.uniform3fv(vecLocation, new Float32Array(value[i]));
+                        else this.gl.uniform2fv(vecLocation, new Float32Array(value[i]));
+                    }
+                }
+            } else if (isArray(value)) {
                 switch (value.length) {
                     case 1:  this.gl.uniform1fv(location, new Float32Array(value)); break;
                     case 2:  this.gl.uniform2fv(location, new Float32Array(value)); break;

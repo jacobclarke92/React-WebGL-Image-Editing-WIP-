@@ -10,17 +10,19 @@ import curves_update from './curves_update'
 import curves_fragment from './curves_fragment.glsl'
 import colorMap_update from './colorMap_update'
 import colorMap_fragment from './colorMap_fragment.glsl'
+import colorMatrix_update from './colorMatrix_update'
+import colorMatrix_fragment from './colorMatrix_fragment.glsl'
 import denoise_fragment from './denoise_fragment.glsl'
 import gamma_fragment from './gamma_fragment.glsl'
 import grain_fragment from './grain_fragment.glsl'
-import hue_fragment from './hue_fragment.glsl'
-import saturation_fragment from './saturation_fragment.glsl'
-import colorMatrix_update from './colorMatrix_update'
-import colorMatrix_fragment from './colorMatrix_fragment.glsl'
 import HSL_update from './HSL_update'
 import HSL_hueAdjustment_fragment from './HSL_hueAdjustment_fragment.glsl'
 import HSL_saturationAdjustment_fragment from './HSL_saturationAdjustment_fragment.glsl'
 import HSL_luminanceAdjustment_fragment from './HSL_luminanceAdjustment_fragment.glsl'
+import hue_fragment from './hue_fragment.glsl'
+import saturation_fragment from './saturation_fragment.glsl'
+import sharpen_update from './sharpen_update'
+import sharpen_fragment from './sharpen_fragment.glsl'
 
 const Shaders = {
 	default: {
@@ -95,9 +97,9 @@ const Shaders = {
 	},
 	// dummy sharpen for now to keep presets happy
 	sharpen: {
-		update: default_update,
+		update: sharpen_update,
 		vertex: filter_vertex,
-		fragment: default_fragment,
+		fragment: sharpen_fragment,
 	},
 	colorMap: {
 		update: colorMap_update,

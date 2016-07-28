@@ -106,7 +106,7 @@ const enhancementAdjustmentProperties = [
 		max: 10,
 		step: 0.01,
 		defaultValue: 0,
-		tipFormatter: value => percentFormatter(value*10),
+		tipFormatter: value => percentFormatter(value),
 	},
 	{
 		label: 'blur',
