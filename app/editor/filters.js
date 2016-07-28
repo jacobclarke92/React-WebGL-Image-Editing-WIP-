@@ -156,6 +156,7 @@ export function hue(amount) {
 export function pixelSort(amount) {
 	const value = clamp(amount, 0, 255);
 	return {
+		iterations: 20,
 		key: 'pixelSort',
 		value,
 	};
