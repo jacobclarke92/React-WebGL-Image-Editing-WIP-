@@ -133,11 +133,21 @@ const enhancementAdjustmentProperties = [
 		tipFormatter: value => decimalPercentFormatter(value*2),
 	},
 	{
-		label: 'pixelSort',
+		label: 'pixelSortHorizontal',
 		min: 0,
 		max: 255,
 		step: 1,
-		defaultValue: 0,
+		range: true,
+		defaultValue: [255, 255],
+		tipFormatter: value => percentFormatter(value/25.5),
+	},
+	{
+		label: 'pixelSortVertical',
+		min: 0,
+		max: 255,
+		step: 1,
+		range: true,
+		defaultValue: [255, 255],
 		tipFormatter: value => percentFormatter(value/25.5),
 	},
 ];
