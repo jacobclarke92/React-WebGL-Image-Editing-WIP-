@@ -8,6 +8,7 @@ uniform float iteration;
 
 uniform float pixelSort;
 uniform float direction;
+uniform float inverted;
 uniform float threshMin;
 uniform float threshMax;
 
@@ -22,8 +23,11 @@ void main()
     vec2 uv = v_texCoord.xy;
     vec2 texel = vec2(1.0, 1.0);
     
-    float step_y = texel.y;
-    vec2 n  = vec2(0.0, direction* step_y);
+    // float stepAmount = texel.x;
+    float stepAmount = texel.y;
+    if(direction <= 1.0) stepAmount = texel.x;
+    vec2 n = vec2(0.0, inverted * stepAmount);
+    if(direction <= 1.0) n = vec2(inverted * stepAmount, 0.0);
 
     vec4 im_n =  texture2D(Texture, uv+n);
     vec4 im =    texture2D(Texture, uv);
@@ -33,7 +37,9 @@ void main()
     float lum_diff = lum_n - lum;
     
     // only apply to ever second pixel because neighbouring y pixels are compared
-    if(int(mod(float(iteration) + v_texCoord.y, 2.0)) == 0) {
+    float offset = v_texCoord.y;
+    if(direction <= 1.0) offset = v_texCoord.x;
+    if(int(mod(float(iteration) + offset, 2.0)) == 0) {
         if (lum_diff > threshMin && lum_diff < threshMax) { 
             im = im_n;    
         }

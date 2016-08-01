@@ -153,12 +153,23 @@ export function hue(amount) {
 	}
 }
 
-export function pixelSort(amount) {
-	const value = clamp(amount, 0, 255);
+export function pixelSortHorizontal(range) {
+	return pixelSort(range, 1);
+}
+
+export function pixelSortVertical(range) {
+	return pixelSort(range, 2);
+}
+
+export function pixelSort(range, direction = 1) {
+	const min = clamp(range[0], 0, 255)/64 - 2;
+	const max = clamp(range[1], 0, 255)/64 - 2;
 	return {
 		iterations: 20,
 		key: 'pixelSort',
-		value,
+		min,
+		max,
+		direction,
 	};
 }
 

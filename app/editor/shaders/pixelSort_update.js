@@ -1,12 +1,13 @@
 // called within context of a Program
-export default function(settings, iteration = 0) {
-	if(settings.key && settings.value) {
+export default function(_settings, iteration = 0) {
+	const settings = Object.assign({min: 0.18, max: 0.9, direction: 1}, _settings);
+	if(settings.key) {
 		this.uniforms({
-			[settings.key]: settings.value,
 			iteration,
-			direction: -1.0,
-			threshMin: 0.18,
-			threshMax: 0.9,
+			inverted: -1.0,
+			direction: settings.direction,
+			threshMin: settings.min,
+			threshMax: settings.max,
 		});
 	}
 }
