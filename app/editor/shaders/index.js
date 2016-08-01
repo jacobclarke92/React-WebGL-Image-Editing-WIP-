@@ -13,6 +13,7 @@ import colorMap_fragment from './colorMap_fragment.glsl'
 import colorMatrix_update from './colorMatrix_update'
 import colorMatrix_fragment from './colorMatrix_fragment.glsl'
 import denoise_fragment from './denoise_fragment.glsl'
+import faceDetect_update from './faceDetect_update'
 import gamma_fragment from './gamma_fragment.glsl'
 import grain_fragment from './grain_fragment.glsl'
 import HSL_update from './HSL_update'
@@ -52,15 +53,25 @@ const Shaders = {
 		vertex: filter_vertex,
 		fragment: curves_fragment,
 	},
-	denoise: {
-		update: default_update,
+	colorMap: {
+		update: colorMap_update,
 		vertex: filter_vertex,
-		fragment: denoise_fragment,
+		fragment: colorMap_fragment,
 	},
 	colorMatrix: {
 		update: colorMatrix_update,
 		vertex: filter_vertex,
 		fragment: colorMatrix_fragment,
+	},
+	denoise: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: denoise_fragment,
+	},
+	faceDetect: {
+		update: faceDetect_update,
+		vertex: filter_vertex,
+		fragment: default_fragment,
 	},
 	gamma: {
 		update: default_update,
@@ -108,11 +119,6 @@ const Shaders = {
 		vertex: filter_vertex,
 		fragment: sharpen_fragment,
 	},
-	colorMap: {
-		update: colorMap_update,
-		vertex: filter_vertex,
-		fragment: colorMap_fragment,
-	}
 };
 
 export default Shaders;

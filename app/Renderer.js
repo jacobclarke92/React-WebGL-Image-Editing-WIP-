@@ -9,7 +9,6 @@ import Framebuffer from './editor/Framebuffer'
 
 import { getProgramInfo } from './editor/utils/webglUtils'
 import cascadeFrontalFace from './editor/constants/cascade_frontalface'
-import * as FaceDetect from './editor/FaceDetect'
 
 export default class Editor extends Component {
 
@@ -96,7 +95,7 @@ export default class Editor extends Component {
 	}
 
 	loadImage(url) {
-		console.log('loading', url);
+		if(url.indexOf('data:') < 0) console.log('loading', url);
 		this.image.src = url;
 	}
 
@@ -146,6 +145,7 @@ export default class Editor extends Component {
 		programList.map(filterLabel => {
 			this.addProgram(filterLabel);
 		});
+		if(window.doFaceDetection) this.addProgram('faceDetect');
 	}
 
 	addProgram(label) {
@@ -195,6 +195,16 @@ export default class Editor extends Component {
 		const steps = [{key: 'default'}, ...editSteps];
 
 		// console.log('render steps', steps);
+		if(window.doFaceDetection) {
+			steps.push({
+				key: 'faceDetect', 
+				cascade: cascadeFrontalFace,
+				scaleFactor: 1.2,
+				windowSize: 24,
+				url: this.props.url,
+				imageElement: this.imageElement,
+			});
+		}
 
 		for(let count = 0; count < steps.length; count ++) {
 			const step = steps[count];
@@ -239,10 +249,10 @@ export default class Editor extends Component {
 		}
 
 		// for reference https://github.com/jamt9000/webcv/tree/master/demos
-		if(window.doFaceDetection === true) {
-			const rectangles = FaceDetect.runImageCascade(this.image, cascadeFrontalFace);
-			console.log(rectangles);
-		}
+		// if(window.doFaceDetection === true) {
+		// 	const rectangles = FaceDetect.runImageCascade(this.image, cascadeFrontalFace);
+		// 	console.log(rectangles);
+		// }
 
 
 		this.props.onRender();
