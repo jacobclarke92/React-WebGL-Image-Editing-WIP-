@@ -5,7 +5,6 @@ export default class FramebufferTexture {
 	constructor(gl) {
 		this.gl = gl;
 		this.id = gl.createFramebuffer();
-		this.use();
 		
 		this.texture = null
 

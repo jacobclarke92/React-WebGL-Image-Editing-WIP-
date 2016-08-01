@@ -5,7 +5,7 @@ import Shaders from './editor/shaders'
 
 import Program from './editor/Program'
 import Texture from './editor/Texture'
-import FramebufferTexture from './editor/FramebufferTexture'
+import Framebuffer from './editor/Framebuffer'
 
 import { getProgramInfo } from './editor/utils/webglUtils'
 import cascadeFrontalFace from './editor/constants/cascade_frontalface'
@@ -133,7 +133,7 @@ export default class Editor extends Component {
 		const { width, height } = this.props;
 
 		if(!this.framebuffers[index]) {
-			this.framebuffers[index] = new FramebufferTexture(this.gl);
+			this.framebuffers[index] = new Framebuffer(this.gl).use();
 			this.framebuffers[index].attachEmptyTexture(width, height);
 		}
 
