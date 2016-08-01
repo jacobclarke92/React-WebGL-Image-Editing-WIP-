@@ -8,6 +8,8 @@ import Texture from './editor/Texture'
 import FramebufferTexture from './editor/FramebufferTexture'
 
 import { getProgramInfo } from './editor/utils/webglUtils'
+import cascadeFrontalFace from './editor/constants/cascade_frontalface'
+import * as FaceDetect from './editor/FaceDetect'
 
 export default class Editor extends Component {
 
@@ -100,7 +102,7 @@ export default class Editor extends Component {
 
 	handleImageLoad(image) {
 		// console.log('---');
-		console.log(this.props.url, 'loaded');
+		if(this.props.url.indexOf('data:') < 0) console.log(this.props.url, 'loaded');
 
 		// make texture for base image, destroy old one first if it exists
 		if(this.imageTexture) this.imageTexture.destroy();
@@ -235,6 +237,12 @@ export default class Editor extends Component {
 
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 		}
+
+		if(window.doFaceDetection === true) {
+			const rectangles = FaceDetect.runImageCascade(this.image, cascadeFrontalFace);
+			console.log(rectangles);
+		}
+
 
 		this.props.onRender();
 	}
