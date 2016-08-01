@@ -56,7 +56,7 @@ export default class Texture {
         this.height = height || this.height;
 
         // change format and type to correspond to byte array
-        this.format = this.gl.RGBA;
+        this.format = this.format;
         this.type = this.gl.UNSIGNED_BYTE;
 
         // make sure gl is using this texture
