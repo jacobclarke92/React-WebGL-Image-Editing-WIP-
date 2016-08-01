@@ -1,7 +1,7 @@
 import Texture from './Texture'
 
 import { createProgramFromSources } from './utils/shaderUtils'
-import { setBufferRectangle } from './utils/webglUtils'
+import { setBufferRectangle, getActiveUniforms, setUniform, setNumericUniform } from './utils/webglUtils'
 import { isNumeric, isArray } from './utils/typeUtils'
 
 import defaultVertexSource from './shaders/default_vertex.glsl'
@@ -50,15 +50,19 @@ export default class Program {
 	uniforms(uniforms) {
 
 		this.use();
-        for (let name in uniforms) {
-            if (!uniforms.hasOwnProperty(name)) continue;
+        const gl = this.gl;
+        const activeUniforms = getActiveUniforms(gl, this.program);
 
-            const location = this.gl.getUniformLocation(this.program, name);
-            // ignore uniform variable if it doesn't exist in the vertex/fragment
-            if (location === null) continue;
+        for (let name in uniforms) {
+            if(!activeUniforms.hasOwnProperty(name)) continue;
+            if(!activeUniforms[name].location) continue;
+            const activeInfo = activeUniforms[name];
+            const location = activeInfo.location;
 
             const value = uniforms[name];
-            if(isArray(value) && value.length && isArray(value[0])) {
+            if (isNumeric(value) || typeof value == 'boolean') {
+                setNumericUniform(gl, activeInfo, name, value);
+            /*}else if(isArray(value) && value.length && isArray(value[0])) {
                 const isVec3 = value[0].length > 2;
                 for(let i=0; i<value.length; i ++) {
                     const vecLocation = this.gl.getUniformLocation(this.program, name+'['+i+']');
@@ -67,20 +71,9 @@ export default class Program {
                         else this.gl.uniform2fv(vecLocation, new Float32Array(value[i]));
                     }
                 }
-            } else if (isArray(value)) {
-                switch (value.length) {
-                    case 1:  this.gl.uniform1fv(location, new Float32Array(value)); break;
-                    case 2:  this.gl.uniform2fv(location, new Float32Array(value)); break;
-                    case 3:  this.gl.uniform3fv(location, new Float32Array(value)); break;
-                    case 4:  this.gl.uniform4fv(location, new Float32Array(value)); break;
-                    case 9:  this.gl.uniformMatrix3fv(location, false, new Float32Array(value)); break;
-                    case 16: this.gl.uniformMatrix4fv(location, false, new Float32Array(value)); break;
-                    default: throw 'dont\'t know how to load uniform "' + name + '" of length ' + value.length;
-                }
-            } else if (isNumeric(value) || typeof value == 'boolean') {
-                this.gl.uniform1f(location, value);
+            }*/ 
             } else {
-                throw 'attempted to set uniform "' + name + '" to invalid value ' + (value || 'undefined').toString();
+                setUniform(gl, activeInfo, name, value);
             }
         }
 
@@ -112,7 +105,8 @@ export default class Program {
 
         // get a_texCoord pointer
         const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
-        
+        if(texCoordLocation < 0) return this;
+
         // enables the generic vertex attribute array
         gl.enableVertexAttribArray(texCoordLocation);
 
