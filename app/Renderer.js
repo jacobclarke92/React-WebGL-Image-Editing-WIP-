@@ -238,6 +238,7 @@ export default class Editor extends Component {
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 		}
 
+		// for reference https://github.com/jamt9000/webcv/tree/master/demos
 		if(window.doFaceDetection === true) {
 			const rectangles = FaceDetect.runImageCascade(this.image, cascadeFrontalFace);
 			console.log(rectangles);
