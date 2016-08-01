@@ -74,3 +74,51 @@ export function getProgramInfo(gl, program) {
 
     return result;
 }
+
+export function getActiveUniforms(gl, program) {
+    const uniforms = {};
+    const nUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let k = 0; k < nUniforms; k ++) {
+        const activeInfo = gl.getActiveUniform(program, k);
+        const uniformName = activeInfo.name.split('[')[0];
+        activeInfo.location = gl.getUniformLocation(program, uniformName);
+        uniforms[uniformName] = activeInfo;
+    }
+    return uniforms;
+}
+
+export function setUniform(gl, activeInfo, name, value) {
+    const location = activeInfo.location;
+    switch (activeInfo.type) {
+        case gl.FLOAT:          gl.uniform1fv(location, new Float32Array(value)); break;
+        case gl.FLOAT_VEC2:     gl.uniform2fv(location, new Float32Array(value)); break;
+        case gl.FLOAT_VEC3:     gl.uniform3fv(location, new Float32Array(value)); break;
+        case gl.FLOAT_VEC4:     gl.uniform4fv(location, new Float32Array(value)); break;
+        case gl.FLOAT_MAT2:     gl.uniformMatrix2fv(location, false, new Float32Array(value)); break;
+        case gl.FLOAT_MAT3:     gl.uniformMatrix3fv(location, false, new Float32Array(value)); break;
+        case gl.FLOAT_MAT4:     gl.uniformMatrix4fv(location, false, new Float32Array(value)); break;
+        case gl.INT:            gl.uniform1iv(location, new Int32Array(value)); break;
+        case gl.INT_VEC2:       gl.uniform2iv(location, new Int32Array(value)); break;
+        case gl.INT_VEC3:       gl.uniform3iv(location, new Int32Array(value)); break;
+        case gl.INT_VEC4:       gl.uniform4iv(location, new Int32Array(value)); break;
+        case gl.BOOL:           gl.uniform1iv(location, new Int32Array(value)); break;
+        case gl.BOOL_VEC2:      gl.uniform2iv(location, new Int32Array(value)); break;
+        case gl.BOOL_VEC3:      gl.uniform3iv(location, new Int32Array(value)); break;
+        case gl.BOOL_VEC4:      gl.uniform4iv(location, new Int32Array(value)); break;
+        case gl.SAMPLER_2D:     gl.uniform1iv(location, new Int32Array(value)); break;
+        case gl.SAMPLER_CUBE:   gl.uniform1iv(location, new Int32Array(value)); break;
+        default: console.log(value); throw 'dont\'t know how to load uniform "' + name + '" of type "'+(activeInfo.type).toString(16)+'"';
+    }
+}
+
+export function setNumericUniform(gl, activeInfo, name, value) {
+    const location = activeInfo.location;
+    switch (activeInfo.type) {
+        case gl.BOOL:           gl.uniform1f(location, value); break;
+        case gl.FLOAT:          gl.uniform1f(location, value); break;
+        case gl.INT:            gl.uniform1i(location, value); break;
+        case gl.SAMPLER_2D:     gl.uniform1i(location, value); break;
+        case gl.SAMPLER_CUBE:   gl.uniform1i(location, value); break;
+        default: console.log(value); throw 'don\'t know how to load numeric uniform "' + name +'" of type "'+(activeInfo.type).toString(16)+'"';
+    }
+}
