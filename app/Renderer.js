@@ -194,18 +194,6 @@ export default class Editor extends Component {
 
 		const steps = [{key: 'default'}, ...editSteps];
 
-		// console.log('render steps', steps);
-		if(window.doFaceDetection) {
-			steps.push({
-				key: 'faceDetect', 
-				cascade: cascadeFrontalFace,
-				scaleFactor: 1.2,
-				windowSize: 24,
-				url: this.props.url,
-				imageElement: this.imageElement,
-			});
-		}
-
 		for(let count = 0; count < steps.length; count ++) {
 			const step = steps[count];
 			const program = count === 0 ? this.defaultProgram : this.programs[count-1];
@@ -247,13 +235,6 @@ export default class Editor extends Component {
 
 			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 		}
-
-		// for reference https://github.com/jamt9000/webcv/tree/master/demos
-		// if(window.doFaceDetection === true) {
-		// 	const rectangles = FaceDetect.runImageCascade(this.image, cascadeFrontalFace);
-		// 	console.log(rectangles);
-		// }
-
 
 		this.props.onRender();
 	}
