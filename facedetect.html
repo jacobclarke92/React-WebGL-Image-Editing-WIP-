@@ -10,8 +10,45 @@
 	</head>
 	<body>
 
-		<canvas id="canvas"></canvas>
+
+		<div class="face-button" style="background-image: url('test_face1.jpg')"></div>
+		<div class="face-button" style="background-image: url('test_face2.jpg')"></div>
+		<div class="face-button" style="background-image: url('test_face3.jpg')"></div>
+		<div class="face-button" style="background-image: url('test_face4.jpg')"></div>
+		<div class="face-button" style="background-image: url('test_face5.jpg')"></div>
+		<div class="face-button" style="background-image: url('test_face6.jpg')"></div>
+
+		<div id="container">
+			<canvas id="image" width="307" height="409"></canvas>
+			<canvas id="overlay" width="307" height="409"></canvas>
+		</div>
+
+		<p id="convergence"></p>
+
 		<script src="dist/facedetect.js" type="text/javascript"></script>
+
+		<style type="text/css">
+			#container {
+				position: relative;
+			}
+			#container canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			.face-button {
+				width: 150px;
+				height: 120px;
+				background-size: cover;
+				cursor: pointer;
+				display: inline-block;
+				margin: 0 10px 10px 0;
+				border: 3px solid rgb(16,102,134);
+			}
+			.face-button:hover {
+				border-color: rgb(136,169,180);
+			}
+		</style>
 
 	</body>
 </html>

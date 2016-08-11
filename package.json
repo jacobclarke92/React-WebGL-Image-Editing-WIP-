@@ -42,14 +42,18 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
+    "canvas": "^1.4.0",
     "classnames": "^2.2.3",
     "deep-equal": "^1.0.1",
     "express": "^4.14.0",
     "get-pixels": "^3.3.0",
     "gl": "^4.0.2",
     "image-size": "^0.5.0",
+    "jquery": "^3.1.0",
+    "jsfeat": "0.0.8",
     "lodash": "^4.11.1",
     "ndarray": "^1.0.18",
+    "numeric": "^1.2.6",
     "os": "^0.1.1",
     "rc-color-picker": "^1.0.0",
     "rc-slider": "^3.4.0",
