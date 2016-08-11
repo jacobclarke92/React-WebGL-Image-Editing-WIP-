@@ -45,7 +45,7 @@ const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
 function getTempFramebuffer(index) {
 	if(!framebuffers[index]) {
-		framebuffers[index] = new Framebuffer(gl);
+		framebuffers[index] = new Framebuffer(gl).use();
 		framebuffers[index].attachEmptyTexture(width, height);
 	}
 	return framebuffers[index];
