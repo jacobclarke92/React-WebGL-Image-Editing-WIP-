@@ -10,7 +10,7 @@ import GL from 'gl'
 
 import Program from '../app/editor/Program'
 import Texture from '../app/editor/Texture'
-import FramebufferTexture from '../app/editor/FramebufferTexture'
+import Framebuffer from '../app/editor/Framebuffer'
 import Shaders from '../app/editor/shaders'
 import { getProgramInfo } from '../app/editor/utils/webglUtils'
 
@@ -45,7 +45,7 @@ const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
 function getTempFramebuffer(index) {
 	if(!framebuffers[index]) {
-		framebuffers[index] = new FramebufferTexture(gl);
+		framebuffers[index] = new Framebuffer(gl);
 		framebuffers[index].attachEmptyTexture(width, height);
 	}
 	return framebuffers[index];
