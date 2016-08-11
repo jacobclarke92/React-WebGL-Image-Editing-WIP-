@@ -3,6 +3,7 @@ import Texture from '../Texture'
 import Framebuffer from '../Framebuffer'
 
 import { getActiveUniforms } from '../utils/webglUtils'
+import { imageToGreyArray, integralImage } from '../utils/imageProcessUtils'
 import lbpStage_vertex from './lbpStage_vertex.glsl'
 import lbpStage_fragment from './lbpStage_fragment.glsl'
 
@@ -18,6 +19,7 @@ export default function(settings) {
 
 	const setupStart = new Date();
 
+    this.imageElement = imageElement;
 	this.cascade = cascade;
 	this.scaleFactor = scaleFactor;
 	this.windowSize = windowSize;
@@ -66,18 +68,18 @@ export default function(settings) {
     this.finalFramebuffer.use();
     this.finalFramebuffer.attachTexture(this.finalTexture.id);
 
-
+    
     // Compile the code for all the shaders (one for each stage)
     this.vertBuf = undefined; // Keep track of vertex buffer for quad. Set in setupShaders
     this.lbpShaders = setupShaders.call(this);
-
+    
     this.integral = new Float32Array(this.integralWidth * this.integralHeight);
     this.integralTexture = new Texture(gl, this.integralWidth, this.integralHeight, gl.LUMINANCE);
 
     this.pixels = new Uint8Array(this.width * this.height * 4);
     this.greyImage = new Uint8Array(this.width * this.height);
     console.log('Face detectuin setup time', new Date() - setupStart);
-
+    
 }
 
 function calculateLBPLookupTableSize() {
@@ -180,5 +182,151 @@ function setupShaders() {
 	return shaderArray;
 }
 
+function detect() {
+    const gl = this.gl;
+    const totalTimeStart = new Date();
+    const cascade = this.cascade;
+    const times = [];
 
+    // Upload original image
+    if(gpuIntegral) {
+        gl.bindTexture(gl.TEXTURE_2D, this.originalImageTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    }
+
+    // Convert to grayscale
+    const grey = imageToGreyArray(this.imageElement, this.greyImage, this.width, this.height);
+
+    // Create and upload integral image
+    integralImage(grey, this.width, this.height, this.integral);
+    
+    gl.bindTexture(gl.TEXTURE_2D, this.integralTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, this.integralWidth, this.integralHeight, 0, gl.LUMINANCE,
+            gl.FLOAT, this.integral);
+
+    // Bind textures for the integral image and LBP lookup table
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.integralTexture);
+
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, this.lbpLookupTexture);
+
+
+    var detectTimeStart = new Date();
+    var rectangles = []
+
+    var ndraws = 0;
+
+    // Ordinal number of the scale, which will be written as the output pixel
+    // value when a rectangle is detected at a certain scale
+    var scaleN = 1;
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    // Clear final output framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.finalFramebuffer);
+    gl.clearColor(0,0,0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    var scale = 1.0;
+
+    for (let s=0; s < this.nscales; s++) {
+        var scaleTime = new Date();
+        var scaledWindowSize = Math.round(scale * this.windowSize);
+        var drawWidth = this.width - scaledWindowSize;
+        var drawHeight = this.height - scaledWindowSize;
+
+        gl.viewport(0, 0, drawWidth, drawHeight);
+        gl.disable(gl.BLEND);
+
+        for (let stageN = 0; stageN < this.nstages; stageN ++) {
+
+            // Render to the framebuffer holding one texture, while using the
+            // other texture, containing windows still active from the previous
+            // stage as input
+            const outFramebuffer = this.framebuffers[stageN % 2];
+            gl.bindFramebuffer(gl.FRAMEBUFFER, outFramebuffer);
+
+            gl.clearColor(0,0,0,0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            if(stageN == this.nstages-1) {
+                // On last stage render to final out texture
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.finalFramebuffer);
+                gl.enable(gl.BLEND);
+            }
+
+
+            // Bind the texture of windows still active (potentially faces) to
+            // texture unit 2
+            if(!zCull && !stencilCull) {
+                var activeWindowTexture = this.outTextures[(stageN + 1) % 2];
+                gl.activeTexture(gl.TEXTURE2);
+                gl.bindTexture(gl.TEXTURE_2D, activeWindowTexture);
+            }
+
+
+            gl.useProgram(this.lbpShaders[stageN]);
+            this.lbpShaders[stageN].uniforms({"scale": scale, "scaleN": scaleN})
+            // cv.shaders.setUniforms(this.lbpShaders[stageN], {"scale": scale, "scaleN": scaleN});
+            // cv.shaders.setAttributes(this.lbpShaders[stageN], {aPosition: this.vertBuf});
+            this.lbpShaders[stageN].willRender();
+
+
+            if (showImage && stageN === 0) {
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                break;
+            }
+            
+            /*
+            if(timeStage) {
+                // Do the draw many times and take average
+                var niters = 10;
+                var drawStart = new Date();
+                for(var n=0; n<niters; n++) {
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    ndraws += 1;
+                    // Dummy readPixels to wait until gpu finishes
+                    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);
+                }
+                var drawTime = new Date() - drawStart;
+                drawTime /= niters;
+                this.stageTimes[stageN][s] = drawTime;
+            } else {
+                */
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                ndraws ++;
+            // }
+        }
+
+
+        scale *= this.scaleFactor;
+        scaleN += 1;
+    }
+
+    // Gather the rectangles from the image
+    gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);
+    //cv.utils.showRGBA(this.pixels, this.width, this.height);
+    var k, x, y, pixelValue, scaleBy;
+    for (k = 0; k < this.width * this.height; k += 1) {
+        // Scale number stored as pixel value
+        pixelValue = this.pixels[k * 4];
+        if (pixelValue != 0) {
+            scaleBy = Math.pow(this.scaleFactor, pixelValue-1);
+            x = (k) % this.width;
+            y = Math.floor((k) / this.width);
+            rectangles.push([x, y, Math.floor(this.windowSize * scaleBy),
+                                   Math.floor(this.windowSize * scaleBy)]);
+        }
+    }
+
+    //console.log("number of draw calls:", ndraws);
+    var detectTime = new Date() - detectTimeStart;
+    var totalTime = new Date() - totalTimeStart;
+    console.log("Detection time:", detectTime, "Detection+integral:", totalTime);
+    window.times.push(detectTime);
+    gl.disable(gl.DEPTH_TEST);
+    this.rectangles = rectangles;
+    return rectangles;
+}
 
