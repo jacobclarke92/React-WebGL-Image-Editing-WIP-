@@ -15,6 +15,9 @@ module.exports = {
 			'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
 			'./app/index.js'
 		],
+		facedetect: [
+			'./app/facedetect.js',
+		],
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
