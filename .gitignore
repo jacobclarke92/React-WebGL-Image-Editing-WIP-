@@ -1,7 +1,9 @@
 node_modules
 npm-debug.log
 dist/*
-!dist/empty
+!dist/.kitkeep
+cache/downloads/*
+!cache/downloads/.gitkeep
 react-webgl-image-editing.sublime-project
 react-webgl-image-editing.sublime-workspace
 *_processed.**
