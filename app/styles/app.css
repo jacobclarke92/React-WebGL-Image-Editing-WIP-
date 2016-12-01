@@ -3,7 +3,6 @@
 
 html, body {
 	margin: 0;
-	padding: 15px;
 	font-family: Helvetica, Arial, sans-serif;
 	color: #333c47;
 }
@@ -67,8 +66,69 @@ a.button {
 	width: calc(100% - 60px);
 }
 
+.image-editor{
+	position:fixed !important;
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+}
+
+.image-editor > *{
+	display: inline-block;
+	vertical-align: top;
+}
+
+.main-window {
+    width: 60%;
+    position: relative;
+    height: 100%;
+    overflow-y: scroll;
+    background: #333333;
+}
+
+button, .button{
+	padding: 0px;
+	border: 1px solid #fff;
+	border-radius: 0px;
+	background: transparent;
+	width: 122px;
+}
+
+
+button canvas {
+	margin-top: -1px;
+}
+
+button:disabled, .button:disabled {
+	background: transparent;
+    cursor: not-allowed;
+    border: 1px solid #333;
+}
+
+.dropzone{
+	position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tray{
+	width: 40%;
+	height: 100%;
+	overflow-y: scroll;
+}
+
+.tray-inner{
+	padding: 20px;
+}
+
 .text-center {
 	text-align: center;
+}
+
+.some-bs{
+	display: none;
 }
 
 .sliders {
@@ -151,7 +211,7 @@ a.button {
 	left: 0;
 	z-index: 10;
 }
-	
+
 .dropzone.drop:before {
 	background-color: rgba(192, 230, 249, 0.85);
 	text-align: center;
@@ -173,7 +233,7 @@ a.button {
 
 /* Editor Styles */
 
-.canvas-wrapper, 
+.canvas-wrapper,
 .canvas-wrapper canvas {
     width: 100%;
     margin: 0 auto;
