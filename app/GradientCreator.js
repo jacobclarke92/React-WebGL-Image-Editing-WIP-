@@ -35,7 +35,7 @@ export default class GradientCreator extends Component {
 			{id: ++counter, position: 1, color: [255, 252, 0], alpha: 1},
 		];
 		this.state = {
-			markers: props.value || defaultValue,
+			markers: props.value ? props.value.map(marker => ({id: ++ counter, ...marker})) : defaultValue,
 		};
 	}
 
@@ -50,7 +50,7 @@ export default class GradientCreator extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState({markers: nextProps.value});
+		setTimeout(() => this.setState({markers: nextProps.value ? nextProps.value.map(marker => ({id: ++counter, ...marker})) : []}));
 	}
 
 	handleCallback(markers) {

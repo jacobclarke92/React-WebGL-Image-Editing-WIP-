@@ -50,7 +50,7 @@ export function interpolateGradient(_markers, range = 255) {
 	// if first marker is above 0 then create an identical one at 0
 	if(markers[0].position > 0) markers = [{...markers[0], position: 0}, ...markers];
 	// and vice versa
-	if(markers[markers.length-1].position < 255) markers = [...markers, {...markers[markers.length-1], position: 255}];
+	if(markers[markers.length-1].position < 256) markers = [...markers, {...markers[markers.length-1], position: 256}];
 
 	const rgbaData = [];
 	let currentMarker = markers[0];
