@@ -83,12 +83,16 @@ export default class Editor extends Component {
 				this.resizePrograms(nextProps.width, nextProps.height);
 			}
 
+			// if(this.props.canvasWidth !== nextProps.canvasWidth || this.props.canvasHeight !== nextProps.canvasHeight) {
+			// 	this.resizeViewport(nextProps.canvasWidth, nextProps.canvasHeight);
+			// }
+
 			// check to see if program list / order has changed in order to allocate new programs / rebuild
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
 				console.log('NEW EDIT STEPS', editStepsKeys.join(','), this.lastEditStepsKeys.join(','));
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms(nextProps.instructions);
-				this.resizePrograms();
+				this.resizePrograms(nextProps.width, nextProps.height);
 				this.renderEditSteps(nextProps.instructions);
 
 			// do a deep check to see if edit step params have changed since last time in order to re-render
@@ -188,8 +192,8 @@ export default class Editor extends Component {
 	}
 
 	resizeViewport(width = this.props.width, height = this.props.height) {
-		this.canvas.width = width;
-		this.canvas.height = height;
+		// this.canvas.width = width;
+		// this.canvas.height = height;
 		this.gl.viewport(0, 0, width, height);
 	}
 
