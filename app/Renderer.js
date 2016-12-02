@@ -56,7 +56,6 @@ export default class Editor extends Component {
 		this.setState({settings: nextProps.settings});
 
 		const editStepsKeys = nextProps.editSteps.map(editStep => editStep.key);
-		// console.log(JSON.stringify(nextProps.editSteps).split('"').join('\\"'));
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
@@ -71,10 +70,7 @@ export default class Editor extends Component {
 			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
 				this.resizeViewport(nextProps.width, nextProps.height);
 				this.resizePrograms(nextProps.width, nextProps.height);
-
-				// Unsure if wrapping in setTimeout is required as resizeViewport and resizePrograms don't affect props/state
-				// But I must have added it for a reason...
-				setTimeout(() => this.renderEditSteps());
+				this.renderEditSteps(nextProps.editSteps);
 			}
 
 			// check to see if program list / order has changed in order to allocate new programs / rebuild
@@ -82,15 +78,11 @@ export default class Editor extends Component {
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms();
 				this.resizePrograms();
-
-				// Original comment: Wait until props have been updated before re-rendering
-				// Unsure if this is required / can't remember why I wrapped in setTimeout
-				// Because buildPrograms and resizePrograms don't affect props/state...
-				setTimeout(() => this.renderEditSteps());
+				this.renderEditSteps(nextProps.editSteps);
 
 			// do a deep check to see if edit step params have changed since last time in order to re-render
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
-				this.renderEditSteps();
+				this.renderEditSteps(nextProps.editSteps);
 			}
 		}
 	}
@@ -190,8 +182,7 @@ export default class Editor extends Component {
 		}
 	}
 
-	renderEditSteps() {
-		const { editSteps } = this.props;
+	renderEditSteps(editSteps = this.props.editSteps || []) {
 
 		// inject default shader as first render step
 		const steps = [{key: 'default'}, ...editSteps];
