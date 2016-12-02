@@ -60,7 +60,6 @@ export default class Editor extends Component {
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
-			// console.log('------------------');
 			this.resetPrograms();
 			this.resetFramebuffers();
 			this.lastEditStepsKeys = editStepsKeys;
@@ -68,27 +67,29 @@ export default class Editor extends Component {
 
 		}else{
 
+			// update viewport and programs if size has changed
 			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-				// console.log('---');
-				// console.log('width/height changed!', nextProps.width, nextProps.height);
 				this.resizeViewport(nextProps.width, nextProps.height);
 				this.resizePrograms(nextProps.width, nextProps.height);
+
+				// Unsure if wrapping in setTimeout is required as resizeViewport and resizePrograms don't affect props/state
+				// But I must have added it for a reason...
 				setTimeout(() => this.renderEditSteps());
 			}
 
+			// check to see if program list / order has changed in order to allocate new programs / rebuild
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
-				// console.log('---');
-				// console.log('editStepsKeys changed');
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms();
 				this.resizePrograms();
 
-				// Wait until props have been updated before re-rendering
+				// Original comment: Wait until props have been updated before re-rendering
+				// Unsure if this is required / can't remember why I wrapped in setTimeout
+				// Because buildPrograms and resizePrograms don't affect props/state...
 				setTimeout(() => this.renderEditSteps());
 
+			// do a deep check to see if edit step params have changed since last time in order to re-render
 			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
-				// console.log('---');
-				// console.log('editSteps changed');
 				this.renderEditSteps();
 			}
 		}
@@ -100,7 +101,7 @@ export default class Editor extends Component {
 	}
 
 	handleImageLoad(image) {
-		// console.log('---');
+		// log the image url if it's not a data uri
 		if(this.props.url.indexOf('data:') < 0) console.log(this.props.url, 'loaded');
 
 		// make texture for base image, destroy old one first if it exists
@@ -111,17 +112,19 @@ export default class Editor extends Component {
 		// init base program to render base image
 		if(this.defaultProgram) this.defaultProgram.destroy();
 		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
-		// console.table(getProgramInfo(this.gl, this.defaultProgram.program).uniforms);
 
+		// init programs 
 		this.buildPrograms();
 
+		// autoResize is a feature which I'm not sure will have use going forward
+		// if set to true it will pass back image dimensions, which should in turn be returned to component as props
+		// if set to false it means the image dimensions are already known and should have been provided at the same time as the new image url
+		// the danger there is that if not autoResize and provided dimensions are different to what the image's dimensions actually are, the shaders could behave unpredicatably
 		if(!this.props.autoResize) {
-			// console.log('not autoResizing so render immediately');
 			this.resizeViewport();
 			this.resizePrograms();
 			this.renderEditSteps();
 		}else{
-			console.log('is autoResize so using resize callback, when props update render will occur');
 			this.props.onResize(image.width, image.height);
 		}
 
@@ -140,7 +143,6 @@ export default class Editor extends Component {
 	}
 
 	buildPrograms(programList = this.lastEditStepsKeys) {
-		// console.log('building programs', programList);
 		this.resetPrograms();
 		programList.map(filterLabel => {
 			this.addProgram(filterLabel);
@@ -149,11 +151,11 @@ export default class Editor extends Component {
 	}
 
 	addProgram(label) {
-		const shader = Shaders[label];
-		if(!shader) {
+		if(!(label in Shaders)) {
 			console.warn('No shader found for:', label);
 			return;
 		}
+		const shader = Shaders[label];
 		const program = new Program(label, this.gl, shader.vertex, shader.fragment, shader.update);
 		this.programs.push(program);
 		return program;
@@ -179,7 +181,6 @@ export default class Editor extends Component {
 		this.canvas.width = width;
 		this.canvas.height = height;
 		this.gl.viewport(0, 0, width, height);
-		// this.props.onResize(width, height);
 	}
 
 	resizePrograms(width = this.props.width, height = this.props.height) {
@@ -192,28 +193,39 @@ export default class Editor extends Component {
 	renderEditSteps() {
 		const { editSteps } = this.props;
 
+		// inject default shader as first render step
 		const steps = [{key: 'default'}, ...editSteps];
 
 		for(let count = 0; count < steps.length; count ++) {
 			const step = steps[count];
+
+			// select the correct program, if first, select the default injected shader from above
 			const program = count === 0 ? this.defaultProgram : this.programs[count-1];
 
 			// switch to program
 			program.use();
 
+			// iterations are just a means of compounding a program's render output
+			// its sole purpose is to make my self-indulgent pixel-sorting shader work :~)
 			const iterations = step.iterations || 1;
-			for(let i=0; i<iterations; i++) {
+			for(let iteration = 0; iteration < iterations; iteration++) {
 
 				// run the shader's update function -- modifies uniforms
-				// program must be in use before calling update otherwise current program's uniforms get modified
-				program.update(step, i);
+				// program must be in use before calling update otherwise previously active program's uniforms get modified
+				program.update(step, iteration);
 
-				// determine source texture - original image texture if first pass or a framebuffer texture
+				// determine source texture - original image texture if first pass or a framebuffer texture for any following passes
+				// explaination of framebuffers below...
 				const sourceTexture = count === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
 
-				// determine render target, set to null if last one because null = canvas
+				// Think of framebuffers as extra, unseen canvases, we only need 2 framebuffers, they get reused.
+				// We take it in turns to take what's on one framebuffer as a texture, apply our edit steps to it, and then render the result to the other framebuffer.
+				// So for the next edit step we do the same thing except the other way around, repeat ad infinitum.
+				// ----
+				// If we're up to the last step then the render target stays at null (null = canvas),
+				// Otherwise we increment our framebuffer index to select (or create) the next framebuffer
 				let target = null;
-				if(count < steps.length-1 && i < iterations) {
+				if(count < steps.length-1 && iteration < iterations) {
 					this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 					target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 				}
@@ -240,7 +252,7 @@ export default class Editor extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		// only do a render if dimensions change
+		// only do a react render if dimensions change
 		return (
 			nextProps.width !== this.props.width ||
 			nextProps.height !== this.props.height

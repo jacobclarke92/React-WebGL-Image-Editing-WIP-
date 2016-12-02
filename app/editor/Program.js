@@ -9,6 +9,15 @@ import defaultFragmentSource from './shaders/default_fragment.glsl'
 
 export default class Program {
 
+    /**
+     * Initialized the program and compiles the vertex and fragment sources
+     * @param  {String} label               - For logging reference
+     * @param  {Canvas} gl                  - WebGL instance being used
+     * @param  {String} vertexSource        - Vertex source, otherwise uses default
+     * @param  {String} fragmentSource      - Fragment source, otherwise uses default
+     * @param  {function} updateFunction    - Update function, used to modify shader / update uniforms before a render
+     * @return {<Program>}                  - Returns self so functions can be chained
+     */
 	constructor(label = '[[unlabeled]]', gl, vertexSource = defaultVertexSource, fragmentSource = defaultFragmentSource, updateFunction = () => {}) {
 		if(!gl) throw 'No GL instance provided for shader';
 		this.gl = gl;
@@ -22,16 +31,29 @@ export default class Program {
         return this;
 	}
 
+    /**
+     * Destroys program
+     */
 	destroy() {
 		this.gl.deleteProgram(this.program);
         this.program = null;
 	}
 
+    /**
+     * Activates program
+     * @return {<Program>}      - Returns self so functions can be chained
+     */
     use() {
         this.gl.useProgram(this.program);
         return this;
     }
 
+    /**
+     * Updates program's u_resolution uniforms
+     * @param  {Integer} width
+     * @param  {Integer} height
+     * @return {<Program>}      - Returns self so functions can be chained
+     */
     resize(width, height) {
         this.use();
 
@@ -47,6 +69,11 @@ export default class Program {
         this.updateFunction.call(this, settings, iteration);
     }
 
+    /**
+     * Updates uniforms (or 'shader variables'), most of the hard work can be found in webglUtils
+     * @param  {Object} uniforms    - Object of values to set
+     * @return {self}               - returns self so functions can be chained 
+     */
 	uniforms(uniforms) {
 
 		this.use();
@@ -80,6 +107,12 @@ export default class Program {
         return this;
 	}
 
+    /**
+     * Defines textures in program, 
+     * I don't think this is actually used as most custom textures are handled by a program's update function
+     * @param  {Object} textures    - Object of textures to set
+     * @return {<Program>}               - returns self so functions can be chained 
+     */
 	textures(textures) {
 		this.use();
         for (let name in textures) {
@@ -90,7 +123,11 @@ export default class Program {
         return this;
 	}
 
-	willRender(left, top, right, bottom) {
+    /**
+     * Full warning ... I have no idea how this works
+     * @return {<Program>} - returns self so functions can be chained 
+     */
+	willRender() {
 
         const gl = this.gl;
         
@@ -116,6 +153,11 @@ export default class Program {
         return this;
     }
 
+
+    /**
+     * Full warning ... I have no idea how this works
+     * @return {<Program>} - returns self so functions can be chained 
+     */
     didRender() {
 
         const gl = this.gl;
@@ -144,6 +186,10 @@ export default class Program {
         return this;
     }
 
+    /**
+     * I guess I know how this works?
+     * @return {<Program>} - returns self so functions can be chained 
+     */
     draw() {
         const gl = this.gl;
         gl.drawArrays(gl.TRIANGLES, 0, 6);
