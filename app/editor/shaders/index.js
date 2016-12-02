@@ -2,8 +2,10 @@ import default_vertex from './default_vertex.glsl'
 import default_vertex_node from './default_vertex_node.glsl'
 import default_fragment from './default_fragment.glsl'
 import default_update from './default_update'
-
 import filter_vertex from './filter_vertex.glsl'
+
+import rotate_fragment from './rotate_fragment.glsl'
+
 import blur_fragment from './blur_fragment.glsl'
 import bloom_fragment from './bloom_fragment.glsl'
 import curves_update from './curves_update'
@@ -37,6 +39,23 @@ const Shaders = {
 		vertex: default_vertex_node,
 		fragment: default_fragment,
 	},
+
+	rotate: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: rotate_fragment,
+	},
+	straighten: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: default_fragment,
+	},
+	crop: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: default_fragment,
+	},
+
 	blur: {
 		update: default_update,
 		vertex: filter_vertex,

@@ -8,7 +8,11 @@ import Texture from './editor/Texture'
 import Framebuffer from './editor/Framebuffer'
 
 import { getProgramInfo } from './editor/utils/webglUtils'
-import cascadeFrontalFace from './editor/constants/cascade_frontalface'
+// import cascadeFrontalFace from './editor/constants/cascade_frontalface'
+
+function combineGroupEditStepKeys(instructions) {
+	return instructions.reduce((steps, group) => [...steps, ...(group.steps || [])], []).map(step => step.key);
+}
 
 export default class Editor extends Component {
 
@@ -16,18 +20,21 @@ export default class Editor extends Component {
 		url: 'test.jpg',
 		width: 400,
 		height: 400,
+		canvasWidth: 400,
+		canvasHeight: 400,
 		onResize: () => {},
 		onRender: () => {},
 		autoResize: false,
-		editSteps: [],
+		// editSteps: [],
+		instructions: [],
 	};
 
 	constructor(props) {
 		super();
-		this.programs = [];
+		this.programs = {};
 		this.framebuffers = [];
 		this.currentFramebufferIndex = -1;
-		this.lastEditStepsKeys = props.editSteps.map(editStep => editStep.key);
+		this.lastEditStepsKeys = combineGroupEditStepKeys(props.instructions);
 		this.state = {
 			url: props.url,
 			settings: props.settings,
@@ -55,7 +62,10 @@ export default class Editor extends Component {
 		// update certain aspects of state
 		this.setState({settings: nextProps.settings});
 
-		const editStepsKeys = nextProps.editSteps.map(editStep => editStep.key);
+		const editStepsKeys = combineGroupEditStepKeys(nextProps.instructions);
+		// console.log(this.props.url);
+		// console.log(this.lastEditStepsKeys.join(','));
+		// console.log(editStepsKeys.join(','));
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
@@ -68,21 +78,23 @@ export default class Editor extends Component {
 
 			// update viewport and programs if size has changed
 			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
+				console.log('RESIZING VIEWPORTS AND PROGRAMS');
 				this.resizeViewport(nextProps.width, nextProps.height);
 				this.resizePrograms(nextProps.width, nextProps.height);
-				this.renderEditSteps(nextProps.editSteps);
 			}
 
 			// check to see if program list / order has changed in order to allocate new programs / rebuild
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
+				console.log('NEW EDIT STEPS', editStepsKeys.join(','), this.lastEditStepsKeys.join(','));
 				this.lastEditStepsKeys = editStepsKeys;
-				this.buildPrograms();
+				this.buildPrograms(nextProps.instructions);
 				this.resizePrograms();
-				this.renderEditSteps(nextProps.editSteps);
+				this.renderEditSteps(nextProps.instructions);
 
 			// do a deep check to see if edit step params have changed since last time in order to re-render
-			}else if(!deepEqual(this.props.editSteps, nextProps.editSteps)) {
-				this.renderEditSteps(nextProps.editSteps);
+			}else if(!deepEqual(this.props.instructions, nextProps.instructions)) {
+				console.log('NEW EDIT STEP PARAM CHANGES');
+				this.renderEditSteps(nextProps.instructions);
 			}
 		}
 	}
@@ -134,10 +146,14 @@ export default class Editor extends Component {
 		return this.framebuffers[index];
 	}
 
-	buildPrograms(programList = this.lastEditStepsKeys) {
+	buildPrograms(instructions = this.props.instructions) {
 		this.resetPrograms();
-		programList.map(filterLabel => {
-			this.addProgram(filterLabel);
+		instructions.filter(group => group.steps && group.steps.length > 0).forEach(group => {
+			const groupName = group.name;
+			if(!(groupName in this.programs)) this.programs[groupName] = [];
+			group.steps.forEach(step => {
+				this.programs[groupName].push(this.addProgram(step.key));
+			});
 		});
 		if(window.doFaceDetection) this.addProgram('faceDetect');
 	}
@@ -149,15 +165,17 @@ export default class Editor extends Component {
 		}
 		const shader = Shaders[label];
 		const program = new Program(label, this.gl, shader.vertex, shader.fragment, shader.update);
-		this.programs.push(program);
+		// this.programs.push(program);
 		return program;
 	}
 
 	resetPrograms() {
-		for(let program of this.programs) {
-			program.destroy();
-		}
-		this.programs = [];
+		Object.keys(this.programs).forEach(groupKey => {
+			for(let program of this.programs[groupKey]) {
+				program.destroy();
+			}
+		})
+		this.programs = {};
 	}
 
 	resetFramebuffers() {
@@ -177,66 +195,84 @@ export default class Editor extends Component {
 
 	resizePrograms(width = this.props.width, height = this.props.height) {
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
-		for(let program of this.programs) {
-			program.resize(width, height);
-		}
+		Object.keys(this.programs).forEach(groupKey => {
+			for(let program of this.programs[groupKey]) {
+				program.resize(width, height);
+			}
+		});
 	}
 
-	renderEditSteps(editSteps = this.props.editSteps || []) {
+	renderEditSteps(_instructions = this.props.instructions || []) {
 
-		// inject default shader as first render step
-		const steps = [{key: 'default'}, ...editSteps];
+		// inject default shader as first render step of first edit group - settings
+		const instructions = [{name: 'preRender', steps: [{key: 'default'}]}, ..._instructions].filter(group => group.steps && group.steps.length > 0);
+		// const steps = [{key: 'default'}, ...editSteps];
 
-		for(let count = 0; count < steps.length; count ++) {
-			const step = steps[count];
+		let totalStepCount = -1;
+		// iterate over instruction groups
+		for(let groupCount = 0; groupCount < instructions.length; groupCount ++) {
+			const group = instructions[groupCount];
+			const groupName = group.name;
+			const steps = group.steps || [];
 
-			// select the correct program, if first, select the default injected shader from above
-			const program = count === 0 ? this.defaultProgram : this.programs[count-1];
+			// iterate over group edit steps
+			for(let count = 0; count < steps.length; count ++) {
+				const step = steps[count];
+				totalStepCount ++;
 
-			// switch to program
-			program.use();
+				// select the correct program, if first, select the default injected shader from above
+				const program = totalStepCount === 0 ? this.defaultProgram : this.programs[groupName][count];
 
-			// iterations are just a means of compounding a program's render output
-			// its sole purpose is to make my self-indulgent pixel-sorting shader work :~)
-			const iterations = step.iterations || 1;
-			for(let iteration = 0; iteration < iterations; iteration++) {
+				// switch to program
+				program.use();
 
-				// run the shader's update function -- modifies uniforms
-				// program must be in use before calling update otherwise previously active program's uniforms get modified
-				program.update(step, iteration);
+				// iterations are just a means of compounding a program's render output
+				// its sole purpose is to make my self-indulgent pixel-sorting shader work :~)
+				const iterations = step.iterations || 1;
+				for(let iteration = 0; iteration < iterations; iteration++) {
 
-				// determine source texture - original image texture if first pass or a framebuffer texture for any following passes
-				// explaination of framebuffers below...
-				const sourceTexture = count === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+					// run the shader's update function -- modifies uniforms
+					// program must be in use before calling update otherwise previously active program's uniforms get modified
+					program.update(step, iteration);
 
-				// Think of framebuffers as extra, unseen canvases, we only need 2 framebuffers, they get reused.
-				// We take it in turns to take what's on one framebuffer as a texture, apply our edit steps to it, and then render the result to the other framebuffer.
-				// So for the next edit step we do the same thing except the other way around, repeat ad infinitum.
-				// ----
-				// If we're up to the last step then the render target stays at null (null = canvas),
-				// Otherwise we increment our framebuffer index to select (or create) the next framebuffer
-				let target = null;
-				if(count < steps.length-1 && iteration < iterations) {
-					this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
-					target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+					// determine source texture - original image texture if first pass or a framebuffer texture for any following passes
+					// explaination of framebuffers below...
+					const sourceTexture = totalStepCount === 0 ? this.imageTexture : this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+
+					// Think of framebuffers as extra, unseen canvases, we only need 2 framebuffers, they get reused.
+					// We take it in turns to take what's on one framebuffer as a texture, apply our edit steps to it, and then render the result to the other framebuffer.
+					// So for the next edit step we do the same thing except the other way around, repeat ad infinitum.
+					// ----
+					// If we're up to the last step then the render target stays at null (null = canvas),
+					// Otherwise we increment our framebuffer index to select (or create) the next framebuffer
+					// console.log(groupName, step.key);
+					// console.log(count, steps.length-1);
+					// console.log(groupCount, instructions.length-1);
+					// console.log(iteration, iterations-1);
+					let target = null;
+					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1)) {
+						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
+						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+					}
+
+
+					// pre-render calcs idk
+					program.willRender();
+
+					// use current source texture and framebuffer target
+					sourceTexture.use();
+					this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+
+					// post-render calcs idk
+					program.didRender();
+
+					// draw that shit
+					program.draw();
+
 				}
 
-				// pre-render calcs idk
-				program.willRender();
-
-				// use current source texture and framebuffer target
-				sourceTexture.use();
-				this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
-
-				// post-render calcs idk
-				program.didRender();
-
-				// draw that shit
-				program.draw();
-
+				// console.table(getProgramInfo(this.gl, program.program).uniforms);
 			}
-
-			// console.table(getProgramInfo(this.gl, program.program).uniforms);
 		}
 
 		this.props.onRender();
@@ -245,15 +281,15 @@ export default class Editor extends Component {
 	shouldComponentUpdate(nextProps, nextState) {
 		// only do a react render if dimensions change
 		return (
-			nextProps.width !== this.props.width ||
-			nextProps.height !== this.props.height
+			nextProps.canvasWidth !== this.props.canvasWidth ||
+			nextProps.canvasHeight !== this.props.canvasHeight
 		);
 	}
 
 	render() {
-		const { width, height } = this.props;
+		const { canvasWidth, canvasHeight } = this.props;
 		return (
-			<canvas ref="editor" width={width} height={height} />
+			<canvas ref="editor" width={canvasWidth} height={canvasHeight} />
 		)
 	}
 

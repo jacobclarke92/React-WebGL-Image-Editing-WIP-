@@ -16,6 +16,7 @@ import filterPresets from './constants/presets.json'
 import gradientPresets from './constants/gradientPresets.js'
 
 import { isArray } from './editor/utils/typeUtils'
+import _find from 'lodash/find'
 
 const thumbnailWidth = 120;
 const thumbnailHeight = 90;
@@ -204,35 +205,39 @@ export default class Editor extends Component {
 		curveAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
 		adjustments[colorMapAdjustment.label] = colorMapAdjustment.defaultValue;
 
+		const instructions = [
+			{name: 'utility', steps: []},
+			{name: 'adjustments', steps: this.generateEditStepsFromAdjustments(adjustments)},
+			{name: 'filter', steps: []},
+		];
+
 		// store reset point, make a copy of adjustments object
 		this.defaultAdjustments = {...adjustments};
+		this.defaultInstructions = [...instructions];
 		
 		this.state = {
 			url: this.urls[Math.floor(Math.random()*this.urls.length)],
 			width: 550,
 			height: 400,
-			adjustments: adjustments,
-			adjustmentSteps: [],
-			filterSteps: [],
-			editSteps: [],
+			canvasWidth: 550,
+			canvasHeight: 400,
+			adjustments,
+			instructions,
 			filterName: null,
-			// hueAmount: 0,
-			// hueRange: 0.13,
 		}
 	}
 
 	handleImageResize(width, height) {
-		this.setState({width, height});
+		console.log('UPDATING DIMENSIONS', width, height);
+		this.setState({width, height, canvasWidth: width, canvasHeight: height});
 	}
 
 	// Reset adjustments and filter
 	handleReset() {
 		this.setState({
 			adjustments: {...this.defaultAdjustments},
-			adjustmentSteps: [],
+			instructions: [...this.defaultInstructions],
 			filterName: null,
-			filterSteps: [],
-			editSteps: [],
 		});
 	}
 
@@ -243,7 +248,7 @@ export default class Editor extends Component {
 
 	// Update adjustment value
 	setValue(key, value) {
-		const { adjustments, filterSteps } = this.state;
+		const { adjustments } = this.state;
 
 		// make sure value is number
 		if(typeof value == 'string') value = parseFloat(value);
@@ -253,22 +258,48 @@ export default class Editor extends Component {
 
 		// generate editSteps for Renderer
 		const adjustmentSteps = this.generateEditStepsFromAdjustments(adjustments);
-		const editSteps = [...adjustmentSteps, ...filterSteps];
+
+		// update instructions with new steps
+		const instructions = this.state.instructions.map(group => group.name == 'adjustments' ? {...group, steps: adjustmentSteps} : group);
 		
-		this.setState({adjustments, adjustmentSteps, editSteps});
+		this.setState({
+			adjustments, 
+			instructions,
+		});
 	}
 
 	// Update filter preset
 	setFilter(filterPreset) {
 
-		const { adjustmentSteps } = this.state;
 		const filterSteps = this.generateEditStepsFromFilterPreset(filterPreset);
+		const instructions = this.state.instructions.map(group => group.name == 'filter' ? {...group, steps: filterSteps} : group);
 
 		this.setState({
 			filterName: filterPreset.name,
-			filterSteps,
-			editSteps: [...adjustmentSteps, ...filterSteps],
+			instructions,
 		});
+	}
+
+	updateUtilityValue(utilityAdjustments = {}) {
+		
+		const utilitySteps = [];
+		if('rotate' in utilityAdjustments) {
+			const oldUtilitySteps = _find(this.state.instructions, {name: 'utility'}).steps || [];
+			const oldRotation = (_find(oldUtilitySteps, {key: 'rotate'}) || {}).value || 0;
+			const rotation = (oldRotation + 360 + utilityAdjustments.rotate)%360;
+			utilitySteps.push({key: 'rotate', value: rotation});
+			if(rotation == 90 || rotation == 270) {
+				this.setState({canvasWidth: this.state.height, canvasHeight: this.state.width});
+			}else{
+				this.setState({canvasWidth: this.state.width, canvasHeight: this.state.height});
+			}
+		}
+		if('straighten' in utilityAdjustments) utilitySteps.push({key: 'straighten', value: utilityAdjustments.straighten});
+		if('crop' in utilityAdjustments) utilitySteps.push({key: 'crop', value: utilityAdjustments.crop});
+
+		// update instructions with new utility steps
+		const instructions = this.state.instructions.map(group => group.name == 'utility' ? {...group, steps: utilitySteps} : group);
+		this.setState({instructions});
 	}
 
 	// Generates specific edit steps for Renderer based on adjustment 'aliases'
@@ -332,7 +363,7 @@ export default class Editor extends Component {
 	}
 
 	render() {
-		const { url, width, height, adjustments, editSteps, filterName } = this.state;
+		const { url, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName } = this.state;
 
 		return (
 			<div className="image-editor">
@@ -352,7 +383,7 @@ export default class Editor extends Component {
 					</button>
 					{filterPresets.map((filterPreset, i) => (
 						<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>
-							<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} editSteps={this.generateEditStepsFromFilterPreset(filterPreset)} onRender={() => console.log(filterPreset.title, 'rendered!')} />
+							<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
 							<br />
 							{filterPreset.title}
 						</button>
@@ -435,20 +466,23 @@ export default class Editor extends Component {
 				</Tabs>
 				<div>
 					<button onClick={event => this.handleReset()}>Reset</button>
+					<button onClick={event => this.updateUtilityValue({rotate: -90})}>Rotate Left</button>
+					<button onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
 				</div>
 				<FileDropzone onFilesReceived={::this.handleReceivedFile}>
 					<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
-						<Renderer url={url} width={width} height={height} onResize={::this.handleImageResize} editSteps={editSteps} autoResize />
+						<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize />
 					</div>
 				</FileDropzone>
 				<div className="text-center">
 					<div className="input" style={{marginBottom: 30}}>
+						<Textarea value={JSON.stringify(instructions, null, 2)} readOnly />
 						<label>Terminal command</label>
-						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 						<label>Server command</label>
-						<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' editSteps="'+JSON.stringify(editSteps).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+						<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 					</div>
-					<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(editSteps, null, '\t'))} download="preset.json">Download preset</a>
+					<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(instructions, null, '\t'))} download="preset.json">Download preset</a>
 				</div>
 			</div>
 		)
