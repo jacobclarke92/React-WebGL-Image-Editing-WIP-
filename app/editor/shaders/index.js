@@ -27,6 +27,8 @@ import pixelSort_fragment from './pixelSort_fragment.glsl'
 import saturation_fragment from './saturation_fragment.glsl'
 import sharpen_update from './sharpen_update'
 import sharpen_fragment from './sharpen_fragment.glsl'
+import blend_fragment from './blend_fragment.glsl'
+import blend_update from './blend_update'
 
 const Shaders = {
 	default: {
@@ -54,6 +56,11 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: default_fragment,
+	},
+	blend: {
+		update: blend_update,
+		vertex: filter_vertex,
+		fragment: blend_fragment,
 	},
 
 	blur: {

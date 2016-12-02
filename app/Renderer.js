@@ -35,6 +35,7 @@ export default class Editor extends Component {
 		this.framebuffers = [];
 		this.currentFramebufferIndex = -1;
 		this.lastEditStepsKeys = combineGroupEditStepKeys(props.instructions);
+
 		this.state = {
 			url: props.url,
 			settings: props.settings,
@@ -50,6 +51,9 @@ export default class Editor extends Component {
 		this.canvas = this.refs.editor;
 		this.gl = this.canvas.getContext('experimental-webgl');
 		if(!this.gl) this.gl = this.canvas.getContext('webgl');
+
+		this.editGroupFramebuffer = new Framebuffer(this.gl).use();
+		this.editGroupFramebuffer.attachEmptyTexture(width, height);
 
 		if(url) {
 			this.loadImage(url);
@@ -111,6 +115,11 @@ export default class Editor extends Component {
 	handleImageLoad(image) {
 		// log the image url if it's not a data uri
 		if(this.props.url.indexOf('data:') < 0) console.log(this.props.url, 'loaded');
+
+		// update edit group framebuffer
+		if(this.editGroupFramebuffer) this.editGroupFramebuffer.destroy();
+		this.editGroupFramebuffer = new Framebuffer(this.gl).use();
+		this.editGroupFramebuffer.attachEmptyTexture(image.width, image.height);
 
 		// make texture for base image, destroy old one first if it exists
 		if(this.imageTexture) this.imageTexture.destroy();
@@ -213,6 +222,8 @@ export default class Editor extends Component {
 		// const steps = [{key: 'default'}, ...editSteps];
 
 		let totalStepCount = -1;
+		let lastProgram = null;
+
 		// iterate over instruction groups
 		for(let groupCount = 0; groupCount < instructions.length; groupCount ++) {
 			const group = instructions[groupCount];
@@ -226,6 +237,7 @@ export default class Editor extends Component {
 
 				// select the correct program, if first, select the default injected shader from above
 				const program = totalStepCount === 0 ? this.defaultProgram : this.programs[groupName][count];
+				lastProgram = program;
 
 				// switch to program
 				program.use();
@@ -254,10 +266,11 @@ export default class Editor extends Component {
 					// console.log(groupCount, instructions.length-1);
 					// console.log(iteration, iterations-1);
 					let target = null;
-					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1)) {
+					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !group.amount)) {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
+					if(count >= steps.length-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
 
 
 					// pre-render calcs idk
@@ -274,6 +287,44 @@ export default class Editor extends Component {
 					program.draw();
 
 				}
+
+				// if last edit step of group and group needs to blend with last group then do that
+				if(groupCount > 0 && count >= steps.length-1 && group.amount) {
+					console.log('APPLY GROUP EDITS OPACITY', group.amount);
+					
+					const blendProgram = new Program('editGroupBlend', this.gl, Shaders.blend.vertex, Shaders.blend.fragment, Shaders.blend.update);
+					blendProgram.use();
+					blendProgram.update({originalImage: this.editGroupFramebuffer.texture, amount: group.amount});
+					
+					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+
+					let blendTarget = null;
+					if(groupCount < instructions.length-1) {
+						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
+						blendTarget = this.getTempFramebuffer(this.currentFramebufferIndex).id;
+					}
+
+					console.log('BLEND TARGET', blendTarget);
+
+					blendProgram.willRender();
+					sourceTexture.use();
+					this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, blendTarget);
+					blendProgram.didRender();
+					blendProgram.draw();
+
+				}
+
+				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
+				if(count >= steps.length-1 && groupCount < instructions.length-1 && instructions[groupCount+1].amount) {
+					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
+					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
+					program.willRender();
+					sourceTexture.use();
+					this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.editGroupFramebuffer.id);
+					program.didRender();
+					program.draw();
+				}
+
 
 				// console.table(getProgramInfo(this.gl, program.program).uniforms);
 			}
