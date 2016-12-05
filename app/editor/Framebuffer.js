@@ -30,8 +30,17 @@ export default class FramebufferTexture {
 	}
 
 	destroy() {
+		if(this.texture) this.texture.destroy();
 		this.gl.deleteFramebuffer(this.id);
 		this.id = null;
+	}
+
+	resizeTexture(width, height) {
+		if(this.texture) {
+			this.texture.destroy();
+			this.use();
+			this.attachEmptyTexture(width, height);
+		}
 	}
 
 	use() {

@@ -25,7 +25,6 @@ export default class Editor extends Component {
 		onResize: () => {},
 		onRender: () => {},
 		autoResize: false,
-		// editSteps: [],
 		instructions: [],
 	};
 
@@ -38,7 +37,6 @@ export default class Editor extends Component {
 
 		this.state = {
 			url: props.url,
-			settings: props.settings,
 		}
 	}
 
@@ -63,13 +61,8 @@ export default class Editor extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		// update certain aspects of state
-		this.setState({settings: nextProps.settings});
 
 		const editStepsKeys = combineGroupEditStepKeys(nextProps.instructions);
-		// console.log(this.props.url);
-		// console.log(this.lastEditStepsKeys.join(','));
-		// console.log(editStepsKeys.join(','));
 
 		// if new url we need to reset current editor state and load new image
 		if(this.props.url !== nextProps.url) {
@@ -80,29 +73,32 @@ export default class Editor extends Component {
 
 		}else{
 
-			// update viewport and programs if size has changed
-			if(this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-				console.log('RESIZING VIEWPORTS AND PROGRAMS');
-				this.resizeViewport(nextProps.width, nextProps.height);
-				this.resizePrograms(nextProps.width, nextProps.height);
+			const resized = (this.props.canvasWidth !== nextProps.canvasWidth || this.props.canvasHeight !== nextProps.canvasHeight);
+
+			// update canvas size if props changed
+			if(resized) {
+				this.refs.editor.width = nextProps.canvasWidth;
+				this.refs.editor.height = nextProps.canvasHeight;
 			}
 
-			// if(this.props.canvasWidth !== nextProps.canvasWidth || this.props.canvasHeight !== nextProps.canvasHeight) {
-			// 	this.resizeViewport(nextProps.canvasWidth, nextProps.canvasHeight);
-			// }
-
 			// check to see if program list / order has changed in order to allocate new programs / rebuild
+			// part of this means it will re-set all the relevant sizes to match canvas size props
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
+				
 				console.log('NEW EDIT STEPS', editStepsKeys.join(','), this.lastEditStepsKeys.join(','));
 				this.lastEditStepsKeys = editStepsKeys;
 				this.buildPrograms(nextProps.instructions);
-				this.resizePrograms(nextProps.width, nextProps.height);
+				this.resizeAll(nextProps.canvasWidth, nextProps.canvasHeight);
 				this.renderEditSteps(nextProps.instructions);
 
 			// do a deep check to see if edit step params have changed since last time in order to re-render
 			}else if(!deepEqual(this.props.instructions, nextProps.instructions)) {
+
+				// however if it's resized, wait until props have updated
+				if(resized) this.resizeAll(nextProps.canvasWidth, nextProps.canvasHeight);
 				console.log('NEW EDIT STEP PARAM CHANGES');
 				this.renderEditSteps(nextProps.instructions);
+
 			}
 		}
 	}
@@ -140,6 +136,7 @@ export default class Editor extends Component {
 		if(!this.props.autoResize) {
 			this.resizeViewport();
 			this.resizePrograms();
+			this.resizeFramebuffers();
 			this.renderEditSteps();
 		}else{
 			this.props.onResize(image.width, image.height);
@@ -194,25 +191,38 @@ export default class Editor extends Component {
 	resetFramebuffers() {
 		this.currentFramebufferIndex = -1;
 		for(let framebuffer of this.framebuffers) {
-			if(framebuffer.texture) framebuffer.texture.destroy();
 			framebuffer.destroy();
 		}
 		this.framebuffers = [];
 	}
 
-	resizeViewport(width = this.props.width, height = this.props.height) {
+	resizeAll(width = this.props.canvasWidth, height = this.props.canvasHeight) {
+		console.log('RESIZING VIEWPORT, PROGRAMS AND FRAMEBUFFERS', width, height);
+		this.resizeViewport(width, height);
+		this.resizePrograms(width, height);
+		this.resizeFramebuffers(width, height);
+	}
+
+	resizeViewport(width = this.props.canvasWidth, height = this.props.canvasHeight) {
 		// this.canvas.width = width;
 		// this.canvas.height = height;
 		this.gl.viewport(0, 0, width, height);
 	}
 
-	resizePrograms(width = this.props.width, height = this.props.height) {
+	resizePrograms(width = this.props.canvasWidth, height = this.props.canvasHeight) {
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
 		Object.keys(this.programs).forEach(groupKey => {
 			for(let program of this.programs[groupKey]) {
 				program.resize(width, height);
 			}
 		});
+	}
+
+	resizeFramebuffers(width = this.props.canvasWidth, height = this.props.canvasHeight) {
+		for(let i = 0; i < this.framebuffers.length; i ++) {
+			this.framebuffers[i].resizeTexture(width, height);
+		}
+		this.editGroupFramebuffer.resizeTexture(width, height);
 	}
 
 	renderEditSteps(_instructions = this.props.instructions || []) {
@@ -266,11 +276,11 @@ export default class Editor extends Component {
 					// console.log(groupCount, instructions.length-1);
 					// console.log(iteration, iterations-1);
 					let target = null;
-					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !group.amount)) {
+					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1/* && !group.amount*/)) {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
-					if(count >= steps.length-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
+					// if(count >= steps.length-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
 
 
 					// pre-render calcs idk
@@ -288,6 +298,7 @@ export default class Editor extends Component {
 
 				}
 
+				/*
 				// if last edit step of group and group needs to blend with last group then do that
 				if(groupCount > 0 && count >= steps.length-1 && group.amount) {
 					console.log('APPLY GROUP EDITS OPACITY', group.amount);
@@ -324,6 +335,8 @@ export default class Editor extends Component {
 					program.didRender();
 					program.draw();
 				}
+				*/
+				
 
 
 				// console.table(getProgramInfo(this.gl, program.program).uniforms);
@@ -335,10 +348,7 @@ export default class Editor extends Component {
 
 	shouldComponentUpdate(nextProps, nextState) {
 		// only do a react render if dimensions change
-		return (
-			nextProps.canvasWidth !== this.props.canvasWidth ||
-			nextProps.canvasHeight !== this.props.canvasHeight
-		);
+		return false;
 	}
 
 	render() {
