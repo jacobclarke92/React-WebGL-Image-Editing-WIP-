@@ -18,6 +18,9 @@ module.exports = {
 		facedetect: [
 			'./app/facedetect.js',
 		],
+		test: [
+			'./app/test.js',
+		],
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
