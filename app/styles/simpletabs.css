@@ -16,10 +16,11 @@
 
 .tabs-menu-item a {
 	display: block;
-	padding: 0 20px;
+	padding: 0 10px;
 	margin-bottom: -1px;
 	height: 30px;
 	line-height: 30px;
+	font-size: 14px;
 	border-bottom: 0;
 	color: #333c47;
 	cursor: pointer;

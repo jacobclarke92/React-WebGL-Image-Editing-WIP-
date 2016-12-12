@@ -3,7 +3,6 @@
 
 html, body {
 	margin: 0;
-	padding: 15px;
 	font-family: Helvetica, Arial, sans-serif;
 	color: #333c47;
 }
@@ -83,10 +82,23 @@ a.button {
 	margin: 15px 0 5px 0;
 }
 
+.images button {
+	padding: 5px 10px;
+}
+
 .filters {
 	max-width: 100%;
 	overflow-x: scroll;
 	white-space: nowrap;
+}
+
+.filters button {
+	padding: 0;
+}
+
+.filters button label {
+	margin: 3px 0px 5px 0;
+	font-size: 10px;
 }
 
 
@@ -191,4 +203,69 @@ a.button {
 }
 .canvas-wrapper:hover canvas {
     opacity: 0;
+}
+
+
+
+
+/* Speed's styles */
+.image-editor{
+	position:fixed !important;
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+}
+
+.image-editor > *{
+	display: inline-block;
+	vertical-align: top;
+}
+
+.main-window {
+    width: 60%;
+    position: relative;
+    height: 100%;
+    overflow-y: scroll;
+    background: #333333;
+}
+
+button, .button{
+	padding: 5px 10px;
+	border: 1px solid #eee;
+	border-radius: 0px;
+	background: transparent;
+	width: 122px;
+}
+
+
+button canvas {
+	margin-top: -1px;
+}
+
+button:disabled, .button:disabled {
+	background: transparent;
+    cursor: not-allowed;
+    border: 1px solid #333;
+}
+
+.dropzone{
+	position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tray{
+	width: 40%;
+	height: 100%;
+	overflow-y: scroll;
+}
+
+.tray-inner{
+	padding: 15px;
+}
+
+.some-bs{
+	display: none;
 }
