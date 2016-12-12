@@ -7,6 +7,8 @@ import Program from './editor/Program'
 import Texture from './editor/Texture'
 import Framebuffer from './editor/Framebuffer'
 
+const useDebugger = false;
+
 class App extends Component {
 
 	constructor() {
@@ -31,10 +33,16 @@ class App extends Component {
 		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
 		this.rotateProgram = new Program('default', this.gl, Shaders.rotate.vertex, Shaders.rotate.fragment, Shaders.rotate.update);
 		this.saturationProgram = new Program('saturation', this.gl, Shaders.saturation.vertex, Shaders.saturation.fragment, Shaders.saturation.update);
+		this.gammaProgram = new Program('gamma', this.gl, Shaders.gamma.vertex, Shaders.gamma.fragment, Shaders.gamma.update);
+		this.blendProgram = new Program('blend', this.gl, Shaders.blend.vertex, Shaders.blend.fragment, Shaders.blend.update);
+		this.testProgram = new Program('default', this.gl, Shaders.rotate.vertex, Shaders.default.fragment, Shaders.default.update);
+		
 		this.framebuffer1 = new Framebuffer(this.gl).use();
 		this.framebuffer1.attachEmptyTexture(this.props.width, this.props.height);
 		this.framebuffer2 = new Framebuffer(this.gl).use();
 		this.framebuffer2.attachEmptyTexture(this.props.width, this.props.height);
+		this.editGroupFramebuffer = new Framebuffer(this.gl).use();
+		this.editGroupFramebuffer.attachEmptyTexture(this.props.width, this.props.height);
 
 		this.image.src = '/test2__.jpg';
 	}
@@ -59,8 +67,11 @@ class App extends Component {
 		this.defaultProgram.resize(canvasWidth, canvasHeight);
 		this.rotateProgram.resize(canvasWidth, canvasHeight);
 		this.saturationProgram.resize(canvasWidth, canvasHeight);
+		this.gammaProgram.resize(canvasWidth, canvasHeight);
+		this.testProgram.resize(canvasWidth, canvasHeight);
 		this.framebuffer1.resizeTexture(canvasWidth, canvasHeight);
 		this.framebuffer2.resizeTexture(canvasWidth, canvasHeight);
+		this.editGroupFramebuffer.resizeTexture(canvasWidth, canvasHeight);
 	}
 
 	renderEditSteps() {
@@ -69,7 +80,7 @@ class App extends Component {
 		// default program step
 		let program = this.defaultProgram;
 		let sourceTexture = this.imageTexture;
-		let target = this.framebuffer1.id;
+		let target = this.framebuffer1;
 
 		program.use();
 		program.update({key: 'default'});
@@ -77,43 +88,107 @@ class App extends Component {
 		program.willRender();
 		sourceTexture.use();
 		
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+		target.use();//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
 
 		program.didRender();
 		program.draw();
+
+		if(useDebugger) debugger;
 
 
 		//rotate step
 		program = this.rotateProgram;
 		sourceTexture = this.framebuffer1.texture;
-		target = this.framebuffer2.id;
+		target = this.framebuffer2;
 
 		program.use();
 		program.update({key: 'rotate', value: rotate});
 		program.willRender();
 		sourceTexture.use();
 
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+		target.use();//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
 
 		program.didRender();
 		program.draw();
 
+		if(useDebugger) debugger;
 
 		//saturation step
 		program = this.saturationProgram;
 		sourceTexture = this.framebuffer2.texture;
-		target = null;
+		target = this.framebuffer1;
 
 		program.use();
 		program.update({key: 'saturation', value: 0.6});
 		program.willRender();
 		sourceTexture.use();
 
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+		target.use();//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
 
 		program.didRender();
 		program.draw();
 
+		if(useDebugger) debugger;
+
+		// copy texture reference to group framebuffer
+		this.editGroupFramebuffer.use();
+		this.editGroupFramebuffer.attachTexture(this.framebuffer1.texture.id);
+		this.editGroupFramebuffer.use();
+		this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+
+		if(useDebugger) debugger;
+
+		// test drawing group framebuffer to cavnas
+		// program = this.testProgram;
+		// sourceTexture = this.editGroupFramebuffer.texture;
+		// target = null;
+
+		// program.use();
+		// program.update({key: 'default'});
+		// program.willRender();
+		// sourceTexture.use();
+		// this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+		// program.didRender();
+		// program.draw();
+		// return;
+
+
+
+		//gamma step
+		program = this.gammaProgram;
+		sourceTexture = this.framebuffer1.texture;
+		target = this.framebuffer2;
+
+		program.use();
+		program.update({key: 'gamma', value: 0.02});
+		program.willRender();
+		sourceTexture.use();
+
+		target.use();//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, target);
+
+		program.didRender();
+		program.draw();
+		// return;
+		
+		if(useDebugger) debugger;
+
+		// blend end of saturation step with gamma step to 50%
+		program = this.saturationProgram;
+		sourceTexture = this.framebuffer2.texture;
+		// const blendTexture = this.editGroupFramebuffer.texture;
+
+		program.use();
+		// program.update({key: 'blend', amount: 0.5, blendTexture});
+		program.update({key: 'saturation', value: 0});
+		program.willRender();
+		sourceTexture.use();
+
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+		program.didRender();
+		program.draw();
+
+		if(useDebugger) debugger;
 
 	}
 

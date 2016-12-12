@@ -3,17 +3,16 @@ export default `
 precision highp float;
 
 uniform sampler2D Texture;
-uniform sampler2D originalImage;
+// uniform sampler2D blendTexture;
+uniform float amount;
 varying vec2 v_texCoord;
  
-void main() {
-   	vec4 color = texture2D(Texture, v_texCoord);
-   	// color.r = color.r * 0.5;
-   	// color.g = color.g * 0.5;
-   	// color.b = color.b * 0.5;
-    // color.r = texture2D(Texture, vec2(color.r)).r;
-    // color.g = texture2D(Texture, vec2(color.g)).g;
-    // color.b = texture2D(Texture, vec2(color.b)).b;
-    gl_FragColor = color;
+void main(void) {
+    // vec4 t0 = texture2D(blendTexture, v_texCoord);
+    // vec4 t1 = texture2D(Texture, v_texCoord);
+    // vec4 color = mix(t0, t1, amount);
+
+    // gl_FragColor = color;
+    gl_FragColor = texture2D(Texture, v_texCoord);
 }
 `
