@@ -28,18 +28,25 @@ process.argv.slice(2).forEach(arg => {
 // console.log(args);
 
 
+function combineGroupEditStepKeys(instructions) {
+	return instructions.reduce((steps, group) => [...steps, ...(group.steps || [])], []).map(step => step.key);
+}
+
 let width = 10;
 let height = 10;
 let imagePixels = null;
-let programs = [];
+let programs = {};
 let framebuffers = [];
-let editSteps = [];
-let editStepKeys = [];
+let rawInstructions = [];
+let lastEditStepsKeys = [];
 let currentFramebufferIndex = -1;
+let editGroupFramebuffer = null;
 
 const gl = GL(10, 10);
 const imageTexture = new Texture(gl);
+
 const defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
+const blendProgram = new Program('blendProgram', gl, Shaders.blend.vertex, Shaders.blend.fragment, Shaders.blend.update);
 
 const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
@@ -51,29 +58,35 @@ function getTempFramebuffer(index) {
 	return framebuffers[index];
 }
 
-function resetPrograms() {
-	for(let program of programs) {
-		program.destroy();
-	}
-	programs = [];
-}
-
 function buildPrograms() {
 	resetPrograms();
-	editStepKeys.map(filterLabel => {
-		addProgram(filterLabel);
+	rawInstructions.filter(group => group.steps && group.steps.length > 0).forEach(group => {
+		const groupName = group.name;
+		if(!(groupName in programs)) programs[groupName] = [];
+		group.steps.forEach(step => {
+			programs[groupName].push(addProgram(step.key));
+		});
 	});
 }
 
 function addProgram(label) {
-	const shader = Shaders[label];
-	if(!shader) {
+	if(!(label in Shaders)) {
 		console.warn('No shader found for:', label);
 		return;
 	}
+	const shader = Shaders[label];
 	const program = new Program(label, gl, shader.vertex, shader.fragment, shader.update);
-	programs.push(program);
+	// this.programs.push(program);
 	return program;
+}
+
+function resetPrograms() {
+	Object.keys(programs).forEach(groupKey => {
+		for(let program of programs[groupKey]) {
+			program.destroy();
+		}
+	});
+	programs = {};
 }
 
 function resetFramebuffers() {
@@ -95,52 +108,109 @@ function resizeViewport(_width, _height) {
 
 function resizePrograms() {
 	if(defaultProgram) defaultProgram.resize(width, height);
-	for(let program of programs) {
-		program.resize(width, height);
+	if(blendProgram) blendProgram.resize(width, height);
+	Object.keys(programs).forEach(groupKey => {
+		for(let program of programs[groupKey]) {
+			program.resize(width, height);
+		}
+	});
+}
+
+function resizeFramebuffers() {
+	for(let i = 0; i < framebuffers.length; i ++) {
+		framebuffers[i].resizeTexture(width, height);
 	}
+	editGroupFramebuffer.resizeTexture(width, height);
 }
 
 function renderEditSteps() {
-	console.log('OMG do some rendering');
-	// const steps = [{key: 'default'}, ...editSteps];
-	const steps = [{key: 'default_node'}, ...editSteps];
-	// const steps = [{key: 'default'}];
+	
+	const instructions = [{name: 'preRender', steps: [{key: 'default'}]}, ...rawInstructions].filter(group => group.steps && group.steps.length > 0);
 
-	for(let count = 0; count < steps.length; count ++) {
-		const step = steps[count];
-		const program = count === 0 ? defaultProgram : programs[count-1];
+	let totalStepCount = -1;
+	let lastProgram = null;
 
-		// switch to program
-		program.use();
+	// iterate over instruction groups
+	for(let groupCount = 0; groupCount < instructions.length; groupCount ++) {
+		const group = instructions[groupCount];
+		const groupName = group.name;
+		const steps = group.steps || [];
 
-		// run the shader's update function -- modifies uniforms
-		// program must be in use before calling update otherwise current program's uniforms get modified
-		program.update(step);
+		// iterate over group edit steps
+		for(let count = 0; count < steps.length; count ++) {
+			const step = steps[count];
+			totalStepCount ++;
 
-		// determine source texture - original image texture if first pass or a framebuffer texture
-		const sourceTexture = count === 0 ? imageTexture : getTempFramebuffer(currentFramebufferIndex).texture;
+			// select the correct program, if first, select the default injected shader from above
+			const program = totalStepCount === 0 ? defaultProgram : programs[groupName][count];
+			lastProgram = program;
 
-		// determine render target, set to null if last one because null = canvas
-		let target = null;
-		if(count < steps.length-1) {
-			currentFramebufferIndex = (currentFramebufferIndex+1)%2;
-			target = getTempFramebuffer(currentFramebufferIndex).id;
+			// switch to program
+			program.use();
+
+			// iterations are just a means of compounding a program's render output
+			// its sole purpose is to make my self-indulgent pixel-sorting shader work :~)
+			const iterations = step.iterations || 1;
+			for(let iteration = 0; iteration < iterations; iteration++) {
+
+				// run the shader's update function -- modifies uniforms
+				// program must be in use before calling update otherwise previously active program's uniforms get modified
+				program.update(step, iteration);
+
+				const sourceTexture = totalStepCount === 0 ? imageTexture : getTempFramebuffer(currentFramebufferIndex).texture;
+
+				let target = null;
+				if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !('amount' in group))) {
+					currentFramebufferIndex = (currentFramebufferIndex+1)%2;
+					target = getTempFramebuffer(currentFramebufferIndex).id;
+				}
+
+				program.willRender();
+
+				sourceTexture.use();
+				gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+
+				program.didRender();
+				program.draw();
+
+			}
+
+
+			// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
+			if(count >= steps.length-1 && groupCount < instructions.length-1 && ('amount' in instructions[groupCount+1])) {
+				editGroupFramebuffer.use();
+				program.draw();
+			}
+
+
+			
+			// if last edit step of group and group needs to blend with last group then do that
+			if(groupCount > 0 && count >= steps.length-1 && ('amount' in group)) {
+				
+				const sourceTexture = getTempFramebuffer(currentFramebufferIndex).texture;
+
+				let blendTarget = null;
+				if(groupCount < instructions.length-1) {
+					currentFramebufferIndex = (currentFramebufferIndex+1)%2;
+					blendTarget = getTempFramebuffer(currentFramebufferIndex).id;
+				}
+
+				blendProgram.use();
+				blendProgram.update({
+					key: 'blend', 
+					amount: group.amount, 
+					blendTexture: editGroupFramebuffer.texture,
+				});
+
+				blendProgram.willRender();
+				sourceTexture.use();
+				gl.bindFramebuffer(gl.FRAMEBUFFER, blendTarget);
+				blendProgram.didRender();
+				blendProgram.draw();
+
+			}
+			
 		}
-
-		// pre-render calcs idk
-		program.willRender();
-
-		// use current source texture and framebuffer target
-		sourceTexture.use();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, target);
-
-		// post-render calcs idk
-		program.didRender();
-
-		// draw that shit
-		program.draw();
-
-		// console.log(getProgramInfo(gl, program.program).uniforms);
 	}
 }
 
@@ -153,21 +223,21 @@ function saveImage() {
 	const saveFile = fs.createWriteStream(savePath, {flags: 'w'});
 	// console.log(pixels);
 	const data = ndarray(pixels, [width, height, 4], [4, 4*width, 1], 0);
-	console.log('After image fetch\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+	console.log('----------\nAfter image fetch\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 	lastTime = new Date().getTime();
 
 	const stream = savePixels(data, ext, (ext == 'jpg' || ext == 'jpeg') ? {quality: 80} : null).pipe(saveFile);
 	stream.on('finish', () => {
 		const endTime = new Date().getTime();
-		console.log('After save\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		console.log('----------\nAfter save\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 		console.log('TOOK: '+(endTime-startTime)+'ms');
 	});
 }
 
-if('editSteps' in args) {
-	editSteps = JSON.parse(args.editSteps);
-	editStepKeys = editSteps.map(editStep => editStep.key);
+if('instructions' in args) {
+	rawInstructions = JSON.parse(args.instructions);
+	lastEditStepsKeys = combineGroupEditStepKeys(rawInstructions)
 }
 
 if(gl == null) {
@@ -182,21 +252,29 @@ if(gl == null) {
 			return;
 		}
 		console.log('Got pixels');
-		console.log('After pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		console.log('----------\nAfter pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
 		resizeViewport(pixels.shape[0], pixels.shape[1]);
+		editGroupFramebuffer = new Framebuffer(gl).use();
+		editGroupFramebuffer.attachEmptyTexture(width, height);
+		
 		imageTexture.loadFromBytes(pixels.data, width, height);
-		console.log('After image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		console.log('----------\nAfter image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
+
+
+
 
 		buildPrograms();
 		resizePrograms();
-		console.log('After programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		resizeFramebuffers();
+
+		console.log('----------\nAfter programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
 		renderEditSteps();
-		console.log('After render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		console.log('----------\nAfter render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
 		saveImage(); 
