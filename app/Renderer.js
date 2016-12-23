@@ -282,7 +282,7 @@ export default class Editor extends Component {
 					// console.log(groupCount, instructions.length-1);
 					// console.log(iteration, iterations-1);
 					let target = null;
-					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !group.amount)) {
+					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !('amount' in group))) {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
@@ -306,7 +306,7 @@ export default class Editor extends Component {
 
 
 				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
-				if(count >= steps.length-1 && groupCount < instructions.length-1 && instructions[groupCount+1].amount) {
+				if(count >= steps.length-1 && groupCount < instructions.length-1 && ('amount' in instructions[groupCount+1])) {
 					
 					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
 					console.log('NEXT EDIT STEP IS', instructions[groupCount+1].name)
@@ -317,7 +317,7 @@ export default class Editor extends Component {
 
 				
 				// if last edit step of group and group needs to blend with last group then do that
-				if(groupCount > 0 && count >= steps.length-1 && group.amount) {
+				if(groupCount > 0 && count >= steps.length-1 && ('amount' in group)) {
 					console.log('APPLY GROUP EDITS OPACITY', group.amount);
 					
 					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
