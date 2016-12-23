@@ -125,12 +125,13 @@ export default class Program {
 
     /**
      * Full warning ... I have no idea how this works
+     * Pretty sure it just inits the vertex shader with the next step being to update uniforms
      * @return {<Program>} - returns self so functions can be chained 
      */
 	willRender() {
 
         const gl = this.gl;
-        
+
         // initializes a WebGLBuffer storing data such as vertices or colors
         if(!this.texCoordBuffer) this.texCoordBuffer = gl.createBuffer();
 
@@ -142,12 +143,23 @@ export default class Program {
 
         // get a_texCoord pointer
         const texCoordLocation = gl.getAttribLocation(this.program, "a_texCoord");
-        if(texCoordLocation < 0) return this;
+        if(texCoordLocation < 0) {
+            console.log('didn\'t find a_texCoord');
+            return this;
+        }
 
-        // enables the generic vertex attribute array
+         // enables the generic vertex attribute array
         gl.enableVertexAttribArray(texCoordLocation);
 
-        // define an array of generic vertex attribute data
+        /**
+         * Tell the attribute how to get data out of this.texCoordBuffer
+         * 1. pointer
+         * 2. size -- 2 components per iteration
+         * 3. type -- the data is 32bit floats
+         * 4. normalize -- don't normalize the data
+         * 5. stride -- 0 = move forward size * sizeof(type) each iteration to get the next position
+         * 6. offset -- start at the beginning of the buffer
+         */
         gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
         return this;
@@ -156,6 +168,7 @@ export default class Program {
 
     /**
      * Full warning ... I have no idea how this works
+     * Called after willRender and uniforms updated
      * @return {<Program>} - returns self so functions can be chained 
      */
     didRender() {
@@ -163,22 +176,30 @@ export default class Program {
         const gl = this.gl;
         if(!this.buffer) this.buffer = gl.createBuffer();
 
+        // use this buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+        // Set a rectangle the same size as the image.
+        setBufferRectangle(gl, 0, 0, this.width, this.height);
 
         // look up where the vertex data needs to go.
         const positionLocation = gl.getAttribLocation(this.program, "a_position");
 
-        //enables the generic vertex attribute array
+        // enables the generic vertex attribute array
         gl.enableVertexAttribArray(positionLocation);
 
-        // define an array of generic vertex attribute data
+        /**
+         * Tell the attribute how to get data out of this.buffer
+         * 1. pointer
+         * 2. size -- 2 components per iteration
+         * 3. type -- the data is 32bit floats
+         * 4. normalize -- don't normalize the data
+         * 5. stride -- 0 = move forward size * sizeof(type) each iteration to get the next position
+         * 6. offset -- start at the beginning of the buffer
+         */
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
 
-        // use this buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-        // Set a rectangle the same size as the image.
-        setBufferRectangle(gl, 0, 0, this.width, this.height);
 
         // set texture back to 0 -- e.g. when another activeTexture is used to set a uniform
         this.gl.activeTexture(this.gl.TEXTURE0);
@@ -187,7 +208,8 @@ export default class Program {
     }
 
     /**
-     * I guess I know how this works?
+     * Draws the verticies? 
+     * Called after didRender
      * @return {<Program>} - returns self so functions can be chained 
      */
     draw() {
