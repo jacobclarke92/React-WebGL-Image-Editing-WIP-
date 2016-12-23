@@ -208,7 +208,7 @@ export default class Editor extends Component {
 		const instructions = [
 			{name: 'utility', steps: []},
 			{name: 'adjustments', steps: this.generateEditStepsFromAdjustments(adjustments)},
-			{name: 'filter', amount: 0, steps: []},
+			{name: 'filter', amount: 1, steps: []},
 		];
 
 		// store reset point, make a copy of adjustments object
@@ -278,6 +278,11 @@ export default class Editor extends Component {
 			filterName: filterPreset.name,
 			instructions,
 		});
+	}
+
+	updateFilterBlend(amount) {
+		const instructions = this.state.instructions.map(group => group.name == 'filter' ? {...group, amount} : group)
+		this.setState({instructions});
 	}
 
 	updateUtilityValue(utilityAdjustments = {}) {
@@ -364,6 +369,7 @@ export default class Editor extends Component {
 
 	render() {
 		const { url, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName } = this.state;
+		const filterAmount = _find(instructions, {name: 'filter'}).amount;
 
 		return (
 			<div className="image-editor">
@@ -395,6 +401,7 @@ export default class Editor extends Component {
 									<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} canvasWidth={thumbnailWidth} canvasHeight={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
 									<br />
 									<label>{filterPreset.title}</label>
+									{filterPreset.name === filterName && <RCSlider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} />}
 								</button>
 							))}
 						</div>
