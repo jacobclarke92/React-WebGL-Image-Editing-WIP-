@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import WebGLDebug from 'webgl-debug'
 
 
 import Shaders from './editor/shaders'
@@ -8,6 +9,12 @@ import Texture from './editor/Texture'
 import Framebuffer from './editor/Framebuffer'
 
 const useDebugger = false;
+
+function throwOnGLError(err, funcName, args) {
+   throw WebGLDebug.glEnumToString(err) 
+   + 'was caused by call to ' 
+   + funcName;
+}
 
 class App extends Component {
 
@@ -29,6 +36,8 @@ class App extends Component {
 		this.canvas = this.refs.editor;
 		this.gl = this.canvas.getContext('experimental-webgl');
 		if(!this.gl) this.gl = this.canvas.getContext('webgl');
+
+		this.gl = WebGLDebug.makeDebugContext(this.gl, throwOnGLError)
 
 		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
 		this.rotateProgram = new Program('default', this.gl, Shaders.rotate.vertex, Shaders.rotate.fragment, Shaders.rotate.update);

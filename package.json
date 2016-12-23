@@ -65,6 +65,7 @@
     "react-textarea-autosize": "^4.0.4",
     "regression": "^1.2.1",
     "save-pixels": "^2.3.3",
-    "titleize": "^1.0.0"
+    "titleize": "^1.0.0",
+    "webgl-debug": "^1.0.2"
   }
 }
