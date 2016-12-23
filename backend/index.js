@@ -255,11 +255,18 @@ if(gl == null) {
 		console.log('----------\nAfter pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
-		resizeViewport(pixels.shape[0], pixels.shape[1]);
+		const utilitySteps = rawInstructions.reduce((prev, group) => group.name == 'utility' ? group.steps : prev, null);
+		const doRotate = utilitySteps ? utilitySteps.reduce((prev, step) => (step.key == 'rotate' && (step.value == 90 || step.value == 270)), false) : false;
+		console.log('---------\nDoing rotate', doRotate);
+
+		resizeViewport(
+			doRotate ? pixels.shape[1] : pixels.shape[0], 
+			doRotate ? pixels.shape[0] : pixels.shape[1]
+		);
 		editGroupFramebuffer = new Framebuffer(gl).use();
 		editGroupFramebuffer.attachEmptyTexture(width, height);
 		
-		imageTexture.loadFromBytes(pixels.data, width, height);
+		imageTexture.loadFromBytes(pixels.data, pixels.shape[0], pixels.shape[1]);
 		console.log('----------\nAfter image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
