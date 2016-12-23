@@ -10,8 +10,8 @@ export default function(settings) {
 	console.log('BLEND SETTINGS', settings);
 
 	if(settings.blendTexture) {
-		console.log('binding image to blend with');
 		settings.blendTexture.use(3);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "blendTexture"), 3);
+		this.gl.activeTexture(this.gl.TEXTURE0);
 	}
 }

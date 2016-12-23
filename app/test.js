@@ -37,7 +37,7 @@ class App extends Component {
 		this.gl = this.canvas.getContext('experimental-webgl');
 		if(!this.gl) this.gl = this.canvas.getContext('webgl');
 
-		this.gl = WebGLDebug.makeDebugContext(this.gl, throwOnGLError)
+		// this.gl = WebGLDebug.makeDebugContext(this.gl, throwOnGLError)
 
 		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
 		this.rotateProgram = new Program('default', this.gl, Shaders.rotate.vertex, Shaders.rotate.fragment, Shaders.rotate.update);
@@ -77,6 +77,7 @@ class App extends Component {
 		this.rotateProgram.resize(canvasWidth, canvasHeight);
 		this.saturationProgram.resize(canvasWidth, canvasHeight);
 		this.gammaProgram.resize(canvasWidth, canvasHeight);
+		this.blendProgram.resize(canvasWidth, canvasHeight);
 		this.testProgram.resize(canvasWidth, canvasHeight);
 		this.framebuffer1.resizeTexture(canvasWidth, canvasHeight);
 		this.framebuffer2.resizeTexture(canvasWidth, canvasHeight);
@@ -139,13 +140,20 @@ class App extends Component {
 
 		if(useDebugger) debugger;
 
+
 		// copy texture reference to group framebuffer
-		this.editGroupFramebuffer.use();
-		this.editGroupFramebuffer.attachTexture(this.framebuffer1.texture.id);
-		this.editGroupFramebuffer.use();
-		this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+		// const editGroupTextureId = 7;
+		// this.editGroupFramebuffer.use();
+		
+		target = this.editGroupFramebuffer;
+		// sourceTexture.use();
+		target.use();
+		// program.didRender();
+		program.draw();
 
 		if(useDebugger) debugger;
+
+
 
 		// test drawing group framebuffer to cavnas
 		// program = this.testProgram;
@@ -181,14 +189,17 @@ class App extends Component {
 		
 		if(useDebugger) debugger;
 
+
 		// blend end of saturation step with gamma step to 50%
-		program = this.saturationProgram;
+		program = this.blendProgram;
 		sourceTexture = this.framebuffer2.texture;
-		// const blendTexture = this.editGroupFramebuffer.texture;
 
 		program.use();
-		// program.update({key: 'blend', amount: 0.5, blendTexture});
-		program.update({key: 'saturation', value: 0});
+		program.update({
+			key: 'blend', 
+			amount: 0.5, 
+			blendTexture: this.editGroupFramebuffer.texture,
+		});
 		program.willRender();
 		sourceTexture.use();
 
@@ -225,4 +236,10 @@ class App extends Component {
 	}
 }
 
-ReactDOM.render(<App /> , document.getElementById('app'));
+// let inited = false;
+// document.addEventListener('click', () => {
+// 	if(!inited) {
+		ReactDOM.render(<App /> , document.getElementById('app'));	
+// 		inited = true;
+// 	}
+// });
