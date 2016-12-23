@@ -138,7 +138,8 @@ export default class Program {
         // use tex coord buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
 
-        // creates and initializes a buffer object's data store
+        // Creates and initializes a buffer object's data store
+        // Calls gl.bufferData with Float32Array of co-ords
         setBufferRectangle(gl, 0, 0, 1, 1);
 
         // get a_texCoord pointer
@@ -154,7 +155,7 @@ export default class Program {
         /**
          * Tell the attribute how to get data out of this.texCoordBuffer
          * 1. pointer
-         * 2. size -- 2 components per iteration
+         * 2. size -- 2 because it's just x,y data, it would be 3 if it contained x,y,z
          * 3. type -- the data is 32bit floats
          * 4. normalize -- don't normalize the data
          * 5. stride -- 0 = move forward size * sizeof(type) each iteration to get the next position
@@ -180,6 +181,7 @@ export default class Program {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
         // Set a rectangle the same size as the image.
+        // Calls gl.bufferData with Float32Array of co-ords
         setBufferRectangle(gl, 0, 0, this.width, this.height);
 
         // look up where the vertex data needs to go.
@@ -191,7 +193,7 @@ export default class Program {
         /**
          * Tell the attribute how to get data out of this.buffer
          * 1. pointer
-         * 2. size -- 2 components per iteration
+         * 2. size -- 2 because it's just x,y data, it would be 3 if it contained x,y,z
          * 3. type -- the data is 32bit floats
          * 4. normalize -- don't normalize the data
          * 5. stride -- 0 = move forward size * sizeof(type) each iteration to get the next position
