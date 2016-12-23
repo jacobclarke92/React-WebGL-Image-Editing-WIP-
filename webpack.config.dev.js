@@ -11,6 +11,8 @@ module.exports = {
 	devtool: '#sourcemap',
 	entry: {
 		scripts: [
+			'webpack-dev-server/client?http://0.0.0.0:3000', // WebpackDevServer host and port
+			'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
 			'./app/index.js'
 		],
 		facedetect: [
@@ -23,9 +25,11 @@ module.exports = {
 	output: {
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js',
+		publicPath: '/dist/' //used for webpack-dev-server
 	},
 	plugins: [
 		new webpack.NoErrorsPlugin(),
+		new webpack.HotModuleReplacementPlugin(),
 	],
 	resolve: {
 		root: [
