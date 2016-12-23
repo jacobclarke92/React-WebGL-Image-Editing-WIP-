@@ -165,6 +165,7 @@ export default class Editor extends Component {
 				this.programs[groupName].push(this.addProgram(step.key));
 			});
 		});
+		if(!this.blendProgram) this.blendProgram = this.addProgram('blend');
 		if(window.doFaceDetection) this.addProgram('faceDetect');
 	}
 
@@ -186,6 +187,10 @@ export default class Editor extends Component {
 			}
 		})
 		this.programs = {};
+		if(this.blendProgram) {
+			this.blendProgram.destroy();
+			this.blendProgram = null;
+		}
 	}
 
 	resetFramebuffers() {
@@ -211,6 +216,7 @@ export default class Editor extends Component {
 
 	resizePrograms(width = this.props.canvasWidth, height = this.props.canvasHeight) {
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
+		if(this.blendProgram) this.blendProgram.resize(width, height);
 		Object.keys(this.programs).forEach(groupKey => {
 			for(let program of this.programs[groupKey]) {
 				program.resize(width, height);
@@ -276,12 +282,12 @@ export default class Editor extends Component {
 					// console.log(groupCount, instructions.length-1);
 					// console.log(iteration, iterations-1);
 					let target = null;
-					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1/* && !group.amount*/)) {
+					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !group.amount)) {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
-					// if(count >= steps.length-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
-
+					if(count >= steps.length-1 && iteration >= iterations-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
+					if(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1) console.log('AND FINAL RENDER TARGET FOR', groupName, target);
 
 					// pre-render calcs idk
 					program.willRender();
@@ -298,14 +304,21 @@ export default class Editor extends Component {
 
 				}
 
-				/*
+
+				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
+				if(count >= steps.length-1 && groupCount < instructions.length-1 && instructions[groupCount+1].amount) {
+					
+					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
+					console.log('NEXT EDIT STEP IS', instructions[groupCount+1].name)
+					this.editGroupFramebuffer.use();
+					program.draw();
+				}
+
+
+				
 				// if last edit step of group and group needs to blend with last group then do that
 				if(groupCount > 0 && count >= steps.length-1 && group.amount) {
 					console.log('APPLY GROUP EDITS OPACITY', group.amount);
-					
-					const blendProgram = new Program('editGroupBlend', this.gl, Shaders.blend.vertex, Shaders.blend.fragment, Shaders.blend.update);
-					blendProgram.use();
-					blendProgram.update({originalImage: this.editGroupFramebuffer.texture, amount: group.amount});
 					
 					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
 
@@ -315,27 +328,25 @@ export default class Editor extends Component {
 						blendTarget = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
 
-					console.log('BLEND TARGET', blendTarget);
+					console.log('BLEND STEP RENDER TARGET', blendTarget);
 
-					blendProgram.willRender();
+					this.blendProgram.use();
+					this.blendProgram.update({
+						key: 'blend', 
+						amount: group.amount, 
+						blendTexture: this.editGroupFramebuffer.texture,
+					});
+
+					this.blendProgram.willRender();
 					sourceTexture.use();
 					this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, blendTarget);
-					blendProgram.didRender();
-					blendProgram.draw();
+					this.blendProgram.didRender();
+					this.blendProgram.draw();
 
 				}
-
-				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
-				if(count >= steps.length-1 && groupCount < instructions.length-1 && instructions[groupCount+1].amount) {
-					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
-					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
-					program.willRender();
-					sourceTexture.use();
-					this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.editGroupFramebuffer.id);
-					program.didRender();
-					program.draw();
-				}
-				*/
+				
+			
+				
 				
 
 

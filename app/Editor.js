@@ -208,7 +208,7 @@ export default class Editor extends Component {
 		const instructions = [
 			{name: 'utility', steps: []},
 			{name: 'adjustments', steps: this.generateEditStepsFromAdjustments(adjustments)},
-			{name: 'filter', steps: []},
+			{name: 'filter', amount: 0, steps: []},
 		];
 
 		// store reset point, make a copy of adjustments object
