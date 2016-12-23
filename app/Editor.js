@@ -485,17 +485,17 @@ export default class Editor extends Component {
 							<button onClick={event => this.updateUtilityValue({rotate: -90})}>Rotate Left</button>
 							<button onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
 						</div>
+						<div className="text-center">
+							<div className="input" style={{marginBottom: 30}}>
+								{/*<Textarea value={JSON.stringify(instructions, null, 2)} readOnly />*/}
+								<label>Terminal command</label>
+								<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+								<label>Server command</label>
+								<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+							</div>
+							<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(instructions, null, '\t'))} download="preset.json">Download preset</a>
+						</div>
 					</div>
-				</div>
-				<div className="text-center some-bs">
-					<div className="input" style={{marginBottom: 30}}>
-						<Textarea value={JSON.stringify(instructions, null, 2)} readOnly />
-						<label>Terminal command</label>
-						<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
-						<label>Server command</label>
-						<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
-					</div>
-					<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(instructions, null, '\t'))} download="preset.json">Download preset</a>
 				</div>
 			</div>
 		)
