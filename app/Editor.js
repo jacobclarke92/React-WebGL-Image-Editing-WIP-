@@ -16,6 +16,7 @@ import filterPresets from './constants/presets.json'
 import gradientPresets from './constants/gradientPresets.js'
 
 import { isArray } from './editor/utils/typeUtils'
+import { hslAdjustmentColors } from './editor/utils/colorUtils'
 import _find from 'lodash/find'
 
 const thumbnailWidth = 120;
@@ -191,6 +192,8 @@ const colorMapAdjustment = {
 const tonalPropertyLabels = tonalAdjustmentProperties.map(property => property.label);
 const enhancementPropertyLabels = enhancementAdjustmentProperties.map(property => property.label);
 const curvePropertyLabels = curveAdjustmentProperties.map(property => property.label);
+
+const hslLabels = Object.keys(hslAdjustmentColors);
 
 export default class Editor extends Component {
 
@@ -410,7 +413,7 @@ export default class Editor extends Component {
 							<input className="button" type="file" onChange={event => this.handleReceivedFile(event.nativeEvent.target.files)} />
 						</label>
 						<Tabs>
-							<Panel title="Tonal Adjustments">
+							<Panel title="Tonal">
 								<div className="sliders">
 									{Object.keys(adjustments).filter(key => tonalPropertyLabels.indexOf(key) >= 0).map((key, i) => {
 										const { label, ...inputAttrs } = tonalAdjustmentProperties.filter(effect => effect.label === key)[0];
@@ -427,10 +430,11 @@ export default class Editor extends Component {
 								{Object.keys(adjustments).filter(key => curvePropertyLabels.indexOf(key) >= 0).map((key, i) => {
 									const { label, channels } = curveAdjustmentProperties.filter(effect => effect.label === key)[0];
 									const points = adjustments[key].curves;
+									const curveColor = label.indexOf('_') >= 0 ? label.split('_')[1] : '#333c47';
 									return (
 										<label key={'curve'+i} className="curve-label">
 											<div>{titleize(label.replace('_', ' '))}</div>
-											<CurveCreator defaultValue={points} size={200} onChange={points => this.setValue(key, {channels, curves: points})} />
+											<CurveCreator defaultValue={points} size={200} onChange={points => this.setValue(key, {channels, curves: points})} strokeStyle={curveColor} />
 										</label>
 									)
 								})}
@@ -463,22 +467,27 @@ export default class Editor extends Component {
 								</div>
 								<GradientCreator value={adjustments['colorMap']} onChange={value => this.setValue('colorMap', value)} />
 							</Panel>
-							{/*
-							<Panel title="HSL Adjustments">
-								<Tabs>
-									<Panel title="Hue">
-										<RCSlider value={this.state.hueAmount} min={-1} max={1} step={0.01} onChange={value => {this.setValue('hueAdjustment', {color: [66, 255, 7], value, range: this.state.hueRange}); this.setState({hueAmount: value})}} />
-										<RCSlider value={this.state.hueRange} min={0} max={1} step={0.01} onChange={range => {this.setValue('hueAdjustment', {color: [66, 255, 7], value: this.state.hueAmount, range}); this.setState({hueRange: range})}} />
-									</Panel>
-									<Panel title="Luminance">
-										<div>Hi</div>
-									</Panel>
-									<Panel title="Saturation">
-										<div>Hello</div>
-									</Panel>
-								</Tabs>
+							<Panel title="HSL">
+								<div className="tabs-container">
+									<Tabs>
+										{['hue', 'saturation', 'luminance'].map((hslTitle, i) => 
+											<Panel key={i} title={titleize(hslTitle)}>
+												{hslLabels.map((hslColor, c) => 
+													<label key={c}>
+														<div>{titleize(hslColor)+'s'}</div>
+														<div className="rc-custom" style={{color: 'rgb('+hslAdjustmentColors[hslColor].join(',')+')'}}>
+															<RCSlider value={this.state[hslTitle+'_'+hslColor] || 0} min={-1} max={1} step={0.01} onChange={value => {
+																this.setValue(hslTitle+'Adjustment', {color: hslAdjustmentColors[hslColor], value});
+																this.setState({[hslTitle+'_'+hslColor]: value});
+															}} />
+														</div>
+													</label>
+												)}
+											</Panel>
+										)}
+									</Tabs>
+								</div>
 							</Panel>
-							*/}
 						</Tabs>
 						<div>
 							<button onClick={event => this.handleReset()}>Reset</button>

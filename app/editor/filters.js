@@ -1,4 +1,5 @@
 import { clamp } from './utils/mathUtils'
+import { isArray } from './utils/typeUtils'
 import { curvesHashTable, getContrastCurve, getVibranceMatrix, getTemperatureRGB} from './utils/colorUtils'
 
 export function colorMatrix(matrix) {
@@ -198,37 +199,40 @@ export function grain(amount) {
 }
 
 export function hueAdjustment(options) {
-	console.warn('HUE ADJUST OPTS', options);
-	const value = clamp(options.value, -1, 1);
-	const range = clamp(options.range, 0, 1);
+	const value = clamp((options.value || 0), -1, 1);
+	const range = clamp((options.range || 0.2), 0, 1);
+	const color = isArray(options.color) ? options.color : [0, 0, 0];
+	console.log('HUE ADJUST', color, value, range);
 	return {
 		key: 'hueAdjustment',
 		value,
-		color: options.color,
+		color,
 		range,
 	};
 }
 
 export function saturationAdjustment(options) {
-	console.warn('LUMINANCE ADJUST OPTS', options);
-	const value = clamp(options.value, -1, 1);
-	const range = clamp(options.range, 0, 1);
+	const value = clamp((options.value || 0), -1, 1);
+	const range = clamp((options.range || 0.1), 0, 1);
+	const color = isArray(options.color) ? options.color : [0, 0, 0];
+	console.log('SATURATION ADJUST', color, value, range);
 	return {
 		key: 'saturationAdjustment',
 		value,
-		color: options.color,
+		color,
 		range,
 	};
 }
 
 export function luminanceAdjustment(options) {
-	console.warn('LUMINANCE ADJUST OPTS', options);
-	const value = clamp(options.value, -1, 1);
-	const range = clamp(options.range, 0, 1);
+	const value = clamp((options.value || 0), -1, 1);
+	const range = clamp((options.range || 0.1), 0, 1);
+	const color = isArray(options.color) ? options.color : [0, 0, 0];
+	console.log('LUMINANCE ADJUST', color, value, range);
 	return {
 		key: 'luminanceAdjustment',
 		value,
-		color: options.color,
+		color,
 		range,
 	};
 }

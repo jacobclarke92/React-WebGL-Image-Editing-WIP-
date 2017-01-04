@@ -55,15 +55,28 @@ a.button {
 	margin-left: 0;
 }
 
+.rc-slider {
+	margin-left: 7px;
+	margin-right: 7px;
+}
+
+.rc-custom .rc-slider-track {
+	background-color: currentColor;
+}
+
+.rc-custom .rc-slider-handle {
+	border-color: currentColor;
+}
+
 .input {
 	display: inline-block;
-	width: 800px;
+	width: 100%;
 	margin-top: 50px;
 	text-align: left;
 }
 
 .input textarea {
-	width: calc(100% - 60px);
+	width: 100%;
 }
 
 .text-center {
@@ -75,7 +88,8 @@ a.button {
 }
 
 .sliders .rc-slider {
-	margin: 5px 0;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 .sliders label>div:first-of-type {
@@ -250,22 +264,29 @@ button:disabled, .button:disabled {
     border: 1px solid #333;
 }
 
-.dropzone{
+.dropzone {
 	position: relative;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.tray{
+.tray {
 	width: 40%;
 	height: 100%;
 	overflow-y: scroll;
 }
 
-.tray-inner{
+.tray-inner {
 	padding: 15px;
 }
 
-.some-bs{
+.some-bs {
 	display: none;
+}
+
+.tabs-container {
+	border: 1px solid #ddd;
+	border-top: none;
+	padding: 10px;
+	margin-bottom: 15px;
 }

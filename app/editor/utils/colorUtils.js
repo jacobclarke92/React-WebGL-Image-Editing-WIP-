@@ -93,16 +93,28 @@ export function getTemperatureRGB(temp) {
 	return {red, green, blue};
 }
 
-const red 		= [187, 13,  44];
-const orange	= [188, 81,  22];
-const yellow	= [191, 182, 38];
-const green		= [69,  188, 33];
-const aqua		= [44,  190, 161];
-const blue		= [13,  109, 188];
-const purple	= [143, 33,  188];
-const magenta 	= [187, 23,  123];
+// old values, not sure why these differ from the below
+// const red 		= [187, 13,  44];
+// const orange	= [188, 81,  22];
+// const yellow	= [191, 182, 38];
+// const green		= [69,  188, 33];
+// const aqua		= [44,  190, 161];
+// const blue		= [13,  109, 188];
+// const purple	= [143, 33,  188];
+// const magenta 	= [187, 23,  123];
 
-const hueAdjustRanges = {
+const red		= [218,	18,  51];
+const orange	= [219,	96,  27];
+const yellow	= [223,	213, 46];
+const green		= [82,	220, 41];
+const aqua		= [53,	221, 189];
+const blue		= [16,	127, 220];
+const purple	= [167,	41,  220];
+const magenta	= [218,	29,  143];
+
+export const hslAdjustmentColors = { red, orange, yellow, green, aqua, blue, purple, magenta };
+
+export const hueAdjustRanges = {
 	reds: [magenta, orange],
 	oranges: [red, yellow],
 	yellows: [orange, green],
