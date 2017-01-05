@@ -199,7 +199,7 @@ export default class Editor extends Component {
 
 	constructor(props) {
 		super(props);
-		this.urls = ['test1.jpg', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test6.jpg', 'test7.jpg', 'test8.jpg', 'test9.jpg'];
+		this.urls = ['test1.png', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test6.jpg', 'test7.jpg', 'test8.jpg', 'test9.jpg'];
 
 		// generate initial slider values
 		const adjustments = {curves: []};

@@ -27,21 +27,48 @@ vec3 hsv2rgb(vec3 c) {
 
 void main(void) {
 
-	vec3 avoidColorHSL = rgb2hsv(vec3(baseColor.r/255.0, baseColor.g/255.0, baseColor.b/255.0));
+	float rng = 60.0 / 360.0;
+
+	vec3 avoidColorHSV = rgb2hsv(vec3(baseColor.r/255.0, baseColor.g/255.0, baseColor.b/255.0));
 
 	vec4 color = texture2D(Texture, v_texCoord);
 	vec3 colorHSV = rgb2hsv(vec3(color.r, color.g, color.b));
-	
-	// float range = 30.0/360.0;
 
-	float hueDifference = colorHSV[0] - avoidColorHSL[0];
-	if(abs(hueDifference) <= range) {
-		colorHSV[0] += amount * hueDifference;
+	float baseColorHue = avoidColorHSV[0];
+	float colorHue = colorHSV[0];
+	float hueDifference = colorHSV[0] - avoidColorHSV[0];
+	float absHueDiff = abs(hueDifference);
+
+	float roundAbsHueDiff = absHueDiff;
+	// if(roundAbsHueDiff > 1.0 - rng) roundAbsHueDiff -= 1.0;
+
+	float aimHue = baseColorHue + amount*rng;
+
+	// if +- 60° of base color 
+	if(roundAbsHueDiff < rng) {
+
+		// create a pull percent based on big the hue difference is
+		float pull = 1.0 - roundAbsHueDiff/rng;
+		
+		float tempAimHue = aimHue;
+		// if(absHueDiff > roundAbsHueDiff) tempAimHue += 1.0;
+		// else if(absHueDiff < roundAbsHueDiff) tempAimHue -= 1.0;
+		
+		// 'ease' the hue towards the aim hue and multiply in the pull and the overall amount
+		colorHue += ((tempAimHue - colorHue) / 1.5) * pull * abs(amount);
+
+		// wrap values if ease goes out of bounds
+		if(colorHue < 0.0) colorHue += 1.0;
+		else if(colorHue > 1.0) colorHue -= 1.0;
+
+		colorHSV[0] = colorHue;
 		vec3 colorRGB = hsv2rgb(colorHSV);
 		vec4 newColor = vec4(colorRGB.r, colorRGB.g, colorRGB.b, color.a);
 		gl_FragColor = newColor;
+		
 	}else{
 		gl_FragColor = color;
 	}
+
 }
 `
