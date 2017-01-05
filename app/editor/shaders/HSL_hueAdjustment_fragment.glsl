@@ -55,7 +55,7 @@ void main(void) {
 		// else if(absHueDiff < roundAbsHueDiff) tempAimHue -= 1.0;
 		
 		// 'ease' the hue towards the aim hue and multiply in the pull and the overall amount
-		colorHue += ((tempAimHue - colorHue) / 1.5) * pull * abs(amount);
+		colorHue += ((tempAimHue - colorHue) / 1.5) * pull * abs(pow(amount, 0.75));
 
 		// wrap values if ease goes out of bounds
 		if(colorHue < 0.0) colorHue += 1.0;
