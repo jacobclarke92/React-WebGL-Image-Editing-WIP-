@@ -5,6 +5,7 @@ export default function(settings) {
 	// set rgb uniforms depending on the channels string
 	this.uniforms({
 		amount: settings.amount,
+		blendType: 1,
 	});
 
 	if(settings.blendTexture) {
