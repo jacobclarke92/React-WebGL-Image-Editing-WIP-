@@ -19,13 +19,13 @@ varying vec2 v_texCoord;
 	3: Multiply
 	4: Color burn
 	5: Linear burn
-	6: Darker color -- not used
+	6: Darker color -- not implemented
 
 	7: Lighten
 	8: Screen
 	9: Color dodge
 	10: Linear dodge
-	11: Lighter color -- not used
+	11: Lighter color -- not implemented
 
 	12: Overlay
 	13: Soft light
@@ -38,12 +38,12 @@ varying vec2 v_texCoord;
 	19: Difference
 	20: Exclusion
 	21: Subtract
-	22: Divide -- not used
+	22: Divide -- not implemented
 
-	23: Hue
-	24: Saturation
-	25: Color
-	26: Luminosity
+	23: Hue 		-- not implemented
+	24: Saturation 	-- not implemented
+	25: Color 		-- not implemented
+	26: Luminosity 	-- not implemented
  */
  
 float darken(float c0, float c1) {
