@@ -4,8 +4,9 @@ import default_fragment from './default_fragment.glsl'
 import default_update from './default_update'
 import filter_vertex from './filter_vertex.glsl'
 
-import rotate_fragment from './rotate_fragment.glsl'
 
+import blend_fragment from './blend_fragment.glsl'
+import blend_update from './blend_update'
 import blur_fragment from './blur_fragment.glsl'
 import bloom_fragment from './bloom_fragment.glsl'
 import crop_vertex from './crop_vertex.glsl'
@@ -27,11 +28,10 @@ import HSL_luminanceAdjustment_fragment from './HSL_luminanceAdjustment_fragment
 import hue_fragment from './hue_fragment.glsl'
 import pixelSort_update from './pixelSort_update'
 import pixelSort_fragment from './pixelSort_fragment.glsl'
+import rotate_fragment from './rotate_fragment.glsl'
 import saturation_fragment from './saturation_fragment.glsl'
 import sharpen_update from './sharpen_update'
 import sharpen_fragment from './sharpen_fragment.glsl'
-import blend_fragment from './blend_fragment.glsl'
-import blend_update from './blend_update'
 
 const Shaders = {
 	default: {
