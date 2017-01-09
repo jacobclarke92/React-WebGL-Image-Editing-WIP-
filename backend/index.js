@@ -95,9 +95,6 @@ if(gl == null) {
 		console.log('----------\nAfter image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
-
-
-
 		ImageProcessor.buildPrograms();
 		ImageProcessor.resizeAll();
 

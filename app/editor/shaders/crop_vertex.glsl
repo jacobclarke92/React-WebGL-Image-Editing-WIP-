@@ -22,10 +22,11 @@ void main() {
    		float scaleY = pow(height, -1.0);
 		clipSpace = clipSpace * mat2(scaleX, 0.0, 0.0, scaleY);
 		// clipSpace += 0.5;
-		clipSpace.x -= (1.0 - width)*scaleX;// + left*scaleX;
+		// clipSpace.x -= (1.0 - width)*scaleX;// + left*scaleX;
 		// clipSpace.y -= (1.0 - height) + top;
 	}
 	*/
+	
    	gl_Position = vec4(clipSpace * vec2(1, 1), 0, 1);
    	v_texCoord = a_texCoord;
 }
