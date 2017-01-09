@@ -11,6 +11,7 @@ export default class Processor {
 
 	constructor(gl, instructions = []) {
 		this.IS_NODE = typeof window === 'undefined';
+		if(this.IS_NODE) this.EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
 		this.width = 550;
 		this.height = 400;
@@ -41,7 +42,7 @@ export default class Processor {
 		// (re)init image texture
 		if(this.imageTexture) this.imageTexture.destroy();
 		this.imageTexture = new Texture(this.gl, width, height);
-		if(this.IS_NODE) imageTexture.loadFromBytes(pixels, width, height);
+		if(this.IS_NODE) this.imageTexture.loadFromBytes(image, width, height);
 		else this.imageTexture.loadContentsOf(image);
 
 		// (re)set edit group buffer
@@ -51,10 +52,8 @@ export default class Processor {
 
 		// (re)set default starting program
 		if(this.defaultProgram) this.defaultProgram.destroy();
-		if(this.IS_NODE) this.defaultProgram = new Program('default_node', gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
+		if(this.IS_NODE) this.defaultProgram = new Program('default_node', this.gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
 		else this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
-
-		this.buildPrograms();
 		
 	}
 
@@ -121,6 +120,7 @@ export default class Processor {
 	}
 
 	resizeViewport(width = this.canvasWidth, height = this.canvasHeight) {
+		if(this.IS_NODE) this.EXT_resize.resize(width, height);
 		this.gl.viewport(0, 0, width, height);
 	}
 

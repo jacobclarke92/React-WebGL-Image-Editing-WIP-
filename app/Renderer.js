@@ -123,12 +123,14 @@ export default class Editor extends Component {
 		// for thumbnails that won't be updated
 		if(!this.props.autoResize) {
 			this.Processor.imageLoaded(image, this.props.width, this.props.height);
+			this.Processor.buildPrograms();
 			this.Processor.resizeAll();
 			this.Processor.renderEditSteps();
 
 		// for main renderer
 		}else{
 			this.Processor.imageLoaded(image, image.width, image.height);
+			this.Processor.buildPrograms();
 			this.props.onResize(image.width, image.height);
 		}
 	}
