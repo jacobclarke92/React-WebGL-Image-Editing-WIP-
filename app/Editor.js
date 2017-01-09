@@ -233,7 +233,7 @@ export default class Editor extends Component {
 		this.defaultInstructions = [...instructions];
 		
 		this.state = {
-			url: this.urls[1],//this.urls[Math.floor(Math.random()*this.urls.length)],
+			url: this.urls[Math.floor(Math.random()*this.urls.length)],
 			width: 550,
 			height: 400,
 			canvasWidth: 550,

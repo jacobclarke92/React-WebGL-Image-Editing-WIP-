@@ -32,7 +32,7 @@ export default class Editor extends Component {
 	constructor(props) {
 		super();
 		this.lastEditStepsKeys = combineGroupEditStepKeys(props.instructions);
-
+		this.waitingForRender = false;
 		this.state = {
 			url: props.url,
 		}
@@ -75,6 +75,7 @@ export default class Editor extends Component {
 
 			// update canvas size if props changed
 			if(resized) {
+				console.log('CANVAS SIZE CHANGED', nextProps.canvasWidth, nextProps.canvasHeight);
 				this.refs.editor.width = nextProps.canvasWidth;
 				this.refs.editor.height = nextProps.canvasHeight;
 				this.Processor.setCanvasSize(nextProps.canvasWidth, nextProps.canvasHeight);
@@ -102,11 +103,13 @@ export default class Editor extends Component {
 				console.log('NEW EDIT STEP PARAM CHANGES');
 				this.Processor.renderEditSteps(nextProps.instructions);
 
-			}else if(resized) {
-				console.log('NEW RESIZED PROP RENDERING ANYWAY')
-				this.Processor.resizeAll();
+			}else if(resized && this.waitingForRender) {
+				console.log('RENDERING AFTER IMAGE LOADED AND SIZE UPDATED')
 				this.Processor.setInstructions(nextProps.instructions);
+				this.Processor.buildPrograms();
+				this.Processor.resizeAll();
 				this.Processor.renderEditSteps();
+				this.waitingForRender = false;
 			}
 		}
 	}
@@ -131,6 +134,8 @@ export default class Editor extends Component {
 		}else{
 			this.Processor.imageLoaded(image, image.width, image.height);
 			this.Processor.buildPrograms();
+
+			this.waitingForRender = true;
 			this.props.onResize(image.width, image.height);
 		}
 	}
