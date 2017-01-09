@@ -233,7 +233,7 @@ export default class Editor extends Component {
 		this.defaultInstructions = [...instructions];
 		
 		this.state = {
-			url: this.urls[0],//this.urls[Math.floor(Math.random()*this.urls.length)],
+			url: this.urls[1],//this.urls[Math.floor(Math.random()*this.urls.length)],
 			width: 550,
 			height: 400,
 			canvasWidth: 550,
@@ -319,6 +319,8 @@ export default class Editor extends Component {
 		this.setState({instructions});
 	}
 
+
+	// this takes utility step adjustemnt(s) and recreates all the utility steps and updates canvas dimensions
 	updateUtilityValue(utilityAdjustments = {}) {
 
 		const oldUtilitySteps = _find(this.state.instructions, {name: 'utility'}).steps || [];

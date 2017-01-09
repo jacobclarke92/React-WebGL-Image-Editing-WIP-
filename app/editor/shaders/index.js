@@ -8,6 +8,9 @@ import rotate_fragment from './rotate_fragment.glsl'
 
 import blur_fragment from './blur_fragment.glsl'
 import bloom_fragment from './bloom_fragment.glsl'
+import crop_vertex from './crop_vertex.glsl'
+import crop_fragment from './crop_fragment.glsl'
+import crop_update from './crop_update'
 import curves_update from './curves_update'
 import curves_fragment from './curves_fragment.glsl'
 import colorMap_update from './colorMap_update'
@@ -53,9 +56,9 @@ const Shaders = {
 		fragment: default_fragment,
 	},
 	crop: {
-		update: default_update,
-		vertex: filter_vertex,
-		fragment: default_fragment,
+		update: crop_update,
+		vertex: crop_vertex,
+		fragment: crop_fragment,
 	},
 	blend: {
 		update: blend_update,
