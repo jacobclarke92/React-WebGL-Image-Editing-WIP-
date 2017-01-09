@@ -277,10 +277,6 @@ export default class Editor extends Component {
 					// ----
 					// If we're up to the last step then the render target stays at null (null = canvas),
 					// Otherwise we increment our framebuffer index to select (or create) the next framebuffer
-					// console.log(groupName, step.key);
-					// console.log(count, steps.length-1);
-					// console.log(groupCount, instructions.length-1);
-					// console.log(iteration, iterations-1);
 					let target = null;
 					if(!(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1 && !('amount' in group))) {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
@@ -305,7 +301,7 @@ export default class Editor extends Component {
 				}
 
 
-				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer
+				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer for later blending
 				if(count >= steps.length-1 && groupCount < instructions.length-1 && ('amount' in instructions[groupCount+1])) {
 					
 					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
