@@ -336,21 +336,20 @@ export default class Editor extends Component {
 		if('rotate' in utilityAdjustments) {
 			const oldRotation = (rotateStep || {}).value || 0;
 			const rotation = (oldRotation + 360 + utilityAdjustments.rotate)%360;
-			const rotationDiff = oldRotation - rotation;
 
 			// transform crop values if rotating an already cropped image
 			// need to properly check this once crop fragment is done
-			if(cropStep && rotationDiff !== 0) {
+			if(cropStep && oldRotation - rotation !== 0) {
 				const oldCrop = cropStep.value;
 				console.log('OLD CROP', oldCrop);
-				if(oldRotation - rotation < 0) {
+				if(utilityAdjustments.rotate > 0) {
 					this.crop = cropStep.value = {
 						left: 1 - oldCrop.top - oldCrop.height,
 						top: oldCrop.left,
 						width: oldCrop.height,
 						height: oldCrop.width,
 					};
-				}else if(oldRotation - rotation > 0) {
+				}else if(utilityAdjustments.rotate < 0) {
 					this.crop = cropStep.value = {
 						left: oldCrop.top,
 						top: 1 - oldCrop.left - oldCrop.width,
