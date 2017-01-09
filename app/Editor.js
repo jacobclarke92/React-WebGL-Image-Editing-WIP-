@@ -600,8 +600,8 @@ export default class Editor extends Component {
 						</Tabs>
 						<div>
 							<button onClick={event => this.handleReset()}>Reset</button>
-							<button onClick={event => this.updateUtilityValue({rotate: -90})}>Rotate Left</button>
-							<button onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
+							<button disabled={cropping} onClick={event => this.updateUtilityValue({rotate: -90})}>Rotate Left</button>
+							<button disabled={cropping} onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
 						</div>
 						<div>
 							<button onClick={event => this.toggleCrop()}>Crop</button>
