@@ -317,6 +317,11 @@ export default class Editor extends Component {
 		this.setState({instructions});
 	}
 
+	/*
+	To do: look at how this works pleaseeeee
+	Currently only one utility step can be active at once
+	Will need to store post-rotate dimensions and set canvas dimensions after crop
+	 */
 	updateUtilityValue(utilityAdjustments = {}) {
 		
 		const utilitySteps = [];
@@ -332,7 +337,12 @@ export default class Editor extends Component {
 			}
 		}
 		if('straighten' in utilityAdjustments) utilitySteps.push({key: 'straighten', value: utilityAdjustments.straighten});
-		if('crop' in utilityAdjustments) utilitySteps.push({key: 'crop', value: utilityAdjustments.crop});
+		if('crop' in utilityAdjustments) {
+			const crop = utilityAdjustments.crop;
+			console.log('cropped', crop);
+			utilitySteps.push({key: 'crop', value: crop});
+			this.setState({canvasWidth: this.state.canvasWidth*crop.width, canvasHeight: this.state.canvasHeight*crop.height});
+		}
 
 		// update instructions with new utility steps
 		const instructions = this.state.instructions.map(group => group.name == 'utility' ? {...group, steps: utilitySteps} : group);
@@ -399,19 +409,12 @@ export default class Editor extends Component {
 		else reader.readAsDataURL(file);
 	}
 
-	updateCrop(crop) {
-		console.log('CROP', crop);
-		this.crop = crop;
-		/*
-		TO DO: Add crop to utility steps
-		 */
-	}
-
 	handleCrop() {
 		this.setState({
 			cropping: false, 
 			cropped: true,
 		});
+		this.updateUtilityValue({crop: this.crop});
 	}
 
 	render() {
@@ -427,7 +430,7 @@ export default class Editor extends Component {
 					<FileDropzone onFilesReceived={::this.handleReceivedFile}>
 						<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
 							<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize />
-							{cropping && <Cropper width={cropperWidth} height={cropperHeight} onApply={::this.handleCrop} fixedRatio={ratio} onChange={::this.updateCrop} defaultCrop={this.crop} />}
+							{cropping && <Cropper width={cropperWidth} height={cropperHeight} onApply={::this.handleCrop} fixedRatio={ratio} onChange={crop => this.crop = crop} defaultCrop={this.crop} />}
 						</div>
 					</FileDropzone>
 				</div>
