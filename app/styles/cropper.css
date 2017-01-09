@@ -1,0 +1,69 @@
+.cropper {
+	position: absolute;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+}
+
+.crop-zone {
+	position: absolute;
+	border: 1px solid #FFF;
+	cursor: move;
+
+}
+
+.crop-zone:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	margin: -1px 0 0 -1px;
+	border: 1px dashed #000;
+}
+
+.crop-zone button {
+	cursor: pointer;
+	z-index: 1;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40px;
+	height: 40px;
+	border-radius: 100%;
+	background-color: #FFF;
+}
+
+.crop-zone button:hover {
+	background-color: #ABE2FB;
+}
+
+.crop-handle {
+	position: absolute;
+	z-index: 5;
+	margin: -10px 0 0 -10px;
+	width: 20px;
+	height: 20px;
+}
+
+.crop-handle:after {
+	content: '';
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	border: 1px solid #fff;
+	background-color: #000;
+	width: 10px;
+	height: 10px;
+}
+
+.crop-handle.TL { cursor: nwse-resize; 	left: 0; 	top: 0; }
+.crop-handle.TM { cursor: ns-resize;	left: 50%; 	top: 0; }
+.crop-handle.TR { cursor: nesw-resize;	left: 100%; top: 0; }
+.crop-handle.ML { cursor: ew-resize;	left: 0; 	top: 50%; }
+.crop-handle.MR { cursor: ew-resize;	left: 100%; top: 50%; }
+.crop-handle.BL { cursor: nesw-resize;	left: 0; 	top: 100%; }
+.crop-handle.BM { cursor: ns-resize;	left: 50%; 	top: 100%; }
+.crop-handle.BR { cursor: nwse-resize;	left: 100%; top: 100%; }

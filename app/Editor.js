@@ -1,9 +1,12 @@
 import React, { PropTypes, Component } from 'react'
+import ReactDOM from 'react-dom'
 import Tabs, { Panel } from 'react-simpletabs'
 import Textarea from 'react-textarea-autosize'
+import throttle from 'lodash/throttle'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
+import Cropper from './Cropper'
 import FileDropzone from './FileDropzone'
 import CurveCreator from './CurveCreator'
 import GradientCreator from './GradientCreator'
@@ -189,6 +192,17 @@ const colorMapAdjustment = {
 	],
 };
 
+const ratios = {
+	'16:9': 16/9,
+	'3:2': 3/2,
+	'4:3': 4/3,
+	'5:4': 5/4,
+	'1:1': 1/1,
+	'4:5': 4/5,
+	'3:4': 3/4,
+	'2:3': 2/3,
+};
+
 const tonalPropertyLabels = tonalAdjustmentProperties.map(property => property.label);
 const enhancementPropertyLabels = enhancementAdjustmentProperties.map(property => property.label);
 const curvePropertyLabels = curveAdjustmentProperties.map(property => property.label);
@@ -219,7 +233,7 @@ export default class Editor extends Component {
 		this.defaultInstructions = [...instructions];
 		
 		this.state = {
-			url: this.urls[Math.floor(Math.random()*this.urls.length)],
+			url: this.urls[0],//this.urls[Math.floor(Math.random()*this.urls.length)],
 			width: 550,
 			height: 400,
 			canvasWidth: 550,
@@ -227,7 +241,22 @@ export default class Editor extends Component {
 			adjustments,
 			instructions,
 			filterName: null,
+			cropping: false,
+			ratio: null,
+			mainWidth: window.innerWidth * 0.6,
 		}
+
+		// throttle resize to 30fps
+		window.onresize = throttle(this.handleResize.bind(this), 1000/30);
+	}
+
+	componentDidMount() {
+		this.handleResize();
+	}
+
+	handleResize() {
+		const box = ReactDOM.findDOMNode(this.refs.mainWindow).getBoundingClientRect();
+		this.setState({mainWidth: box.width});
 	}
 
 	handleImageResize(width, height) {
@@ -370,16 +399,35 @@ export default class Editor extends Component {
 		else reader.readAsDataURL(file);
 	}
 
+	updateCrop(crop) {
+		console.log('CROP', crop);
+		this.crop = crop;
+		/*
+		TO DO: Add crop to utility steps
+		 */
+	}
+
+	handleCrop() {
+		this.setState({
+			cropping: false, 
+			cropped: true,
+		});
+	}
+
 	render() {
-		const { url, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName } = this.state;
+		const { url, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName, cropping, ratio, mainWidth } = this.state;
 		const filterAmount = _find(instructions, {name: 'filter'}).amount;
+
+		const cropperWidth = canvasWidth > mainWidth ? mainWidth : canvasWidth;
+		const cropperHeight = canvasWidth > mainWidth ? (canvasHeight/canvasWidth*mainWidth) : canvasHeight;
 
 		return (
 			<div className="image-editor">
-				<div className="main-window">
+				<div className="main-window" ref="mainWindow">
 					<FileDropzone onFilesReceived={::this.handleReceivedFile}>
 						<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
 							<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize />
+							{cropping && <Cropper width={cropperWidth} height={cropperHeight} onApply={::this.handleCrop} fixedRatio={ratio} onChange={::this.updateCrop} defaultCrop={this.crop} />}
 						</div>
 					</FileDropzone>
 				</div>
@@ -493,6 +541,13 @@ export default class Editor extends Component {
 							<button onClick={event => this.handleReset()}>Reset</button>
 							<button onClick={event => this.updateUtilityValue({rotate: -90})}>Rotate Left</button>
 							<button onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
+						</div>
+						<div>
+							<button onClick={event => this.setState({cropping: !cropping})}>Crop</button>
+							{cropping && Object.keys(ratios).map((ratioLabel, i) => {
+								const ratioValue = ratios[ratioLabel];
+								return (<button key={i} className={ratio == ratioValue ? 'selected': ''} onClick={event => this.setState({ratio: ratio == ratioValue ? null : ratioValue})}>{ratioLabel}</button>);
+							})}
 						</div>
 						<div className="text-center">
 							<div className="input" style={{marginBottom: 30}}>

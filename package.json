@@ -51,6 +51,7 @@
     "image-size": "^0.5.0",
     "jquery": "^3.1.0",
     "jsfeat": "0.0.8",
+    "keycode": "^2.1.8",
     "lodash": "^4.11.1",
     "ndarray": "^1.0.18",
     "numeric": "^1.2.6",
