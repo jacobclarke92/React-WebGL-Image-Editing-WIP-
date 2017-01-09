@@ -267,6 +267,8 @@ export default class Editor extends Component {
 	// Reset adjustments and filter
 	handleReset() {
 		this.setState({
+			canvasWidth: this.state.width,
+			canvasHeight: this.state.height,
 			adjustments: {...this.defaultAdjustments},
 			instructions: [...this.defaultInstructions],
 			filterName: null,
@@ -317,36 +319,83 @@ export default class Editor extends Component {
 		this.setState({instructions});
 	}
 
-	/*
-	To do: look at how this works pleaseeeee
-	Currently only one utility step can be active at once
-	Will need to store post-rotate dimensions and set canvas dimensions after crop
-	 */
 	updateUtilityValue(utilityAdjustments = {}) {
-		
+
+		const oldUtilitySteps = _find(this.state.instructions, {name: 'utility'}).steps || [];
 		const utilitySteps = [];
+
+		let rotateStep = _find(oldUtilitySteps, {key: 'rotate'});
+		let straightenStep = _find(oldUtilitySteps, {key: 'straighten'});
+		let cropStep = _find(oldUtilitySteps, {key: 'crop'});
+
+		let canvasWidth = this.state.width;
+		let canvasHeight = this.state.height;
+
 		if('rotate' in utilityAdjustments) {
-			const oldUtilitySteps = _find(this.state.instructions, {name: 'utility'}).steps || [];
-			const oldRotation = (_find(oldUtilitySteps, {key: 'rotate'}) || {}).value || 0;
+			const oldRotation = (rotateStep || {}).value || 0;
 			const rotation = (oldRotation + 360 + utilityAdjustments.rotate)%360;
-			utilitySteps.push({key: 'rotate', value: rotation});
-			if(rotation == 90 || rotation == 270) {
-				this.setState({canvasWidth: this.state.height, canvasHeight: this.state.width});
+
+			if(rotation === 0) {
+				rotateStep = null;
 			}else{
-				this.setState({canvasWidth: this.state.width, canvasHeight: this.state.height});
+				rotateStep = {key: 'rotate', value: rotation};
 			}
 		}
-		if('straighten' in utilityAdjustments) utilitySteps.push({key: 'straighten', value: utilityAdjustments.straighten});
-		if('crop' in utilityAdjustments) {
-			const crop = utilityAdjustments.crop;
-			console.log('cropped', crop);
-			utilitySteps.push({key: 'crop', value: crop});
-			this.setState({canvasWidth: this.state.canvasWidth*crop.width, canvasHeight: this.state.canvasHeight*crop.height});
+
+		if(rotateStep) {
+			if(rotateStep.value == 90 || rotateStep.value == 270) {
+				canvasWidth = this.state.height;
+				canvasHeight = this.state.width;
+			}else{
+				canvasWidth = this.state.width;
+				canvasHeight = this.state.height;
+			}
+			utilitySteps.push(rotateStep);
 		}
+
+
+		if('straighten' in utilityAdjustments) {
+			const straighten = utilityAdjustments.straighten;
+
+			if(!straighten) {
+				straightenStep = null;
+			}else{
+				straightenStep = {key: 'straighten', value: straighten};
+			}
+		}
+		if(straightenStep) utilitySteps.push(straightenStep);
+
+
+		if('crop' in utilityAdjustments) {
+			const enabled = utilityAdjustments.enabled || false;
+			let crop = utilityAdjustments.crop;
+
+			console.log('CROP ENABLED', enabled);
+
+			// attempt to reuse old crop value e.g. if just switching enabled state
+			if(!crop && cropStep) crop = cropStep.crop;
+
+			if(!crop) {
+				cropStep = null;
+			}else{
+				cropStep = {key: 'crop', value: crop, enabled};
+			}
+		}
+		if(cropStep) {
+			if(cropStep.enabled) {
+				canvasWidth *= cropStep.value.width;
+				canvasHeight *= cropStep.value.height;
+			}
+			utilitySteps.push(cropStep);
+		}
+
+
 
 		// update instructions with new utility steps
 		const instructions = this.state.instructions.map(group => group.name == 'utility' ? {...group, steps: utilitySteps} : group);
-		this.setState({instructions});
+
+		// set new instructions and canvas size
+		this.setState({instructions, canvasWidth, canvasHeight});
 	}
 
 	// Generates specific edit steps for Renderer based on adjustment 'aliases'
@@ -414,7 +463,16 @@ export default class Editor extends Component {
 			cropping: false, 
 			cropped: true,
 		});
-		this.updateUtilityValue({crop: this.crop});
+		this.updateUtilityValue({crop: this.crop, enabled: true});
+	}
+
+	toggleCrop() {
+		const cropping = !this.state.cropping;
+
+		// toggle crop rendering if cropping
+		this.updateUtilityValue({crop: this.crop, enabled: !cropping});
+
+		this.setState({cropping});
 	}
 
 	render() {
@@ -546,7 +604,7 @@ export default class Editor extends Component {
 							<button onClick={event => this.updateUtilityValue({rotate: 90})}>Rotate Right</button>
 						</div>
 						<div>
-							<button onClick={event => this.setState({cropping: !cropping})}>Crop</button>
+							<button onClick={event => this.toggleCrop()}>Crop</button>
 							{cropping && Object.keys(ratios).map((ratioLabel, i) => {
 								const ratioValue = ratios[ratioLabel];
 								return (<button key={i} className={ratio == ratioValue ? 'selected': ''} onClick={event => this.setState({ratio: ratio == ratioValue ? null : ratioValue})}>{ratioLabel}</button>);
