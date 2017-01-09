@@ -72,8 +72,13 @@
 						$ext = getExt($url);
 						$file = null;
 						$fileHeaders = get_headers($url);
-						$eTag = $fileHeaders[23];
-						$eTag = str_replace('Etag: ', '', $eTag);
+						$eTag = '';
+						if(!empty($fileHeaders[23])) {
+							$eTag = $fileHeaders[23];
+							$eTag = str_replace('Etag: ', '', $eTag);
+						}else{
+							$eTag = md5($url);
+						}
 
 						// check if a cached version exists
 						$fileUrl = '../cache/downloads/'.$eTag.'.'.$ext;
@@ -99,7 +104,9 @@
 							}
 						}
 
-						$editSteps = '[{\"key\":\"curves\",\"channels\":\"rgb\",\"curves\":[[5.1000000000000005,0],[255,249.9]]},{\"key\":\"curves\",\"channels\":\"rgb\",\"curves\":[[0,0],[75,63],[180,192],[255,255]]},{\"key\":\"curves\",\"channels\":\"rgb\",\"curves\":[[0,0],[70,110],[190,220],[255,255]]},{\"key\":\"saturation\",\"value\":-0.2},{\"key\":\"colorMatrix\",\"matrix\":[1.175,-0.11666666666666665,-0.11666666666666665,0,0,-0.11666666666666665,1.175,-0.11666666666666665,0,0,-0.11666666666666665,-0.11666666666666665,1.175,0,0,0,0,0,1,0]},{\"key\":\"gamma\",\"value\":0.6}]';
+						$editSteps = '[{"name":"utility","steps":[]},{"name":"adjustments","steps":[{"key":"hueAdjustment","value":-1,"color":[16,127,220],"range":0.2}]},{"name":"filter","amount":1,"steps":[{"key":"saturation","value":0.1},{"key":"colorMatrix","matrix":[1,0,0,0,0.05,0,1,0,0,0.08,0,0,1,0,0.08,0,0,0,1,0]},{"key":"curves","channels":"rgb","curves":[[0,0],[75,70],[180,185],[255,255]]},{"key":"grain","value":0.1},{"key":"curves","channels":"rgb","curves":[[0,25],[46,54],[121,125],[255,252]]}]}]';
+						$editSteps = str_replace('"', '\\"', $editSteps);
+
 						$response = processImage($filepath, $editSteps);
 						// echo '<pre>'.$response.'</pre>';
 
@@ -151,7 +158,7 @@
 		$dir = getcwd();
 		$command = BIN_PATH.'/babel-node '.$dir.'/../backend/index.js ';
 		$command .= 'input="'.$dir.'/../'.$path.'" ';
-		$command .= 'editSteps="'.$steps.'" ';
+		$command .= 'instructions="'.$steps.'" ';
 		$command .= ' 2>&1';
 		// echo '<pre>'.$command.'</pre>';
 		putenv('PATH='.BIN_PATH);
