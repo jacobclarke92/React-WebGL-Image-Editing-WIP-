@@ -31,6 +31,7 @@ let rawInstructions = ('instructions' in args) ? JSON.parse(args.instructions) :
 const gl = GL(10, 10);
 const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 const ImageProcessor = new Processor(gl, rawInstructions);
+ImageProcessor.debug = true;
 
 
 function saveImage() {
