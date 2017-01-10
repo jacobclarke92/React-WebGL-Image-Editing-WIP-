@@ -200,7 +200,7 @@ export default class Processor {
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
 
-					if(this.debug) {
+					if(this.debug && !this.IS_NODE) {
 						if(count >= steps.length-1 && iteration >= iterations-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
 						if(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1) console.log('AND FINAL RENDER TARGET FOR', groupName, target);
 					}
