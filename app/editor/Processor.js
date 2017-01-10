@@ -60,11 +60,9 @@ export default class Processor {
 
 	// this function returns either an existing framebuffer or a new framebuffer
 	getTempFramebuffer(index) {
-		const { width, height } = this;
-
 		if(!this.framebuffers[index]) {
 			this.framebuffers[index] = new Framebuffer(this.gl).use();
-			this.framebuffers[index].attachEmptyTexture(width, height);
+			this.framebuffers[index].attachEmptyTexture(this.canvasWidth, this.canvasHeight);
 		}
 
 		return this.framebuffers[index];
