@@ -35,6 +35,11 @@ export default class Program {
      * Destroys program
      */
 	destroy() {
+        // destroy buffers used in render functions
+        if(this.texCoordBuffer) this.gl.deleteBuffer(this.texCoordBuffer);
+        if(this.buffer) this.gl.deleteBuffer(this.buffer);
+
+        // delete self :')
 		this.gl.deleteProgram(this.program);
         this.program = null;
 	}
