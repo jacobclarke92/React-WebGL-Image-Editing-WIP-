@@ -28,6 +28,9 @@ export default class Program {
         this.width = 100;
         this.height = 100;
 
+        // to keep track of textures created in update function
+        this.textureCache = [];
+
         return this;
 	}
 
@@ -38,6 +41,7 @@ export default class Program {
         // destroy buffers used in render functions
         if(this.texCoordBuffer) this.gl.deleteBuffer(this.texCoordBuffer);
         if(this.buffer) this.gl.deleteBuffer(this.buffer);
+        this.textureCache.forEach(texture => texture.destroy());
 
         // delete self :')
 		this.gl.deleteProgram(this.program);

@@ -23,5 +23,6 @@ export default function(settings) {
 	if(!this.curveTexture) this.curveTexture = new Texture(this.gl, this.width, this.height);
 	this.curveTexture.loadFromBytes(rgbaData, 256, 1);
 	this.curveTexture.use(3);
+	this.textureCache.push(this.curveTexture);
 	this.gl.uniform1i(this.gl.getUniformLocation(this.program, "map"), 3);
 }
