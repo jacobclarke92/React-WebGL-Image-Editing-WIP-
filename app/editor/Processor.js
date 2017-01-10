@@ -13,6 +13,7 @@ export default class Processor {
 		this.IS_NODE = typeof window === 'undefined';
 		if(this.IS_NODE) this.EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
 
+		this.debug = false;
 		this.width = 550;
 		this.height = 400;
 		this.canvasWidth = 550;
@@ -71,6 +72,7 @@ export default class Processor {
 
 	buildPrograms(instructions = this.instructions) {
 		this.resetPrograms();
+		if(this.debug) console.log('BUILDING PROGRAMS');
 		instructions.filter(group => group.steps && group.steps.length > 0).forEach(group => {
 			const groupName = group.name;
 			if(!(groupName in this.programs)) this.programs[groupName] = [];
@@ -92,6 +94,7 @@ export default class Processor {
 	}
 
 	resetPrograms() {
+		if(this.debug) console.log('RESETTING PROGRAMS');
 		Object.keys(this.programs).forEach(groupKey => {
 			for(let program of this.programs[groupKey]) {
 				program.destroy();
@@ -105,6 +108,7 @@ export default class Processor {
 	}
 
 	resetFramebuffers() {
+		if(this.debug) console.log('RESETTING FRAMEBUFFERS');
 		this.currentFramebufferIndex = -1;
 		for(let framebuffer of this.framebuffers) {
 			framebuffer.destroy();
@@ -113,18 +117,20 @@ export default class Processor {
 	}
 
 	resizeAll(width = this.canvasWidth, height = this.canvasHeight) {
-		console.log('RESIZING VIEWPORT, PROGRAMS AND FRAMEBUFFERS', width, height);
+		// if(this.debug) console.log('RESIZING VIEWPORT, PROGRAMS AND FRAMEBUFFERS', width, height);
 		this.resizeViewport(width, height);
 		this.resizePrograms(width, height);
 		this.resizeFramebuffers(width, height);
 	}
 
 	resizeViewport(width = this.canvasWidth, height = this.canvasHeight) {
+		if(this.debug) console.log('RESIZING VIEWPORT');
 		if(this.IS_NODE) this.EXT_resize.resize(width, height);
 		this.gl.viewport(0, 0, width, height);
 	}
 
 	resizePrograms(width = this.canvasWidth, height = this.canvasHeight) {
+		if(this.debug) console.log('RESIZING PROGRAMS');
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
 		if(this.blendProgram) this.blendProgram.resize(width, height);
 		Object.keys(this.programs).forEach(groupKey => {
@@ -135,17 +141,18 @@ export default class Processor {
 	}
 
 	resizeFramebuffers(width = this.canvasWidth, height = this.canvasHeight) {
+		if(this.debug) console.log('RESIZING FRAMEBUFFERS');
 		for(let i = 0; i < this.framebuffers.length; i ++) {
 			this.framebuffers[i].resizeTexture(width, height);
 		}
 		this.editGroupFramebuffer.resizeTexture(width, height);
 	}
 
-	renderEditSteps(_instructions = this.instructions || []) {
+	renderInstructions(_instructions = this.instructions || []) {
+		if(this.debug) console.log('RENDERING INSTRUCTIONS');
 
 		// inject default shader as first render step of first edit group - settings
 		const instructions = [{name: 'preRender', steps: [{key: 'default'}]}, ..._instructions].filter(group => group.steps && group.steps.length > 0);
-		// const steps = [{key: 'default'}, ...editSteps];
 
 		let totalStepCount = -1;
 		let lastProgram = null;
@@ -192,8 +199,11 @@ export default class Processor {
 						this.currentFramebufferIndex = (this.currentFramebufferIndex+1)%2;
 						target = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
-					if(count >= steps.length-1 && iteration >= iterations-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
-					if(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1) console.log('AND FINAL RENDER TARGET FOR', groupName, target);
+
+					if(this.debug) {
+						if(count >= steps.length-1 && iteration >= iterations-1) console.log('LAST STEP RENDER TARGET FOR', groupName, target);
+						if(count >= steps.length-1 && groupCount >= instructions.length-1 && iteration >= iterations-1) console.log('AND FINAL RENDER TARGET FOR', groupName, target);
+					}
 
 					// pre-render calcs idk
 					program.willRender();
@@ -214,8 +224,8 @@ export default class Processor {
 				// if last edit step of group and next group has an 'amount' value then store current image in seperate framebuffer for later blending
 				if(count >= steps.length-1 && groupCount < instructions.length-1 && ('amount' in instructions[groupCount+1])) {
 					
-					console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
-					console.log('NEXT EDIT STEP IS', instructions[groupCount+1].name)
+					if(this.debug) console.log('STORING IMAGE OF FINAL EDIT STEP FOR', groupName);
+					if(this.debug) console.log('NEXT EDIT STEP IS', instructions[groupCount+1].name)
 					this.editGroupFramebuffer.use();
 					program.draw();
 				}
@@ -224,7 +234,7 @@ export default class Processor {
 				
 				// if last edit step of group and group needs to blend with last group then do that
 				if(groupCount > 0 && count >= steps.length-1 && ('amount' in group)) {
-					console.log('APPLY GROUP EDITS OPACITY', group.amount);
+					if(this.debug) console.log('APPLY GROUP EDITS OPACITY', group.amount);
 					
 					const sourceTexture = this.getTempFramebuffer(this.currentFramebufferIndex).texture;
 
@@ -234,7 +244,7 @@ export default class Processor {
 						blendTarget = this.getTempFramebuffer(this.currentFramebufferIndex).id;
 					}
 
-					console.log('BLEND STEP RENDER TARGET', blendTarget);
+					if(this.debug) console.log('BLEND STEP RENDER TARGET', blendTarget);
 
 					this.blendProgram.use();
 					this.blendProgram.update({

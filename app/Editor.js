@@ -512,7 +512,7 @@ export default class Editor extends Component {
 				<div className="main-window" ref="mainWindow">
 					<FileDropzone onFilesReceived={::this.handleReceivedFile}>
 						<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
-							<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize />
+							<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize debug />
 							{cropping && <Cropper width={cropperWidth} height={cropperHeight} onApply={::this.handleCrop} fixedRatio={ratio} onChange={crop => this.crop = crop} defaultCrop={this.crop} />}
 						</div>
 					</FileDropzone>

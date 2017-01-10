@@ -27,6 +27,7 @@ export default class Editor extends Component {
 		onRender: () => {},
 		autoResize: false,
 		instructions: [],
+		debug: false,
 	};
 
 	constructor(props) {
@@ -39,8 +40,9 @@ export default class Editor extends Component {
 	}
 
 	componentDidMount() {
-		const { width, height, canvasWidth, canvasHeight, url } = this.props;
+		const { width, height, canvasWidth, canvasHeight, url, debug } = this.props;
 
+		this.debug = debug;
 		this.image = new Image();
 		this.image.onload = () => this.handleImageLoad(this.image);
 
@@ -50,6 +52,7 @@ export default class Editor extends Component {
 
 		this.Processor = new Processor(this.gl, this.props.instructions);
 		this.Processor.setCanvasSize(canvasWidth, canvasHeight);
+		this.Processor.debug = debug;
 
 		if(url) {
 			this.loadImage(url);
@@ -75,7 +78,7 @@ export default class Editor extends Component {
 
 			// update canvas size if props changed
 			if(resized) {
-				console.log('CANVAS SIZE CHANGED', nextProps.canvasWidth, nextProps.canvasHeight);
+				if(this.debug) console.info('CANVAS SIZE CHANGED', nextProps.canvasWidth, nextProps.canvasHeight);
 				this.refs.editor.width = nextProps.canvasWidth;
 				this.refs.editor.height = nextProps.canvasHeight;
 				this.Processor.setCanvasSize(nextProps.canvasWidth, nextProps.canvasHeight);
@@ -85,55 +88,58 @@ export default class Editor extends Component {
 			// part of this means it will re-set all the relevant sizes to match canvas size props
 			if(editStepsKeys.join(',') !== this.lastEditStepsKeys.join(',')) {
 				
-				console.log('NEW EDIT STEPS', editStepsKeys.join(','), this.lastEditStepsKeys.join(','));
+				if(this.debug) console.info('NEW EDIT STEPS', editStepsKeys.join(','), this.lastEditStepsKeys.join(','));
 				this.lastEditStepsKeys = editStepsKeys;
 				this.Processor.setInstructions(nextProps.instructions);
 				this.Processor.buildPrograms();
 				this.Processor.resizeAll();
-				this.Processor.renderEditSteps();
+				this.Processor.renderInstructions();
 
 			// do a deep check to see if edit step params have changed since last time in order to re-render
 			}else if(!deepEqual(this.props.instructions, nextProps.instructions)) {
 
 				// however if it's resized, wait until props have updated
 				if(resized) {
-					console.log('IMAGE CHANGED SO RESIZING ALL');
+					if(this.debug) console.info('IMAGE CHANGED SO RESIZING ALL');
 					this.Processor.resizeAll();
 				}
-				console.log('NEW EDIT STEP PARAM CHANGES');
-				this.Processor.renderEditSteps(nextProps.instructions);
+				if(this.debug) console.info('NEW EDIT STEP PARAM CHANGES');
+				this.Processor.renderInstructions(nextProps.instructions);
 
 			}else if(resized && this.waitingForRender) {
-				console.log('RENDERING AFTER IMAGE LOADED AND SIZE UPDATED')
+
+				if(this.debug) console.info('RENDERING AFTER IMAGE LOADED AND SIZE UPDATED')
 				this.Processor.setInstructions(nextProps.instructions);
 				this.Processor.buildPrograms();
 				this.Processor.resizeAll();
-				this.Processor.renderEditSteps();
+				this.Processor.renderInstructions();
 				this.waitingForRender = false;
 			}
+
+			if(this.debug) console.log('-------------------------');
 		}
 	}
 
 	loadImage(url) {
-		if(url.indexOf('data:') < 0) console.log('loading', url);
+		if(this.debug && url.indexOf('data:') < 0) console.log('loading', url);
 		this.image.src = url;
 	}
 
 	handleImageLoad(image) {
 		// log the image url if it's not a data uri
-		if(this.props.url.indexOf('data:') < 0) console.log(this.props.url, 'loaded');
+		if(this.debug && this.props.url.indexOf('data:') < 0) console.log(this.props.url, 'loaded');
 
 		// for thumbnails that won't be updated
 		if(!this.props.autoResize) {
 			this.Processor.imageLoaded(image, this.props.width, this.props.height);
 			this.Processor.buildPrograms();
 			this.Processor.resizeAll();
-			this.Processor.renderEditSteps();
+			this.Processor.renderInstructions();
 
 		// for main renderer
 		}else{
 			this.Processor.imageLoaded(image, image.width, image.height);
-			this.Processor.buildPrograms();
+			// this.Processor.buildPrograms();
 
 			this.waitingForRender = true;
 			this.props.onResize(image.width, image.height);

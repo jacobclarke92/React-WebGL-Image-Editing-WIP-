@@ -101,7 +101,7 @@ if(gl == null) {
 		console.log('----------\nAfter programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
-		ImageProcessor.renderEditSteps();
+		ImageProcessor.renderInstructions();
 		console.log('----------\nAfter render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
