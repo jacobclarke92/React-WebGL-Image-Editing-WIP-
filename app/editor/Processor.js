@@ -53,8 +53,13 @@ export default class Processor {
 
 		// (re)set default starting program
 		if(this.defaultProgram) this.defaultProgram.destroy();
-		if(this.IS_NODE) this.defaultProgram = new Program('default_node', this.gl, Shaders.default_node.vertex, Shaders.default_node.fragment, Shaders.default_node.update);
-		else this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
+		this.defaultProgram = new Program('default', this.gl, Shaders.default.vertex, Shaders.default.fragment, Shaders.default.update);
+		
+		// (re)set node program
+		if(this.IS_NODE) {
+			if(this.flipProgram) this.flipProgram.destroy();
+			this.flipProgram = new Program('flip', this.gl, Shaders.flip.vertex, Shaders.flip.fragment, Shaders.flip.update);
+		}
 		
 	}
 
@@ -100,6 +105,7 @@ export default class Processor {
 		})
 		this.programs = {};
 		if(this.blendProgram) {
+			if(this.debug) console.log('destroying program', this.blendProgram.label);
 			this.blendProgram.destroy();
 			this.blendProgram = null;
 		}
@@ -130,6 +136,7 @@ export default class Processor {
 	resizePrograms(width = this.canvasWidth, height = this.canvasHeight) {
 		if(this.debug) console.log('RESIZING PROGRAMS');
 		if(this.defaultProgram) this.defaultProgram.resize(width, height);
+		if(this.flipProgram) this.flipProgram.resize(width, height);
 		if(this.blendProgram) this.blendProgram.resize(width, height);
 		Object.keys(this.programs).forEach(groupKey => {
 			for(let program of this.programs[groupKey]) {
@@ -152,6 +159,9 @@ export default class Processor {
 		// inject default shader as first render step of first edit group - settings
 		const instructions = [{name: 'preRender', steps: [{key: 'default'}]}, ..._instructions].filter(group => group.steps && group.steps.length > 0);
 
+		// if rendering on node, add a flip program as a last step .. because reasons
+		if(this.IS_NODE) instructions.push({name:'postRender', steps: [{key:'flip'}]});
+
 		let totalStepCount = -1;
 		let lastProgram = null;
 
@@ -166,8 +176,13 @@ export default class Processor {
 				const step = steps[count];
 				totalStepCount ++;
 
+
 				// select the correct program, if first, select the default injected shader from above
-				const program = totalStepCount === 0 ? this.defaultProgram : this.programs[groupName][count];
+				let program = null;
+				if(totalStepCount === 0) program = this.defaultProgram;
+				else if(groupName == 'postRender' && step.key == 'flip') program = this.flipProgram;
+				else program = this.programs[groupName][count];
+
 				lastProgram = program;
 
 				// switch to program

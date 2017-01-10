@@ -1,5 +1,4 @@
 import default_vertex from './default_vertex.glsl'
-import default_vertex_node from './default_vertex_node.glsl'
 import default_fragment from './default_fragment.glsl'
 import default_update from './default_update'
 import filter_vertex from './filter_vertex.glsl'
@@ -19,6 +18,7 @@ import colorMap_fragment from './colorMap_fragment.glsl'
 import colorMatrix_update from './colorMatrix_update'
 import colorMatrix_fragment from './colorMatrix_fragment.glsl'
 import denoise_fragment from './denoise_fragment.glsl'
+import flip_fragment from './flip_fragment.glsl'
 import gamma_fragment from './gamma_fragment.glsl'
 import grain_fragment from './grain_fragment.glsl'
 import HSL_update from './HSL_update'
@@ -39,12 +39,6 @@ const Shaders = {
 		vertex: default_vertex,
 		fragment: default_fragment,
 	},
-	default_node: {
-		update: default_update,
-		vertex: default_vertex_node,
-		fragment: default_fragment,
-	},
-
 	rotate: {
 		update: default_update,
 		vertex: filter_vertex,
@@ -95,6 +89,11 @@ const Shaders = {
 		update: default_update,
 		vertex: filter_vertex,
 		fragment: denoise_fragment,
+	},
+	flip: {
+		update: default_update,
+		vertex: filter_vertex,
+		fragment: flip_fragment,
 	},
 	gamma: {
 		update: default_update,
