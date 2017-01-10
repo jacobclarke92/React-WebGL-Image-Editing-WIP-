@@ -211,16 +211,24 @@ const hslLabels = Object.keys(hslAdjustmentColors);
 
 export default class Editor extends Component {
 
+	static defaultProps = {
+		renderThumbnails: true,
+		adjustments: {},
+	};
+
 	constructor(props) {
 		super(props);
 		this.urls = ['test1.png', 'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test6.jpg', 'test7.jpg', 'test8.jpg', 'test9.jpg'];
 
 		// generate initial slider values
-		const adjustments = {curves: []};
-		tonalAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
-		enhancementAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
-		curveAdjustmentProperties.map(effect => adjustments[effect.label] = effect.defaultValue);
+		let adjustments = {};
+		tonalAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
+		enhancementAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
+		curveAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
 		adjustments[colorMapAdjustment.label] = colorMapAdjustment.defaultValue;
+
+		// merge default adjustments with any adjustments provided
+		adjustments = {...adjustments, ...props.adjustments};
 
 		const instructions = [
 			{name: 'utility', steps: []},
@@ -535,7 +543,11 @@ export default class Editor extends Component {
 							</button>
 							{filterPresets.map((filterPreset, i) => (
 								<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>
-									<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} canvasWidth={thumbnailWidth} canvasHeight={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
+									{this.props.renderThumbnails ? (
+										<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} canvasWidth={thumbnailWidth} canvasHeight={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
+									) : (
+										<img src={url} width={thumbnailWidth} height={thumbnailHeight} />
+									)}
 									<br />
 									<label>{filterPreset.title}</label>
 									{filterPreset.name === filterName && <RCSlider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} />}
