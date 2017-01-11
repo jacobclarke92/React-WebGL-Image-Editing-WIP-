@@ -553,7 +553,9 @@ export default class Editor extends Component {
 									)}
 									<br />
 									<label>{filterPreset.title}</label>
-									{filterPreset.name === filterName && <Slider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} />}
+									{filterPreset.name === filterName && 
+										<Slider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} tipFormatter={decimalPercentFormatter} />
+									}
 								</button>
 							))}
 						</div>

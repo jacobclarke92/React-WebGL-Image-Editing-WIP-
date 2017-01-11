@@ -264,6 +264,10 @@ button:disabled, .button:disabled {
     border: 1px solid #333;
 }
 
+button .rc-slider {
+	margin-left: 0;
+}
+
 .dropzone {
 	position: relative;
   top: 50%;
