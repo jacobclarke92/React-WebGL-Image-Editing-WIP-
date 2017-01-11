@@ -1,11 +1,11 @@
 import React, { PropTypes, Component } from 'react'
 import ReactDOM from 'react-dom'
-import Tabs, { Panel } from 'react-simpletabs'
 import Textarea from 'react-textarea-autosize'
 import throttle from 'lodash/throttle'
 import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
+import Tabs, { Panel } from './Tabs'
 import Cropper from './Cropper'
 import FileDropzone from './FileDropzone'
 import CurveCreator from './CurveCreator'
