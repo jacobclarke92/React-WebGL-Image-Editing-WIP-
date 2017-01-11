@@ -547,7 +547,7 @@ export default class Editor extends Component {
 							{filterPresets.map((filterPreset, i) => (
 								<button key={i} onClick={() => this.setFilter(filterPreset)} disabled={filterPreset.name === filterName}>
 									{this.props.renderThumbnails ? (
-										<Renderer url={url} width={thumbnailWidth} height={thumbnailHeight} canvasWidth={thumbnailWidth} canvasHeight={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
+										<Renderer url={url.split('.').join('_thumb.')} width={thumbnailWidth} height={thumbnailHeight} canvasWidth={thumbnailWidth} canvasHeight={thumbnailHeight} instructions={[ { name: 'adjustments', steps: this.generateEditStepsFromFilterPreset(filterPreset) } ]} onRender={() => console.log(filterPreset.title, 'rendered!')} />
 									) : (
 										<img src={url} width={thumbnailWidth} height={thumbnailHeight} />
 									)}
