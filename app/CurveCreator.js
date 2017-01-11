@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react'
-import _throttle from 'lodash/throttle'
 import deepEqual from 'deep-equal'
+import _find from 'lodash/find'
+import _throttle from 'lodash/throttle'
 
 import { clamp } from './editor/utils/mathUtils'
 import { curvesHashTable } from './editor/utils/colorUtils'
 import { getElementMousePosition } from './utils/domUtils'
+import { isShiftKeyPressed } from './utils/selectKeyUtils'
 
 let counter = 0;
 
@@ -32,6 +34,7 @@ export default class CurveCreator extends Component {
 		super(props);
 		this.ctx = null;
 		this.currentPointId = null;
+		this.lastMousePosition = null;
 		this.capturingMouseMove = false;
 		this.handleCallback = _throttle(this.handleCallback, props.throttle);
 		this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -80,15 +83,24 @@ export default class CurveCreator extends Component {
 	handleMouseMove(event) {
 		if(this.capturingMouseMove) {
 			const mousePosition = getElementMousePosition(event, this.refs.curveCreator);
+			const newPointPosition = {...mousePosition};
+
+			// check if shift key is down for fine-precision adjustments
+			if(isShiftKeyPressed()) {
+				const oldPointPosition = _find(this.state.points, {id: this.currentPointId});
+				newPointPosition.x = oldPointPosition.x + (mousePosition.x - this.lastMousePosition.x)/5;
+				newPointPosition.y = oldPointPosition.y + (mousePosition.y - this.lastMousePosition.y)/5;
+			}
+
+			this.lastMousePosition = mousePosition;
+
 
 			// clamp point position inside grid
-			mousePosition.x = clamp(mousePosition.x, 0, this.props.size);
-			mousePosition.y = clamp(mousePosition.y, 0, this.props.size);
+			newPointPosition.x = clamp(newPointPosition.x, 0, this.props.size);
+			newPointPosition.y = clamp(newPointPosition.y, 0, this.props.size);
 			
-			const points = this.state.points.map(point => {
-				if(point.id == this.currentPointId) point = {...point, ...mousePosition};
-				return point;
-			});
+			const points = this.state.points.map(point => point.id == this.currentPointId ? {...point, ...newPointPosition} : point);
+
 			this.setState({points}, () => {
 				this.handleCallback(points.map(point => [point.x, point.y]));
 			});
@@ -96,10 +108,15 @@ export default class CurveCreator extends Component {
 	}
 
 	handleNewMouseDown(event) {
-		this.capturingMouseMove = true;
+
+		// get relative mouse position and set last mouse position to that
 		const mousePosition = getElementMousePosition(event, this.refs.curveCreator);
+		this.capturingMouseMove = true;
+		this.lastMousePosition = mousePosition;
+
 		const { points } = this.state;
 		points.push({id: ++counter, ...mousePosition});
+		
 		this.currentPointId = counter;
 		console.log('Created new point', mousePosition);
 
@@ -108,9 +125,10 @@ export default class CurveCreator extends Component {
 		this.handleMouseMove(event);
 	}
 
-	handlePointMouseDown(event, id) {
+	handlePointMouseDown(event, point) {
 		this.capturingMouseMove = true;
-		this.currentPointId = id;
+		this.currentPointId = point.id;
+		this.lastMousePosition = {x: point.x, y: point.y};
 		event.stopPropagation();
 	}
 
@@ -163,7 +181,7 @@ export default class CurveCreator extends Component {
 					<div key={i} 
 						className="curve-point"
 						style={{left: point.x, top: point.y}} 
-						onMouseDown={event => this.handlePointMouseDown(event, point.id)}
+						onMouseDown={event => this.handlePointMouseDown(event, point)}
 						onDoubleClick={event => this.handlePointDelete(point.id)}
 						data-label={Math.round(point.x/size * outputSize) + ', ' + Math.round((size-point.y)/size * outputSize)} />
 				)}
