@@ -2,10 +2,10 @@ import React, { PropTypes, Component } from 'react'
 import ReactDOM from 'react-dom'
 import Textarea from 'react-textarea-autosize'
 import throttle from 'lodash/throttle'
-import RCSlider from 'rc-slider'
 import titleize from 'titleize'
 
 import Tabs, { Panel } from './Tabs'
+import Slider from './Slider'
 import Cropper from './Cropper'
 import FileDropzone from './FileDropzone'
 import CurveCreator from './CurveCreator'
@@ -121,6 +121,7 @@ const enhancementAdjustmentProperties = [
 		max: 20,
 		step: 0.2,
 		defaultValue: 0,
+		debounce: 150,
 		tipFormatter: value => percentFormatter(value*5),
 	},
 	{
@@ -552,7 +553,7 @@ export default class Editor extends Component {
 									)}
 									<br />
 									<label>{filterPreset.title}</label>
-									{filterPreset.name === filterName && <RCSlider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} />}
+									{filterPreset.name === filterName && <Slider value={filterAmount} onChange={value => this.updateFilterBlend(value)} min={0} max={1} step={0.05} />}
 								</button>
 							))}
 						</div>
@@ -568,7 +569,7 @@ export default class Editor extends Component {
 										return (
 											<label key={'tonal'+i}>
 												<div>{titleize(label)}</div>
-												<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
+												<Slider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} />
 											</label>
 										)
 									})}
@@ -594,7 +595,7 @@ export default class Editor extends Component {
 										return (
 											<label key={'enhancement'+i}>
 				                                <div>{titleize(label)}</div>
-												<RCSlider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} included={inputAttrs.min < 0} marks={inputAttrs.defaultValue > inputAttrs.min ? {[inputAttrs.defaultValue]: inputAttrs.defaultValue} : {}} />
+												<Slider {...inputAttrs} value={adjustments[key]} onChange={value => this.setValue(key, value)} />
 											</label>
 										)
 									})}
@@ -624,7 +625,7 @@ export default class Editor extends Component {
 													<label key={c}>
 														<div>{titleize(hslColor)+'s'}</div>
 														<div className="rc-custom" style={{color: 'rgb('+hslAdjustmentColors[hslColor].join(',')+')'}}>
-															<RCSlider value={this.state[hslTitle+'_'+hslColor] || 0} min={-1} max={1} step={0.01} onChange={value => {
+															<Slider value={this.state[hslTitle+'_'+hslColor] || 0} min={-1} max={1} step={0.01} onChange={value => {
 																this.setValue(hslTitle+'Adjustment', {color: hslAdjustmentColors[hslColor], value});
 																this.setState({[hslTitle+'_'+hslColor]: value});
 															}} />
@@ -651,12 +652,12 @@ export default class Editor extends Component {
 						</div>
 						<div className="text-center">
 							{DEV && 
-							<div className="input" style={{marginBottom: 30}}>
-								<label>Terminal command</label>
-								<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
-								<label>Server command</label>
-								<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
-							</div>
+								<div className="input" style={{marginBottom: 30}}>
+									<label>Terminal command</label>
+									<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+									<label>Server command</label>
+									<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+								</div>
 							}
 							<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(instructions, null, '\t'))} download="preset.json">Download preset</a>
 						</div>
