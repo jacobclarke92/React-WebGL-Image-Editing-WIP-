@@ -14,16 +14,15 @@ I've also created a node script to that uses headless-gl to render edits so it c
 
 For a start node.js + npm is requied.
 
-You'll probably need to install webpack globally:  
-(unless your bash profile contains `./node_modules/`)
-
-`npm install -g webpack webpack-dev-server`
-
-Also babel-cli if you plan on using the node.js renderer
+You'll probably need to install `babel-cli` globally if you plan on using the nodeJS server renderer
 
 `npm install -g babel-cli`
 
-Then navigate to project directory and install npm dependencies
+In addition to this the nodeJS renderer relies on `node-canvas` dependencies which can be installed by running
+
+`chmod +x ./preinstall.sh && ./preinstall.sh`
+
+Then do the standard
 
 `npm install`
 
@@ -54,13 +53,13 @@ All of the core shader effects can be found in `editor/shaders/index.js`
 
 ## Serverside
 
-While totally optional the nodeJS renderer offers an alternative using a GUI. It takes input, output and editSteps as JSON strong. The major advantage of using nodeJS is that I'm able to uuse the same WebGL render code as in the front-end to create identical results. 
+While totally optional the nodeJS renderer offers an alternative using a GUI. It takes input, output and `instructions` as JSON string. The major advantage of using nodeJS is that I'm able to use the same WebGL render code as in the front-end to create identical results. 
 
 As mentioned above a global install of babel-cli is required to run the node script.
 
 An example of what a command might look like is
 
-`babel-node backend/index.js input=test1.jpg output=test1_processed.jpg editSteps="[{\"key\":\"gamma\",\"value\":0.42}]"`
+`sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ./backend/index.js input=test_image.jpg instructions="[{\"name\":\"adjustments\",\"steps\":[{\"key\":\"gamma\",\"value\":2.1}]}]"`
 
 
 ## WebGL
@@ -71,7 +70,7 @@ These classes are still in flux and I'll keep editing them as needs arise.
 The main classes are currently:
 - Program
 - Texture
-- FramebufferTexture
+- Framebuffer
 
 #### Program
 
@@ -82,7 +81,6 @@ The Program class takes on a gl instance and has basic functions such as:
 - resize
 
 Two of its functions 'uniforms' and 'textures' were borrowed from glfx.js's core 'shader.js' class, and are used to update uniforms and texture uniforms.  
-I use them minimally and they're something I need to look into more and possibly refactor.  
 The other functions get executed in this order and require a bit more understanding on my part:
 - 'update' uniforms
 - 'willRender'

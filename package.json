@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preinstall": "chmod +x ./preinstall.sh && ./preinstall.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dev_server.js",
     "watch": "webpack -d --watch --progress",
