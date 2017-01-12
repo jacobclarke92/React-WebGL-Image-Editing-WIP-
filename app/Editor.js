@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import ReactDOM from 'react-dom'
 import Textarea from 'react-textarea-autosize'
+import classNames from 'classnames'
 import throttle from 'lodash/throttle'
 import titleize from 'titleize'
 
@@ -245,6 +246,7 @@ export default class Editor extends Component {
 		
 		this.state = {
 			url: this.urls[Math.floor(Math.random()*this.urls.length)],
+			loadingImage: true,
 			width: 550,
 			height: 400,
 			canvasWidth: 550,
@@ -272,7 +274,7 @@ export default class Editor extends Component {
 
 	handleImageResize(width, height) {
 		console.log('UPDATING DIMENSIONS', width, height);
-		this.setState({width, height, canvasWidth: width, canvasHeight: height});
+		this.setState({width, height, canvasWidth: width, canvasHeight: height, loadingImage: false});
 	}
 
 	// Reset adjustments and filter
@@ -288,7 +290,7 @@ export default class Editor extends Component {
 
 	// Update image url
 	setUrl(url) {
-		this.setState({url});
+		this.setState({url, loadingImage: true});
 	}
 
 	// Update adjustment value
@@ -512,17 +514,19 @@ export default class Editor extends Component {
 	}
 
 	render() {
-		const { url, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName, cropping, ratio, mainWidth } = this.state;
+		const { url, loadingImage, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName, cropping, ratio, mainWidth } = this.state;
 		const filterAmount = _find(instructions, {name: 'filter'}).amount;
 
 		const cropperWidth = canvasWidth > mainWidth ? mainWidth : canvasWidth;
 		const cropperHeight = canvasWidth > mainWidth ? (canvasHeight/canvasWidth*mainWidth) : canvasHeight;
 
+		const instructionsJSON = JSON.stringify(instructions).split('"').join('\\"');
+
 		return (
 			<div className="image-editor">
 				<div className="main-window" ref="mainWindow">
 					<FileDropzone onFilesReceived={::this.handleReceivedFile}>
-						<div className="canvas-wrapper" style={{backgroundImage:'url('+url+')', maxWidth: width}}>
+						<div className={classNames('canvas-wrapper', loadingImage && 'loading')} style={{backgroundImage:'url('+url+')', maxWidth: width}}>
 							<Renderer url={url} width={width} height={height} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onResize={::this.handleImageResize} instructions={instructions} autoResize debug />
 							{cropping && <Cropper width={cropperWidth} height={cropperHeight} onApply={::this.handleCrop} fixedRatio={ratio} onChange={crop => this.crop = crop} defaultCrop={this.crop} />}
 						</div>
@@ -656,9 +660,9 @@ export default class Editor extends Component {
 							{DEV && 
 								<div className="input" style={{marginBottom: 30}}>
 									<label>Terminal command</label>
-									<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+									<Textarea value={'babel-node backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+instructionsJSON+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 									<label>Server command</label>
-									<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ~/imaging/backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+JSON.stringify(instructions).split('"').join('\\"')+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
+									<Textarea value={'sudo xvfb-run -s "-ac -screen 0 1x1x24" babel-node ./backend/index.js input='+(url.indexOf('data:') === 0 ? '[[filepath]]' : url)+' instructions="'+instructionsJSON+'"'} readOnly onClick={event => {event.target.focus(); event.target.select()}} />
 								</div>
 							}
 							<a className="button" href={'data:text/plain,'+encodeURIComponent(JSON.stringify(instructions, null, '\t'))} download="preset.json">Download preset</a>
