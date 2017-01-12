@@ -7,3 +7,6 @@ cache/downloads/*
 react-webgl-image-editing.sublime-project
 react-webgl-image-editing.sublime-workspace
 *_processed.**
+
+api/config/*
+!api/config/*.default
