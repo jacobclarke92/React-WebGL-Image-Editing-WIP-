@@ -1,4 +1,6 @@
-// based on this http://thejackalofjavascript.com/architecting-a-restful-node-js-app/
+// based on this: http://thejackalofjavascript.com/architecting-a-restful-node-js-app/
+// for reference: http://docs.aws.amazon.com/autoscaling/latest/userguide/as-using-sqs-queue.html
+// for reference: http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features-managing-env-tiers.html
 
 import path from 'path'
 import express from 'express'
