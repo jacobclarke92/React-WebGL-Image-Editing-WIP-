@@ -267,6 +267,7 @@ export default class Editor extends Component {
 			filterName: null,
 			cropping: false,
 			ratio: null,
+			hideSteps: true,
 			mainWidth: window.innerWidth * 0.6,
 		}
 
@@ -526,7 +527,7 @@ export default class Editor extends Component {
 	}
 
 	render() {
-		const { url, loadingImage, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName, cropping, ratio, mainWidth } = this.state;
+		const { url, loadingImage, width, height, canvasWidth, canvasHeight, adjustments, instructions, filterName, cropping, ratio, mainWidth, hideSteps } = this.state;
 		const filterAmount = _find(instructions, {name: 'filter'}).amount;
 
 		const cropperWidth = canvasWidth > mainWidth ? mainWidth : canvasWidth;
@@ -544,6 +545,17 @@ export default class Editor extends Component {
 						</div>
 					</FileDropzone>
 				</div>
+				
+				{!hideSteps && 
+					<div className="steps-window">
+						<ol>
+							{Object.keys(adjustments).filter(key => adjustments[key] && !deepEqual(adjustments[key], this.defaultAdjustments[key])).map(key => 
+								<li key={key}>{titleize(key)}</li>
+							)}
+						</ol>
+					</div>
+				}
+				<button className="steps-toggle" onClick={e => this.setState({hideSteps: !hideSteps})}>{hideSteps ? 'Show' : 'Hide'} Steps</button>
 				<div className="tray">
 					<div className="tray-inner">
 
