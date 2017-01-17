@@ -52,6 +52,61 @@
 		]
 	},
 	{
+		"name": "fluDreams",
+		"title": "Flu Dreams",
+		"steps": [
+			{
+				"key": "colorMap",
+				"value": [
+					{
+						"id": 91,
+						"position": 0.086015625,
+						"color": [0, 0, 0],
+						"alpha": 1
+					},
+					{
+						"id": 92,
+						"position": 0.406015625,
+						"color": [127, 127, 127],
+						"alpha": 1
+					},
+					{
+						"id": 93,
+						"position": 1,
+						"color": [255, 255, 255],
+						"alpha": 1
+					}
+				]
+			},
+			{
+				"key": "colorMatrix",
+				"matrix": [1,0,0,0,0,0,0.9620226470243116,0,0,0,0,0,0.9233239558953822,0,0,0,0,0,1,0]
+			},
+			{
+				"key": "curves",
+				"value": {
+					"channels": "rgb",
+					"curves": [
+						[0,0],
+						[75,48],
+						[180,207],
+						[255,255]
+					]
+				}
+			},
+			{
+				"key": "curves",
+				"value": {
+					"channels": "rgb",
+					"curves": [
+						[0,43],
+						[255,233.5]
+					]
+				}
+			}
+		]
+	},
+	{
 		"name": "harshSunset",
 		"title": "Harsh Sunset",
 		"steps": [  
