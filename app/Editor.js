@@ -535,6 +535,8 @@ export default class Editor extends Component {
 
 		const instructionsJSON = JSON.stringify(instructions).split('"').join('\\"');
 
+		const adjustmentKeys = Object.keys(adjustments).filter(key => adjustments[key] && !deepEqual(adjustments[key], this.defaultAdjustments[key]));
+
 		return (
 			<div className="image-editor">
 				<div className="main-window" ref="mainWindow">
@@ -548,11 +550,15 @@ export default class Editor extends Component {
 				
 				{!hideSteps && 
 					<div className="steps-window">
-						<ol>
-							{Object.keys(adjustments).filter(key => adjustments[key] && !deepEqual(adjustments[key], this.defaultAdjustments[key])).map(key => 
-								<li key={key}>{titleize(key)}</li>
-							)}
-						</ol>
+						{adjustmentKeys.length > 0 ? (
+							<ol>
+								{adjustmentKeys.map(key => 
+									<li key={key}>{titleize(key)}</li>
+								)}
+							</ol>
+						) : (
+							<p>No active adjustments</p>
+						)}
 					</div>
 				}
 				<button className="steps-toggle" onClick={e => this.setState({hideSteps: !hideSteps})}>{hideSteps ? 'Show' : 'Hide'} Steps</button>
