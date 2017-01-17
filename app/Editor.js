@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Textarea from 'react-textarea-autosize'
 import classNames from 'classnames'
 import throttle from 'lodash/throttle'
+import deepEqual from 'deep-equal'
 import titleize from 'titleize'
 
 import Tabs, { Panel } from './Tabs'
@@ -188,9 +189,9 @@ const curveAdjustmentProperties = [
 const levelsAdjustment = {
 	label: 'levels',
 	defaultValue: [
-		{position: 0, color: [0,0,0], alpha: 1},
-		{position: 0.5, color: [127,127,127], alpha: 1},
-		{position: 1, color: [255,255,255], alpha: 1},
+		{position: 0, color: [0,0,0], alpha: 1, id: 91},
+		{position: 0.5, color: [127,127,127], alpha: 1, id: 92},
+		{position: 1, color: [255,255,255], alpha: 1, id: 93},
 	],
 };
 
@@ -200,8 +201,8 @@ const colorMapAdjustment = {
 		// {position: 0, color: [10, 0, 178], alpha: 1},
 		// {position: 0.5, color: [255, 0, 0], alpha: 1},
 		// {position: 1, color: [255, 252, 0], alpha: 1},
-		{position: 0, color: [0,0,0], alpha: 0},
-		{position: 1, color: [0,0,0], alpha: 0},
+		{position: 0, color: [0,0,0], alpha: 0, id: 81},
+		{position: 1, color: [0,0,0], alpha: 0, id: 82},
 	],
 };
 
@@ -453,13 +454,14 @@ export default class Editor extends Component {
 		Object.keys(adjustments).map(adjustment => {
 			const adjustmentValue = adjustments[adjustment];
 			const adjustmentProperties = [
+				levelsAdjustment,
 				...tonalAdjustmentProperties, 
 				...enhancementAdjustmentProperties, 
 				...curveAdjustmentProperties,
 				colorMapAdjustment,
 			];
 			const adjustmentProperty = adjustmentProperties.filter(property => property.label === adjustment)[0];
-			if(!adjustmentProperty || (adjustmentProperty && adjustmentValue !== adjustmentProperty.defaultValue)) {
+			if(!adjustmentProperty || (adjustmentProperty && !deepEqual(adjustmentValue, adjustmentProperty.defaultValue))) {
 				const realKey = (adjustment.indexOf('_unique') > 0) ? adjustment.split('_unique')[0] : adjustment;
 				editSteps.push(Filters[realKey](adjustmentValue));
 			}
