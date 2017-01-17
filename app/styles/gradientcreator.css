@@ -33,7 +33,7 @@
 	margin: 10px 0 0 -6px;
 }
 
-.gradient-marker:after{
+.gradient-marker:after {
 	content: '';
 	position: absolute;
 	bottom: 100%;
@@ -43,6 +43,17 @@
 	border-style: solid;
 	border-width: 0 5px 5px 5px;
 	border-color: transparent transparent #333c47 transparent;
+}
+
+.gradient-marker.show-label:before {
+	content: attr(data-label);
+	position: absolute;
+	top: calc(100% + 10px);
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 5px;
+	background-color: rgba(0,0,0,0.4);
+	color: white;
 }
 
 .marker-trigger {

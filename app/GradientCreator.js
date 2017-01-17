@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import ColorPicker from 'rc-color-picker'
-import _throttle from 'lodash/throttle'
+import throttle from 'lodash/throttle'
+import classNames from 'classnames'
 
 import Gradient from './Gradient'
 
@@ -16,6 +17,7 @@ export default class GradientCreator extends Component {
 		size: 400,
 		outputSize: 255,
 		throttle: 1000/50,
+		editable: true,
 	};
 
 	constructor(props) {
@@ -23,7 +25,7 @@ export default class GradientCreator extends Component {
 		this.capturingMouseMove = false;
 		this.hideCurrentMarker = false;
 		this.currentMarkerId = null;
-		this.handleCallback = _throttle(this.handleCallback, props.throttle);
+		this.handleCallback = throttle(this.handleCallback, props.throttle);
 		this.handleMouseMove = this.handleMouseMove.bind(this);
 		this.handleMouseUp = this.handleMouseUp.bind(this);
 
@@ -72,7 +74,9 @@ export default class GradientCreator extends Component {
 			// clamp point position inside grid
 			mousePosition.x = clamp(mousePosition.x, 0, this.props.size);
 
-			this.hideCurrentMarker = Math.abs(mousePosition.y) > 150;
+			if(this.props.editable) {
+				this.hideCurrentMarker = Math.abs(mousePosition.y) > 150;
+			}
 			
 			const markers = this.state.markers.map(marker => {
 				if(marker.id == this.currentMarkerId) marker.position = mousePosition.x/this.props.size;
@@ -85,6 +89,8 @@ export default class GradientCreator extends Component {
 	}
 
 	handleNewMouseDown(event) {
+		if(!this.props.editable) return;
+
 		this.capturingMouseMove = true;
 		const mousePosition = getElementMousePosition(event, this.refs.gradientCreator.refs.gradient);
 		
@@ -104,6 +110,7 @@ export default class GradientCreator extends Component {
 	}
 
 	handleMarkerDelete(id) {
+		if(!this.props.editable) return;
 		const markers = this.state.markers.filter(marker => marker.id !== id);
 		this.setState({markers});
 	}
@@ -121,7 +128,7 @@ export default class GradientCreator extends Component {
 	}
 
 	render() {
-		const { size } = this.props;
+		const { size, outputSize, editable } = this.props;
 		const markers = this.state.markers.filter(marker => (!this.hideCurrentMarker || marker.id !== this.currentMarkerId));
 		markers.sort((a,b) => a.position < b.position ? -1 : (a.position > b.position ? 1 : 0));
 		
@@ -129,19 +136,24 @@ export default class GradientCreator extends Component {
 			<Gradient ref="gradientCreator" width={size} markers={markers} onMouseDown={::this.handleNewMouseDown}>
 				{markers.map((marker, i) =>
 					<div key={i} 
-						className="gradient-marker" 
+						data-label={Math.round(marker.position*outputSize)}
+						className={classNames('gradient-marker', (this.capturingMouseMove && marker.id === this.currentMarkerId) && 'show-label')}
 						style={{left: marker.position*size, backgroundColor: 'rgb('+marker.color.join(',')+')'}} 
 						onClick={() => {}}
 						onDoubleClick={event => this.handleMarkerDelete(marker.id)}
 						onMouseDown={event => this.handleMarkerMouseDown(event, marker.id)}>
-						<ColorPicker 
-							placement="bottomLeft" 
-							defaultColor="#FFFFFF"
-							alpha={marker.alpha*100}
-							color={rgbToHex(marker.color)} 
-							onChange={value => this.updateColor(marker.id, hexToRgb(value.color), value.alpha)}>
+						{editable ? (
+							<ColorPicker 
+								placement="bottomLeft" 
+								defaultColor="#FFFFFF"
+								alpha={marker.alpha*100}
+								color={rgbToHex(marker.color)} 
+								onChange={value => this.updateColor(marker.id, hexToRgb(value.color), value.alpha)}>
+								<span className="marker-trigger" />
+							</ColorPicker>
+						) : (
 							<span className="marker-trigger" />
-						</ColorPicker>
+						)}
 					</div>
 				)}
 			</Gradient>

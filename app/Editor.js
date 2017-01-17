@@ -185,6 +185,15 @@ const curveAdjustmentProperties = [
 	},
 ];
 
+const levelsAdjustment = {
+	label: 'levels',
+	defaultValue: [
+		{position: 0, color: [0,0,0], alpha: 1},
+		{position: 0.5, color: [127,127,127], alpha: 1},
+		{position: 1, color: [255,255,255], alpha: 1},
+	],
+};
+
 const colorMapAdjustment = {
 	label: 'colorMap',
 	defaultValue: [
@@ -226,6 +235,7 @@ export default class Editor extends Component {
 
 		// generate initial slider values
 		let adjustments = {};
+		adjustments[levelsAdjustment.label] = levelsAdjustment.defaultValue;
 		tonalAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
 		enhancementAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
 		curveAdjustmentProperties.forEach(effect => adjustments[effect.label] = effect.defaultValue);
@@ -570,6 +580,10 @@ export default class Editor extends Component {
 						<Tabs>
 							<Panel title="Tonal">
 								<div className="sliders">
+									<label>
+										<div>Levels</div>
+										<GradientCreator value={adjustments['levels']} onChange={value => this.setValue('levels', value)} editable={false} />
+									</label>
 									{Object.keys(adjustments).filter(key => tonalPropertyLabels.indexOf(key) >= 0).map((key, i) => {
 										const { label, ...inputAttrs } = tonalAdjustmentProperties.filter(effect => effect.label === key)[0];
 										return (

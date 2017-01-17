@@ -16,6 +16,10 @@ export function colorMap(markers) {
 	}
 }
 
+export function levels(markers) {
+	return colorMap(markers);
+}
+
 export function temperature(amount) {
 
 	const {red, green, blue} = getTemperatureRGB(amount);
