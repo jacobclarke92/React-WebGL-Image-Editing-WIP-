@@ -73,7 +73,7 @@ if(gl == null) {
 		width = pixels.shape[0];
 		height = pixels.shape[1];
 
-		const utilitySteps = _find(rawInstructions, {name: 'utility'}).steps || [];
+		const utilitySteps = _find(rawInstructions, {name: 'utility'}, {}).steps || [];
 		const rotateStep = _find(utilitySteps, {key: 'rotate'});
 		const cropStep = _find(utilitySteps, {key: 'crop'});
 		
