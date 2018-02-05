@@ -1,10 +1,10 @@
 import fs from 'fs'
-import path from 'path'
+// import path from 'path'
 import _find from 'lodash/find'
 
 import OS from 'os'
 import ndarray from 'ndarray'
-import sizeOf from 'image-size'
+// import sizeOf from 'image-size'
 import getPixels from 'get-pixels'
 import savePixels from 'save-pixels'
 import GL from 'gl'
@@ -24,94 +24,92 @@ process.argv.slice(2).forEach(arg => {
 });
 
 
-let width = 10;
-let height = 10;
-let instructions = ('instructions' in args) ? JSON.parse(args.instructions) : [];
+export default class ProcessImage {
+	constructor() {
 
-const gl = GL(10, 10);
-const EXT_resize = gl.getExtension('STACKGL_resize_drawingbuffer');
-const ImageProcessor = new Processor(gl, instructions);
-ImageProcessor.debug = true;
-
-export class processImage {
-	constructor({buffer, instructions, callback, errorCallback}) {
-		
+		this.width = 10;
+		this.height = 10;
+		this.instructions = [];
+		this.gl = GL(10, 10);
+		this.ImageProcessor = new Processor(this.gl, this.instructions);
+		this.ImageProcessor.debug = true;
 	}
-}
+
+	processImage({buffer, instructions, contentType, contentLength, extension, callback, errorCallback}) {
+		this.ImageProcessor.setInstructions(instructions);
+		console.log(buffer, contentType)
+		getPixels(buffer, contentType, (err, pixels) => {
+			if(err) {
+				console.log('Error reading file', err);
+				errorCallback(err);
+				return;
+			}
+			console.log('Got pixels');
+			console.log('----------\nAfter pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+			lastTime = new Date().getTime();
+
+			this.width = pixels.shape[0];
+			this.height = pixels.shape[1];
+
+			const utilitySteps = _find(instructions, {name: 'utility'}, {}).steps || [];
+			const rotateStep = _find(utilitySteps, {key: 'rotate'});
+			const cropStep = _find(utilitySteps, {key: 'crop'});
+			
+			if(rotateStep && (rotateStep.value == 90 || rotateStep.value == 270)) {
+				this.width = pixels.shape[1];
+				this.height = pixels.shape[0];
+			}
+
+			if(cropStep && cropStep.value) {
+				this.width = Math.floor(this.width * cropStep.value.width);
+				this.height = Math.floor(this.height * cropStep.value.height);
+			}
 
 
-function saveImage() {
-	const pixels = new Uint8Array(width*height*4);
-	gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-	const extIndex = args.input.lastIndexOf('.');
-	const savePath = ('output' in args) ? args.output : args.input.slice(0, extIndex) + '_processed.' + args.input.slice(extIndex+1);
-	const ext = savePath.slice(savePath.lastIndexOf('.')+1);
-	const saveFile = fs.createWriteStream(savePath, {flags: 'w'});
-	// console.log(pixels);
-	const data = ndarray(pixels, [width, height, 4], [4, 4*width, 1], 0);
-	console.log('----------\nAfter image fetch\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
-	lastTime = new Date().getTime();
+			console.log('---------\nResizing viewport', width, height);
 
-	const stream = savePixels(data, ext, (ext == 'jpg' || ext == 'jpeg') ? {quality: 80} : null).pipe(saveFile);
-	stream.on('finish', () => {
-		const endTime = new Date().getTime();
-		console.log('----------\nAfter save\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
-		lastTime = new Date().getTime();
-		console.log('TOOK: '+(endTime-startTime)+'ms');
-	});
-}
+			this.ImageProcessor.setCanvasSize(this.width, this.height);
+			this.ImageProcessor.imageLoaded(pixels.data, pixels.shape[0], pixels.shape[1]);
 
-if(gl == null) {
-	console.log('HeadlessGL context could not be initialised :(');
-}else if('input' in args) {
+			console.log('----------\nAfter image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+			lastTime = new Date().getTime();
 
-	const imagePath = path.isAbsolute(args.input) ? args.input : path.resolve(__dirname + '/../' + args.input);
-	console.log(imagePath)
-	getPixels(imagePath, (err, pixels) => {
-		if(err) {
-			console.log('Error reading file', err);
-			return;
-		}
-		console.log('Got pixels');
-		console.log('----------\nAfter pixels read\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
-		lastTime = new Date().getTime();
+			this.ImageProcessor.buildPrograms();
+			this.ImageProcessor.resizeAll();
 
-		width = pixels.shape[0];
-		height = pixels.shape[1];
+			console.log('----------\nAfter programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+			lastTime = new Date().getTime();
 
-		const utilitySteps = _find(instructions, {name: 'utility'}, {}).steps || [];
-		const rotateStep = _find(utilitySteps, {key: 'rotate'});
-		const cropStep = _find(utilitySteps, {key: 'crop'});
-		
-		if(rotateStep && (rotateStep.value == 90 || rotateStep.value == 270)) {
-			width = pixels.shape[1];
-			height = pixels.shape[0];
-		}
+			this.ImageProcessor.renderInstructions();
+			console.log('----------\nAfter render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+			lastTime = new Date().getTime();
 
-		if(cropStep && cropStep.value) {
-			width = Math.floor(width * cropStep.value.width);
-			height = Math.floor(height * cropStep.value.height);
-		}
+			this.saveImage({contentType, extension, callback, callbackError}); 
+		});
+	}
 
+	saveImage({contentType, extension, callback, callbackError}) {
+		const pixels = new Uint8Array(this.width * this.height * 4);
+		this.gl.readPixels(0, 0, this.width, this.height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixels);
 
-		console.log('---------\nResizing viewport', width, height);
+		const savePath = `tmp_processed.${extension}`
+		const saveFile = fs.createWriteStream(savePath, {flags: 'w'});
 
-		ImageProcessor.setCanvasSize(width, height);
-		ImageProcessor.imageLoaded(pixels.data, pixels.shape[0], pixels.shape[1]);
+		const data = ndarray(pixels, [this.width, this.height, 4], [4, 4 * this.width, 1], 0);
 
-		console.log('----------\nAfter image sent to webgl\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
-		lastTime = new Date().getTime();
-
-		ImageProcessor.buildPrograms();
-		ImageProcessor.resizeAll();
-
-		console.log('----------\nAfter programs init\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+		console.log('----------\nAfter image fetch\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
 		lastTime = new Date().getTime();
 
-		ImageProcessor.renderInstructions();
-		console.log('----------\nAfter render\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
-		lastTime = new Date().getTime();
+		const stream = savePixels(data, extension, (extension == 'jpg' || extension == 'jpeg') ? {quality: 80} : null).pipe(saveFile);
+		stream.on('finish', () => {
+			const endTime = new Date().getTime();
+			console.log('----------\nAfter save\n', (startMem-OS.freemem())/1024/1024 + 'mb\n' + (new Date().getTime()-lastTime) + 'ms');
+			lastTime = new Date().getTime();
+			console.log('TOOK: '+(endTime-startTime)+'ms');
 
-		saveImage(); 
-	});
+
+
+			callback(savePath)
+		});
+	}
 }

@@ -2,15 +2,18 @@ import fs from 'fs'
 import http from 'http'
 import request from 'request'
 
+import ProcessImage from './processor'
+
 const port = 8085
 
 const typeExts = {
 	'image/gif': 'gif',
 	'image/png': 'png',
 	'image/jpeg': 'jpg',
+	'image/jpg': 'jpg',
 }
 
-
+/*
 const downloadImage = ({ uri, fileName, callback, errorCallback }) => {
 	request.head(uri, (err, res, body) => {
 	    const contentType = res.headers['content-type']
@@ -29,6 +32,7 @@ const downloadImage = ({ uri, fileName, callback, errorCallback }) => {
 	    }
 	})
 }
+*/
 
 const getImageBuffer = ({uri, callback, errorCallback}) => {
 	request.head(uri, (err, res, body) => {
@@ -42,8 +46,10 @@ const getImageBuffer = ({uri, callback, errorCallback}) => {
 				if(error || response.statusCode < 200 || response.statusCode >= 300) {
 					errorCallback('could not fetch image')
 				}else{
+					const buffer = Buffer.from(body)
+					console.log('!!!CHECK!!!', Buffer.isBuffer(buffer))
 					callback({
-						buffer: Buffer.from(body),
+						buffer,
 		    			contentType,
 		    			contentLength,
 					})
@@ -87,8 +93,19 @@ const requestHandler = (request, response) => {
             		*/
             		getImageBuffer({
             			uri: postData.url,
-            			callback: data => {
-            				console.log(data)
+            			callback: ({buffer, contentType, contentLength}) => {
+            				const processor = new ProcessImage()
+            				processor.processImage({
+            					buffer,
+            					contentType,
+            					contentLength,
+            					extension: typeExts[contentType],
+            					instructions: postData.instructions || [],
+            					errorCallback: error => console.log('Error processing image', error),
+            					callback: () => console.log('OK.'),
+            				})
+
+            				// console.log(data)
 				            response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
 				            response.end()
 				        },
